@@ -30,8 +30,9 @@ class startDanceView: WKInterfaceController {
         print("START")
         startSession()
         //startAccelerometers()
-        testData()
+        //testData()
         //workoutBuilder(builder, didCollectDataOf: collectedTypes)
+        measure()
     }
 
     @IBAction func stopWorkoutButton() {
@@ -214,6 +215,21 @@ class startDanceView: WKInterfaceController {
                 }
             }
         }
+    }
+    
+    // MARK: - Motion Tracking w/ Accellerometer
+    //https://nshipster.com/cmdevicemotion/
+    func measure(){
+        guard motionManager.isAccelerometerAvailable else {
+            return
+        }
+        motionManager.startAccelerometerUpdates()
+        if(!motionManager.isAccelerometerActive){
+            return
+        }
+        print(motionManager.accelerometerData?.acceleration.x ?? 0)
+        print(motionManager.accelerometerData?.acceleration.y ?? 0)
+        print(motionManager.accelerometerData?.acceleration.z ?? 0)
     }
 
 }
