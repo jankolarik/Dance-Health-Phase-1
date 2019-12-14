@@ -1,6 +1,7 @@
 #include <Windows.h>
 #include "Kinect.h"
 #include <iostream>
+#include <time.h>       /* clock_t, clock, CLOCKS_PER_SEC */
 
 // Safe release for interfaces
 template<class Interface>
@@ -32,11 +33,14 @@ private:
 	// Body reader
 	IBodyFrameReader*	 m_pBodyFrameReader;
 	
-	void				 Update();
+	void				 Update(bool calibrated, int x, int y);
 
 	HRESULT				 InitializeDefaultSensor();
 
 	void				 ProcessBody(int nBodyCount, IBody** ppBodies);
+
+	int *	    		 Calibrate();
+	int *				 leftAndRightFeet((int nBodyCount, IBody** ppBodies));
 
 };
 
@@ -59,16 +63,71 @@ SkeletalBasics::~SkeletalBasics()
 int SkeletalBasics::Run()
 {
 	InitializeDefaultSensor();
-
-	while (true)
-	{
-		Update();
-	}
+	Update(False, 0, 0);
 	return 0;
 }
 
-void SkeletalBasics::Update()
-{
+int* Calibrate() {
+	cout << "Please stand straight facing the camers, feet firmly planted, legs straight, at maximum 4 meters away.";
+	clock_t t;
+	t = clock();
+	int * temp;
+	int xPos; //stores the x axis in the middle/average of the left and right feet each time
+	int height;//stores the average height each time
+	int* finalCoords;
+	int i = 0;//keeps track of the number
+	while (t < 300) {//keeps checking for 5 minutes
+		if (!m_pBodyFrameReader)
+		{
+			return;
+		}
+
+		IBodyFrame* pBodyFrame = NULL;
+
+		HRESULT hr = m_pBodyFrameReader->AcquireLatestFrame(&pBodyFrame);
+
+		if (SUCCEEDED(hr))
+		{
+
+			IBody* ppBodies[BODY_COUNT] = { 0 };
+
+			if (SUCCEEDED(hr))
+			{
+				hr = pBodyFrame->GetAndRefreshBodyData(_countof(ppBodies), ppBodies);
+			}
+
+			if (SUCCEEDED(hr))
+			{
+				temp = leftAndRightFeet(BODY_COUNT, ppBodies);
+			}
+
+			for (int i = 0; i < _countof(ppBodies); ++i)
+			{
+				SafeRelease(ppBodies[i]);
+			}
+		}
+		SafeRelease(pBodyFrame);
+		xPos += (temp[0] + temp[2]) / 2;
+		height += (temp[1] + temp[3]) / 2;
+		i++;
+		t = clock() - t;
+	}
+	xPos = xPos / i;
+	height = height / i;
+	finalCoords[0] = xPos;
+	finalCoords[1] = height;
+	return finalCoords;
+}
+
+void SkeletalBasics::Update(bool calibrated, int FloorX, int FloorY)
+{ 
+	if (!calibrated) {
+		int * temp = Calibrate();
+		FloorX = temp[0];
+		FloorY = temp[1];
+		calibrated = !calibrated;
+	}
+
 	if (!m_pBodyFrameReader)
 	{
 		return;
@@ -99,6 +158,7 @@ void SkeletalBasics::Update()
 		}
 	}
 	SafeRelease(pBodyFrame);
+	Update(calibrated, FloorX, FloorY);
 }
 
 HRESULT SkeletalBasics::InitializeDefaultSensor()
@@ -178,6 +238,46 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 						//std::cout << joints[j].JointType;
 						//std::cout << joints[j].Position.X << std::endl;
 					}
+				}
+
+			}
+		}
+	}
+
+}
+
+int * SkeletalBasics::leftAndRightFeet(int nBodyCount, IBody** ppBodies)
+{
+	HRESULT hr;
+
+	for (int i = 0; i < nBodyCount; ++i)
+	{
+		IBody* pBody = ppBodies[i];
+
+		if (pBody)
+		{
+			BOOLEAN bTracked = false;
+			hr = pBody->get_IsTracked(&bTracked);
+
+			if (SUCCEEDED(hr) && bTracked)
+			{
+				Joint joints[JointType_Count];
+
+				FootState leftFootState = FootState_Unknown;
+				FootState rightFootState = FootState_Unknown;
+
+				pBody->get_FootLeftState(&leftFootState);
+				pBody->get_FootRightState(&rightFootState);
+
+				hr = pBody->GetJoints(_countof(joints), joints);
+				if (SUCCEEDED(hr))
+				{
+					int* positions;
+					positions[0] = joints[15].Position.X;
+					positions[1] = joints[15].Position.Y;
+					positions[2] = joints[19].Position.X;
+					positions[3] = joints[19].Position.Y;
+					return positions;
 				}
 
 			}
