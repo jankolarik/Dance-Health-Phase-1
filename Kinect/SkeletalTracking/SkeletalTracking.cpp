@@ -40,7 +40,7 @@ private:
 	void				 ProcessBody(int nBodyCount, IBody** ppBodies);
 
 	int *	    		 Calibrate();
-	int *				 leftAndRightFeet((int nBodyCount, IBody** ppBodies));
+	int *				 leftAndRightFeet(int nBodyCount, IBody** ppBodies);
 
 };
 
@@ -63,7 +63,7 @@ SkeletalBasics::~SkeletalBasics()
 int SkeletalBasics::Run()
 {
 	InitializeDefaultSensor();
-	Update(False, 0, 0);
+	Update(false, 0, 0);
 	return 0;
 }
 
@@ -72,7 +72,7 @@ int* SkeletalBasics::Calibrate() {
 	as they stand still in front of the camera. The intention is that this coordinate will be used as the floor position,
 	and the origin of the graph for other coordinates.
 	*/
-	cout << "Please stand straight facing the camera, feet firmly planted, legs straight, at maximum 4 meters away.";
+	std::cout << "Please stand straight facing the camera, feet firmly planted, legs straight, at maximum 4 meters away.";
 	clock_t t;
 	t = clock();
 	int * temp;
@@ -249,8 +249,7 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 	}
 }
 
-
-int* SkeletalBasics::leftAndRightFeet((int nBodyCount, IBody** ppBodies))
+int* SkeletalBasics::leftAndRightFeet(int nBodyCount, IBody** ppBodies)
 {/*This basically does the same as ProcessBody but it returns the X and Y coordinates of 
    the left and right feet in a pointer to an int array so as to be useful in the calibration
    period
@@ -269,15 +268,9 @@ int* SkeletalBasics::leftAndRightFeet((int nBodyCount, IBody** ppBodies))
 			if (SUCCEEDED(hr) && bTracked)
 			{
 				Joint joints[JointType_Count];
-
-				FootState leftFootState = FootState_Unknown;
-				FootState rightFootState = FootState_Unknown;
-
-				pBody->get_FootLeftState(&leftFootState);
-				pBody->get_FootRightState(&rightFootState);
-
+				//this checks if your feet are even in frame before performing the calculations
 				hr = pBody->GetJoints(_countof(joints), joints);
-				if (SUCCEEDED(hr))
+				if (SUCCEEDED(joints[15].TrackingState) && SUCCEEDED(joints[19].TrackingState))
 				{
 					int* positions;
 					positions[0] = joints[15].Position.X;
@@ -286,7 +279,10 @@ int* SkeletalBasics::leftAndRightFeet((int nBodyCount, IBody** ppBodies))
 					positions[3] = joints[19].Position.Y;
 					return positions;
 				}
-
+				else {
+					std::cout << "Please make sure your foot is in frame!";
+					return leftAndRightFeet(nBodyCount, ppBodies);
+				}
 			}
 		}
 	}
