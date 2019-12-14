@@ -68,6 +68,10 @@ int SkeletalBasics::Run()
 }
 
 int* SkeletalBasics::Calibrate() {
+	/*The calibration period is 5 seconds of the kinect finding the average coordinate between the feet of the subject
+	as they stand still in front of the camera. The intention is that this coordinate will be used as the floor position,
+	and the origin of the graph for other coordinates.
+	*/
 	cout << "Please stand straight facing the camera, feet firmly planted, legs straight, at maximum 4 meters away.";
 	clock_t t;
 	t = clock();
@@ -76,7 +80,7 @@ int* SkeletalBasics::Calibrate() {
 	int height;//stores the average height each time
 	int* finalCoords;
 	int i = 0;//keeps track of the number
-	while (t < 300) {//keeps checking for 5 minutes
+	while (t < 5) {//keeps checking for 5 seconds
 		if (!m_pBodyFrameReader)
 		{
 			return;
@@ -247,7 +251,10 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 }
 
 int * SkeletalBasics::leftAndRightFeet(int nBodyCount, IBody** ppBodies)
-{
+{/*This basically does the same as ProcessBody but it returns the X and Y coordinates of 
+   the left and right feet in a pointer to an int array so as to be useful in the calibration
+   period
+ */
 	HRESULT hr;
 
 	for (int i = 0; i < nBodyCount; ++i)
