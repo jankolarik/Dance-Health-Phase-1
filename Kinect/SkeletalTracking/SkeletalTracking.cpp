@@ -67,8 +67,8 @@ int SkeletalBasics::Run()
 	return 0;
 }
 
-int* Calibrate() {
-	cout << "Please stand straight facing the camers, feet firmly planted, legs straight, at maximum 4 meters away.";
+int* SkeletalBasics::Calibrate() {
+	cout << "Please stand straight facing the camera, feet firmly planted, legs straight, at maximum 4 meters away.";
 	clock_t t;
 	t = clock();
 	int * temp;
