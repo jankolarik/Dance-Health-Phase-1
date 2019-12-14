@@ -247,10 +247,10 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 			}
 		}
 	}
-
 }
 
-int * SkeletalBasics::leftAndRightFeet(int nBodyCount, IBody** ppBodies)
+
+int* SkeletalBasics::leftAndRightFeet((int nBodyCount, IBody** ppBodies))
 {/*This basically does the same as ProcessBody but it returns the X and Y coordinates of 
    the left and right feet in a pointer to an int array so as to be useful in the calibration
    period
