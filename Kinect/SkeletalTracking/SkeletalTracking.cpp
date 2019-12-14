@@ -1,6 +1,7 @@
 #include <Windows.h>
 #include "Kinect.h"
 #include <iostream>
+#include <cmath>
 
 // Safe release for interfaces
 template<class Interface>
@@ -26,18 +27,25 @@ public:
 
 private:
 	// Current Kinect
-	IKinectSensor*		 m_pKinectSensor;
-	ICoordinateMapper*	 m_pCoordinateMapper;
+	IKinectSensor* m_pKinectSensor;
+	ICoordinateMapper* m_pCoordinateMapper;
 
 	// Body reader
-	IBodyFrameReader*	 m_pBodyFrameReader;
-	
+	IBodyFrameReader* m_pBodyFrameReader;
+
+	// Body from last frame
+	IBody* m_pBodyFromPreviousFrame[BODY_COUNT] = { 0 };
+
+
 	void				 Update();
 
 	HRESULT				 InitializeDefaultSensor();
 
 	void				 ProcessBody(int nBodyCount, IBody** ppBodies);
 
+	float				 ActivityAnalysis(IBody* pBodyFromCurrentFrame, IBody* pBodyFromPreviousFrame);
+
+	float				 JointDisplacementCalculator(Joint firstJoint, Joint secondJoint);
 };
 
 SkeletalBasics::SkeletalBasics() :
@@ -91,11 +99,14 @@ void SkeletalBasics::Update()
 		if (SUCCEEDED(hr))
 		{
 			ProcessBody(BODY_COUNT, ppBodies);
+
+			pBodyFrame->GetAndRefreshBodyData(_countof(m_pBodyFromPreviousFrame), m_pBodyFromPreviousFrame);
 		}
 
 		for (int i = 0; i < _countof(ppBodies); ++i)
 		{
 			SafeRelease(ppBodies[i]);
+			
 		}
 	}
 	SafeRelease(pBodyFrame);
@@ -153,6 +164,16 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 	for (int i = 0; i < nBodyCount; ++i)
 	{
 		IBody* pBody = ppBodies[i];
+		IBody* pBodyPrevious = NULL;
+
+		boolean previousBodyLoad = false;
+
+		if (m_pBodyFromPreviousFrame != NULL)
+		{
+			previousBodyLoad = true;
+			pBodyPrevious = m_pBodyFromPreviousFrame[i];
+		}
+
 
 		if (pBody)
 		{
@@ -170,14 +191,18 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 				pBody->get_HandRightState(&rightHandState);
 
 				hr = pBody->GetJoints(_countof(joints), joints);
+
+
+				// Main loop for processing the data
 				if (SUCCEEDED(hr))
 				{
-					std::cout << joints[7].Position.Y << std::endl;
-					for (int j = 0; j < _countof(joints); ++j)
+					if (previousBodyLoad)
 					{
-						//std::cout << joints[j].JointType;
-						//std::cout << joints[j].Position.X << std::endl;
+						std:: cout << "Body Loaded" << std::endl;
+						std:: cout << ActivityAnalysis(pBody, pBodyPrevious);
 					}
+					std::cout << joints[7].Position.Z << std::endl;
+					//for (int j = 0; j < _countof(joints); ++j) {}
 				}
 
 			}
@@ -185,6 +210,46 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 	}
 
 }
+
+float SkeletalBasics::ActivityAnalysis(IBody* pBodyFromCurrentFrame, IBody* pBodyFromPreviousFrame)
+{
+	HRESULT hr;
+
+	Joint currentjoints[JointType_Count];
+	Joint previousjoints[JointType_Count];
+
+	float totalDistanceTravelPerJoint = 0;
+	float averageDistanceTravelPerJoint = 0;
+
+
+	hr = pBodyFromCurrentFrame->GetJoints(_countof(currentjoints), currentjoints);
+	if (SUCCEEDED(hr))
+	{
+		hr = pBodyFromPreviousFrame->GetJoints(_countof(previousjoints), previousjoints);
+
+		if (SUCCEEDED(hr))
+		{
+			for (int j = 0; j < _countof(currentjoints); ++j)
+			{
+				totalDistanceTravelPerJoint += JointDisplacementCalculator(currentjoints[j], previousjoints[j]);
+				std::cout << totalDistanceTravelPerJoint << std::endl;
+			}
+		}
+	}
+
+	averageDistanceTravelPerJoint = totalDistanceTravelPerJoint / _countof(currentjoints);
+
+	return averageDistanceTravelPerJoint;
+}
+
+
+float SkeletalBasics::JointDisplacementCalculator(Joint firstJoint, Joint secondJoint)
+{
+	int distanceTraveled = sqrt(pow((firstJoint.Position.X - secondJoint.Position.X), 2) + pow((firstJoint.Position.Y - secondJoint.Position.Y), 2) + pow((firstJoint.Position.Z - secondJoint.Position.Z), 2));
+	return distanceTraveled;
+}
+
+
 
 int main()
 {
