@@ -1,7 +1,5 @@
 ﻿  SkeletalTracking.cpp
 C:\Users\Alex\source\repos\Dance-Health-Phase-1\Kinect\SkeletalTracking\SkeletalTracking.cpp(86,10): error C2561: 'SkeletalBasics::Calibrate': function must return a value
 C:\Users\Alex\source\repos\Dance-Health-Phase-1\Kinect\SkeletalTracking\SkeletalTracking.cpp(70): message : see declaration of 'SkeletalBasics::Calibrate'
-C:\Users\Alex\source\repos\Dance-Health-Phase-1\Kinect\SkeletalTracking\SkeletalTracking.cpp(283,40): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-C:\Users\Alex\source\repos\Dance-Health-Phase-1\Kinect\SkeletalTracking\SkeletalTracking.cpp(284,40): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-C:\Users\Alex\source\repos\Dance-Health-Phase-1\Kinect\SkeletalTracking\SkeletalTracking.cpp(285,40): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-C:\Users\Alex\source\repos\Dance-Health-Phase-1\Kinect\SkeletalTracking\SkeletalTracking.cpp(286,40): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Users\Alex\source\repos\Dance-Health-Phase-1\Kinect\SkeletalTracking\SkeletalTracking.cpp(129,27): error C2440: 'initializing': cannot convert from 'float *' to 'int *'
+C:\Users\Alex\source\repos\Dance-Health-Phase-1\Kinect\SkeletalTracking\SkeletalTracking.cpp(129,14): message : Types pointed to are unrelated; conversion requires reinterpret_cast, C-style cast or function-style cast
