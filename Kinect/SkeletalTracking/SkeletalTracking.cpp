@@ -33,14 +33,14 @@ private:
 	// Body reader
 	IBodyFrameReader*	 m_pBodyFrameReader;
 	
-	void				 Update(bool calibrated, int x, int y);
+	void				 Update(bool calibrated, float x, float y);
 
 	HRESULT				 InitializeDefaultSensor();
 
 	void				 ProcessBody(int nBodyCount, IBody** ppBodies);
 
-	int *	    		 Calibrate();
-	int *				 leftAndRightFeet(int nBodyCount, IBody** ppBodies);
+	float *	    		 Calibrate();
+	float *				 leftAndRightFeet(int nBodyCount, IBody** ppBodies);
 
 };
 
@@ -67,23 +67,25 @@ int SkeletalBasics::Run()
 	return 0;
 }
 
-int* SkeletalBasics::Calibrate() {
+float* SkeletalBasics::Calibrate() {
 	/*The calibration period is 5 seconds of the kinect finding the average coordinate between the feet of the subject
 	as they stand still in front of the camera. The intention is that this coordinate will be used as the floor position,
 	and the origin of the graph for other coordinates.
 	*/
+	char wait;
 	std::cout << "Please stand straight facing the camera, feet firmly planted, legs straight, at maximum 4 meters away.";
+	std::cin >> wait; //waits for user to input anything
 	clock_t t;
 	t = clock();
-	int * temp;
-	int xPos; //stores the x axis in the middle/average of the left and right feet each time
-	int height;//stores the average height each time
-	int* finalCoords;
+	float* temp = 0;
+	float xPos = 0; //stores the x axis in the middle/average of the left and right feet each time
+	float height = 0;//stores the average height each time
+	float finalCoords[2];
 	int i = 0;//keeps track of the number
 	while (t < 5) {//keeps checking for 5 seconds
 		if (!m_pBodyFrameReader)
 		{
-			return;
+			return NULL;
 		}
 
 		IBodyFrame* pBodyFrame = NULL;
@@ -111,8 +113,8 @@ int* SkeletalBasics::Calibrate() {
 			}
 		}
 		SafeRelease(pBodyFrame);
-		xPos += (temp[0] + temp[2]) / 2;
-		height += (temp[1] + temp[3]) / 2;
+		xPos += (*temp + *(temp+2)) / 2;
+		height += (*(temp+1) + *(temp+3)) / 2;
 		i++;
 		t = clock() - t;
 	}
@@ -123,12 +125,12 @@ int* SkeletalBasics::Calibrate() {
 	return finalCoords;
 }
 
-void SkeletalBasics::Update(bool calibrated, int FloorX, int FloorY)
+void SkeletalBasics::Update(bool calibrated, float FloorX, float FloorY)
 { 
 	if (!calibrated) {
-		int * temp = Calibrate();
-		FloorX = temp[0];
-		FloorY = temp[1];
+		float * temp = Calibrate();
+		FloorX = *temp;
+		FloorY = *(temp+1);
 		calibrated = !calibrated;
 	}
 
@@ -249,12 +251,13 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 	}
 }
 
-int* SkeletalBasics::leftAndRightFeet(int nBodyCount, IBody** ppBodies)
+float* SkeletalBasics::leftAndRightFeet(int nBodyCount, IBody** ppBodies)
 {/*This basically does the same as ProcessBody but it returns the X and Y coordinates of 
    the left and right feet in a pointer to an int array so as to be useful in the calibration
    period
  */
 	HRESULT hr;
+	char wait;
 
 	for (int i = 0; i < nBodyCount; ++i)
 	{
@@ -272,7 +275,7 @@ int* SkeletalBasics::leftAndRightFeet(int nBodyCount, IBody** ppBodies)
 				hr = pBody->GetJoints(_countof(joints), joints);
 				if (SUCCEEDED(joints[15].TrackingState) && SUCCEEDED(joints[19].TrackingState))
 				{
-					int* positions;
+					float positions[4] = { 0,0,0,0 };
 					positions[0] = joints[15].Position.X;
 					positions[1] = joints[15].Position.Y;
 					positions[2] = joints[19].Position.X;
@@ -281,9 +284,20 @@ int* SkeletalBasics::leftAndRightFeet(int nBodyCount, IBody** ppBodies)
 				}
 				else {
 					std::cout << "Please make sure your foot is in frame!";
+					std::cin >> wait; //waits for user to input anything
 					return leftAndRightFeet(nBodyCount, ppBodies);
 				}
 			}
+			else {
+				std::cout << "Please make sure you are fully in frame!";	
+				std::cin >> wait; //waits for user to input anything
+				return leftAndRightFeet(nBodyCount, ppBodies);
+			}
+		}
+		else {
+			std::cout << "Please make sure there is a person in frame!";
+			std::cin >> wait; //waits for user to input anything
+			return leftAndRightFeet(nBodyCount, ppBodies);
 		}
 	}
 
