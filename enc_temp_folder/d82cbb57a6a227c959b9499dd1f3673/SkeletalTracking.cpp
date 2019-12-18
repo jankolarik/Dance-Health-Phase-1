@@ -131,7 +131,7 @@ void SkeletalBasics::Update(bool calibrated, float FloorY)
 
 	IBodyFrame* pBodyFrame = NULL;
 
-	HRESULT hr = m_pBodyFrameReader->AcquireLatestFrame(&pBodyFrame);//Stack Overflow happens here
+	HRESULT hr = m_pBodyFrameReader->AcquireLatestFrame(&pBodyFrame);
 
 	if (SUCCEEDED(hr))
 	{
