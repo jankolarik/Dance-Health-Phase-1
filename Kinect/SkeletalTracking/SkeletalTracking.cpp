@@ -3,6 +3,8 @@
 #include <iostream>
 #include <time.h>       /* clock_t, clock, CLOCKS_PER_SEC */
 
+//use std::vector instead of wasting space on the stack/heap -> causing stack overflow
+
 // Safe release for interfaces
 template<class Interface>
 inline void SafeRelease(Interface*& pInterfaceToRelease)
@@ -39,8 +41,8 @@ private:
 
 	void				 ProcessBody(int nBodyCount, IBody** ppBodies);
 
-	float *	    		 Calibrate();
-	float *				 leftAndRightFeet(int nBodyCount, IBody** ppBodies);
+	std::vector<float>	    		 Calibrate();
+	std::vector<float>				 leftAndRightFeet(int nBodyCount, IBody** ppBodies);
 
 };
 
@@ -67,20 +69,20 @@ int SkeletalBasics::Run()
 	return 0;
 }
 
-float* SkeletalBasics::Calibrate() {
+std::vector<float> SkeletalBasics::Calibrate() {
 	/*The calibration period is 5 seconds of the kinect finding the average coordinate between the feet of the subject
 	as they stand still in front of the camera. The intention is that this coordinate will be used as the floor position,
 	and the origin of the graph for other coordinates.
 	*/
 	char wait;
-	std::cout << "Please stand straight facing the camera, feet firmly planted, legs straight, at maximum 4 meters away.";
+	std::cout << "Please stand straight facing the camera, feet firmly planted, legs straight, at maximum 4 meters away.\nPress any key + enter to continue.\n";
 	std::cin >> wait; //waits for user to input anything
 	clock_t t;
 	t = clock();
-	float* temp = 0;
+	std::vector<float> temp;//create the arrays on the heap to save space on the stack
 	float xPos = 0; //stores the x axis in the middle/average of the left and right feet each time
 	float height = 0;//stores the average height each time
-	float finalCoords[2];
+	std::vector<float> finalCoords;
 	int i = 0;//keeps track of the number
 	while (t < 5) {//keeps checking for 5 seconds
 		if (!m_pBodyFrameReader)
@@ -113,8 +115,8 @@ float* SkeletalBasics::Calibrate() {
 			}
 		}
 		SafeRelease(pBodyFrame);
-		xPos += (*temp + *(temp+2)) / 2;
-		height += (*(temp+1) + *(temp+3)) / 2;
+		xPos += (temp[0] + temp[2]) / 2;
+		height += (temp[1] + temp[3]) / 2;
 		i++;
 		t = clock() - t;
 	}
@@ -128,9 +130,11 @@ float* SkeletalBasics::Calibrate() {
 void SkeletalBasics::Update(bool calibrated, float FloorX, float FloorY)
 { 
 	if (!calibrated) {
-		float * temp = Calibrate();
-		FloorX = *temp;
-		FloorY = *(temp+1);
+		std::vector<float> temp;
+		temp.assign(2, 0);
+		temp = Calibrate();
+		FloorX = temp[0];
+		FloorY = temp[1];
 		calibrated = !calibrated;
 	}
 
@@ -251,7 +255,7 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 	}
 }
 
-float* SkeletalBasics::leftAndRightFeet(int nBodyCount, IBody** ppBodies)
+std::vector<float> SkeletalBasics::leftAndRightFeet(int nBodyCount, IBody** ppBodies)
 {/*This basically does the same as ProcessBody but it returns the X and Y coordinates of 
    the left and right feet in a pointer to an int array so as to be useful in the calibration
    period
@@ -275,7 +279,8 @@ float* SkeletalBasics::leftAndRightFeet(int nBodyCount, IBody** ppBodies)
 				hr = pBody->GetJoints(_countof(joints), joints);
 				if (SUCCEEDED(joints[15].TrackingState) && SUCCEEDED(joints[19].TrackingState))
 				{
-					float positions[4] = { 0,0,0,0 };
+					std::vector<float> positions;
+					positons.assign(4, 0);
 					positions[0] = joints[15].Position.X;
 					positions[1] = joints[15].Position.Y;
 					positions[2] = joints[19].Position.X;
@@ -283,19 +288,19 @@ float* SkeletalBasics::leftAndRightFeet(int nBodyCount, IBody** ppBodies)
 					return positions;
 				}
 				else {
-					std::cout << "Please make sure your foot is in frame!";
+					std::cout << "Please make sure your foot is in frame!\nPress any key + enter to continue.\n";
 					std::cin >> wait; //waits for user to input anything
 					return leftAndRightFeet(nBodyCount, ppBodies);
 				}
 			}
 			else {
-				std::cout << "Please make sure you are fully in frame!";	
+				std::cout << "Please make sure you are fully in frame!\nPress any key + enter to continue.\n";	
 				std::cin >> wait; //waits for user to input anything
 				return leftAndRightFeet(nBodyCount, ppBodies);
 			}
 		}
 		else {
-			std::cout << "Please make sure there is a person in frame!";
+			std::cout << "Please make sure there is a person in frame!\nPress any key + enter to continue.\n";
 			std::cin >> wait; //waits for user to input anything
 			return leftAndRightFeet(nBodyCount, ppBodies);
 		}
