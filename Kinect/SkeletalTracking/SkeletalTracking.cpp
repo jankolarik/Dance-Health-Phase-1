@@ -33,7 +33,7 @@ private:
 	// Body reader
 	IBodyFrameReader*	 m_pBodyFrameReader;
 	
-	void				 Update(bool calibrated, float y);
+	void				 Update(float y);
 
 	HRESULT				 InitializeDefaultSensor();
 
@@ -63,7 +63,11 @@ SkeletalBasics::~SkeletalBasics()
 int SkeletalBasics::Run()
 {
 	InitializeDefaultSensor();
-	Update(false, 0);
+	//Update(false, 0);
+	float y = Calibrate();
+	while(true){
+		Update(y);
+	}
 	return 0;
 }
 
@@ -117,13 +121,8 @@ float SkeletalBasics::Calibrate() {
 	return floorHeight;
 }
 
-void SkeletalBasics::Update(bool calibrated, float FloorY)
-{ 
-	if (!calibrated) {
-		FloorY = Calibrate();
-		calibrated = !calibrated;
-	}
-
+void SkeletalBasics::Update(float FloorY)
+{
 	if (!m_pBodyFrameReader)
 	{
 		return;
@@ -154,7 +153,6 @@ void SkeletalBasics::Update(bool calibrated, float FloorY)
 		}
 	}
 	SafeRelease(pBodyFrame);
-	Update(calibrated, FloorY);
 }
 
 HRESULT SkeletalBasics::InitializeDefaultSensor()
