@@ -1,4 +1,2 @@
 ﻿  SkeletalTracking.cpp
-C:\Users\98397\OneDrive\Course\COMP0016 System Eng\Dance-Health-Phase-1\Kinect\SkeletalTracking\SkeletalTracking.cpp(250,23): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-C:\Users\98397\OneDrive\Course\COMP0016 System Eng\Dance-Health-Phase-1\Kinect\SkeletalTracking\SkeletalTracking.cpp(251,9): warning C4244: 'return': conversion from 'int' to 'float', possible loss of data
   SkeletalTracking.vcxproj -> C:\Users\98397\OneDrive\Course\COMP0016 System Eng\Dance-Health-Phase-1\Kinect\SkeletalTracking\Debug\SkeletalTracking.exe
