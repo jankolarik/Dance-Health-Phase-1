@@ -79,14 +79,17 @@ float SkeletalBasics::Calibrate() {
 	char wait;
 	std::cout << "Please stand straight facing the camera, feet firmly planted, legs straight, at maximum 4 meters away.\nPress any key + enter to continue.\n";
 	std::cin >> wait; //waits for user to input anything
-	clock_t t;
-	t = clock();
+	clock_t start = clock();
+	clock_t accumulate;
+	float timeSpent = 0;
 	float floorHeight = 0;//stores the average height each time
 	int i = 0;//keeps track of the number
-	while (t < 5) {//keeps checking for 5 seconds
+	while (timeSpent < 5) {//keeps checking for 5 seconds
 		if (!m_pBodyFrameReader)
 		{
-			return NULL;
+			std::cout << "Please make sure someone is in the frame.\nPress any key + enter to continue.\n";
+			std::cin >> wait; //waits for user to input anything
+			return Calibrate();
 		}
 
 		IBodyFrame* pBodyFrame = NULL;
@@ -113,11 +116,19 @@ float SkeletalBasics::Calibrate() {
 				SafeRelease(ppBodies[i]);
 			}
 		}
+		//can't find how to catch next possibility without it constntly crashing 
+		/*else{
+				std::cout << "Please stay in frame for 5 seconds.\nPress any key + enter to continue.\n";
+				std::cin >> wait; //waits for user to input anything
+				return Calibrate();
+			}*/
 		SafeRelease(pBodyFrame);
 		i++;
-		t = clock() - t;
+		accumulate = clock() - start;
+		timeSpent = (float)accumulate / CLOCKS_PER_SEC;
 	}
 	floorHeight = floorHeight / i;
+	std::cout << "Calibration complete: the floor is at level: " << floorHeight << " coordinate" << std::endl;
 	return floorHeight;
 }
 
@@ -240,10 +251,7 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 }
 
 float SkeletalBasics::leftAndRightFeet(int nBodyCount, IBody** ppBodies)
-{/*This basically does the same as ProcessBody but it returns the X and Y coordinates of 
-   the left and right feet in a pointer to an int array so as to be useful in the calibration
-   period
- */
+{
 	HRESULT hr;
 	char wait;
 
@@ -253,27 +261,16 @@ float SkeletalBasics::leftAndRightFeet(int nBodyCount, IBody** ppBodies)
 
 		if (pBody)
 		{
-			BOOLEAN bTracked = false;
-			hr = pBody->get_IsTracked(&bTracked);
-
-			if (SUCCEEDED(hr) && bTracked)
+			Joint joints[JointType_Count];
+			//this checks if your feet are even in frame before performing the calculations
+			hr = pBody->GetJoints(_countof(joints), joints);
+			if (SUCCEEDED(joints[15].TrackingState) && SUCCEEDED(joints[19].TrackingState))
 			{
-				Joint joints[JointType_Count];
-				//this checks if your feet are even in frame before performing the calculations
-				hr = pBody->GetJoints(_countof(joints), joints);
-				if (SUCCEEDED(joints[15].TrackingState) && SUCCEEDED(joints[19].TrackingState))
-				{
-					float floorHeight = ((joints[15].Position.Y) + (joints[19].Position.Y)) / 2;
-					return floorHeight;
-				}
-				else {
-					std::cout << "Please make sure your foot is in frame!\nPress any key + enter to continue.\n";
-					std::cin >> wait; //waits for user to input anything
-					return leftAndRightFeet(nBodyCount, ppBodies);
-				}
+				float floorHeight = ((joints[15].Position.Y) + (joints[19].Position.Y)) / 2;
+				return floorHeight;
 			}
 			else {
-				std::cout << "Please make sure you are fully in frame!\nPress any key + enter to continue.\n";	
+				std::cout << "Please make sure your foot is in frame!\nPress any key + enter to continue.\n";
 				std::cin >> wait; //waits for user to input anything
 				return leftAndRightFeet(nBodyCount, ppBodies);
 			}
