@@ -2,6 +2,7 @@
 #include "Kinect.h"
 #include <iostream>
 #include <cmath>
+#include <time.h>       /* clock_t, clock, CLOCKS_PER_SEC */
 
 // No need to include the std keyword before cout
 using namespace std;
@@ -31,14 +32,19 @@ public:
 
 private:
 	// Current Kinect
-	IKinectSensor* m_pKinectSensor;
-	ICoordinateMapper* m_pCoordinateMapper;
+	IKinectSensor*		 m_pKinectSensor;
+	ICoordinateMapper*	 m_pCoordinateMapper;
 
 	// Body reader
-	IBodyFrameReader* m_pBodyFrameReader;
+	IBodyFrameReader*	 m_pBodyFrameReader;
 
 	// Body from last frame
-	IBody* m_pBodyFromPreviousFrame[BODY_COUNT] = { 0 };
+	IBody*				 m_pBodyFromPreviousFrame[BODY_COUNT] = { 0 };
+
+	// Calibration Indicator
+	bool				 m_bCalibrationStatus;
+	float				 m_fCalibrationValue;
+	clock_t				 m_nCalibrationStartTime;
 
 
 	void				 Update();
@@ -50,13 +56,20 @@ private:
 	float				 ActivityAnalysis(IBody* pBodyFromCurrentFrame, IBody* pBodyFromPreviousFrame);
 
 	float				 JointDisplacementCalculator(Joint firstJoint, Joint secondJoint);
+
+	void				 Calibration(IBody** ppBodies);
+
+	IBody*				 getSingleBody(IBody** ppBodies);
 };
 
 
 SkeletalBasics::SkeletalBasics() :
 	m_pKinectSensor(NULL),
 	m_pCoordinateMapper(NULL),
-	m_pBodyFrameReader(NULL)
+	m_pBodyFrameReader(NULL),
+	m_bCalibrationStatus(false),
+	m_fCalibrationValue(0),
+	m_nCalibrationStartTime(0)
 {
 }
 
@@ -152,11 +165,20 @@ void SkeletalBasics::Update()
 		// If the Body data is refreshed successfully
 		if (SUCCEEDED(hr))
 		{	
-			// The main function to process body data for each frame
-			ProcessBody(BODY_COUNT, ppBodies);
+			// If the calibration hasn't done, continue calibration
+			if (!m_bCalibrationStatus)
+			{
+				Calibration(ppBodies);
+				cout << "Calibration value : " << m_fCalibrationValue << endl;
+			}
+			else
+			{
+				// The main function to process body data for each frame
+				ProcessBody(BODY_COUNT, ppBodies);
 
-			// Load the used frame data into the "previousframe" pointer to be used in the next frmae for comparison
-			hr = pBodyFrame->GetAndRefreshBodyData(_countof(m_pBodyFromPreviousFrame), m_pBodyFromPreviousFrame);
+				// Load the used frame data into the "previousframe" pointer to be used in the next frmae for comparison
+				hr = pBodyFrame->GetAndRefreshBodyData(_countof(m_pBodyFromPreviousFrame), m_pBodyFromPreviousFrame);
+			}
 		}
 
 		for (int i = 0; i < _countof(ppBodies); ++i)
@@ -182,7 +204,7 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 		boolean previousBodyLoad = false;
 
 		// If the previous frame data is ready
-		if (m_pBodyFromPreviousFrame != NULL)
+		if (m_pBodyFromPreviousFrame[i] != NULL)
 		{
 			previousBodyLoad = true;
 			pBodyPrevious = m_pBodyFromPreviousFrame[i];
@@ -217,7 +239,7 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 					// If the data from last frame is loaded, start comparison
 					if (previousBodyLoad)
 					{
-						cout << ActivityAnalysis(pBody, pBodyPrevious);
+						cout << "Activity Analysis value : " << ActivityAnalysis(pBody, pBodyPrevious) << endl;
 					}
 
 					// Example to use single jonint data
@@ -242,6 +264,8 @@ float SkeletalBasics::ActivityAnalysis(IBody* pBodyFromCurrentFrame, IBody* pBod
 	float totalDistanceTravelPerJoint = 0;
 	float averageDistanceTravelPerJoint = 0;
 
+	int   trackedJointNumber = 0;
+
 
 	hr = pBodyFromCurrentFrame->GetJoints(_countof(currentjoints), currentjoints);
 
@@ -255,12 +279,17 @@ float SkeletalBasics::ActivityAnalysis(IBody* pBodyFromCurrentFrame, IBody* pBod
 		{
 			for (int j = 0; j < _countof(currentjoints); ++j)
 			{
-				totalDistanceTravelPerJoint += JointDisplacementCalculator(currentjoints[j], previousjoints[j]);
+				// Only take into account of joints that are being tracked in the both frames
+				if (SUCCEEDED(currentjoints[j].TrackingState) && SUCCEEDED(previousjoints[j].TrackingState))
+				{
+					totalDistanceTravelPerJoint += JointDisplacementCalculator(currentjoints[j], previousjoints[j]);
+					trackedJointNumber++;
+				}
 			}
 		}
 	}
 
-	averageDistanceTravelPerJoint = totalDistanceTravelPerJoint / _countof(currentjoints);
+	averageDistanceTravelPerJoint = totalDistanceTravelPerJoint / trackedJointNumber;
 
 	return averageDistanceTravelPerJoint;
 }
@@ -271,6 +300,72 @@ float SkeletalBasics::JointDisplacementCalculator(Joint firstJoint, Joint second
 	// sqrt( x^2 + y^2 + z^2 )
 	float distanceTraveled = sqrt(pow((firstJoint.Position.X - secondJoint.Position.X), 2) + pow((firstJoint.Position.Y - secondJoint.Position.Y), 2) + pow((firstJoint.Position.Z - secondJoint.Position.Z), 2));
 	return distanceTraveled;
+}
+
+IBody* SkeletalBasics::getSingleBody(IBody** ppBodies)
+{
+
+	return nullptr;
+}
+
+
+void SkeletalBasics::Calibration(IBody** ppBodies)
+{
+	HRESULT hr;
+
+	//cout << "Please stand straight facing the camera, feet firmly planted, legs straight, at maximum 4 meters away." << endl;
+	//cout << "When you are ready to start calibration session, please raise both of your hands above your head." << endl;
+
+	for (int i = 0; i < BODY_COUNT; ++i)
+	{
+		IBody* pBody = ppBodies[i];
+
+		if (pBody)
+		{
+			BOOLEAN bTracked = false;
+			hr = pBody->get_IsTracked(&bTracked);
+
+			// If this body is being tracked
+			if (SUCCEEDED(hr) && bTracked)
+			{
+				Joint joints[JointType_Count];
+
+				hr = pBody->GetJoints(_countof(joints), joints);
+
+				if (SUCCEEDED(hr))
+				{
+					float leftHandHeight = joints[7].Position.Y;
+					float rightHandHeight = joints[23].Position.Y;
+					float headHeight = joints[3].Position.Y;
+
+					// Calibration starting position: both hands above head
+					if ((leftHandHeight > headHeight) && (rightHandHeight > headHeight))
+					{
+						// Initial calibration start time
+						if (!m_nCalibrationStartTime)
+						{
+							m_nCalibrationStartTime = clock();
+						}
+
+						float timeSpent = float((clock() - m_nCalibrationStartTime)) / CLOCKS_PER_SEC;
+
+						if (timeSpent > 5)
+						{
+							m_bCalibrationStatus = true;
+						}
+
+						Joint leftFeet = joints[15];
+						Joint rightFeet = joints[19];
+
+						if (SUCCEEDED(leftFeet.TrackingState) && SUCCEEDED(rightFeet.TrackingState))
+						{
+							m_fCalibrationValue = (m_fCalibrationValue + (leftFeet.Position.Y + rightFeet.Position.Y)) / 2;
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 
