@@ -80,6 +80,8 @@ private:
 	void				 Calibration(IBody** ppBodies);
 
 	IBody*				 getSingleBody(IBody** ppBodies);
+
+	void				 drawSkeletals(bool tracked, Joint joints[]);
 };
 
 
@@ -156,13 +158,14 @@ HRESULT SkeletalBasics::InitializeDefaultSensor()
 	}
 
 	// gets the color frame for the video display
-
-	if (FAILED(GetDefaultKinectSensor(&sensor))) {
+	HRESULT color = GetDefaultKinectSensor(&sensor);
+	if (FAILED(color)) {
 		cout << "Failed to get sensor or color" << endl;
-		return false;
+		return color;
 	}
 
 	if (sensor) {
+		//cout << "I get here" << endl;
 		sensor->Open();
 		IColorFrameSource* framesource = NULL;
 		sensor->get_ColorFrameSource(&framesource);
@@ -172,7 +175,7 @@ HRESULT SkeletalBasics::InitializeDefaultSensor()
 			framesource = NULL;
 		}
 		else {
-			cout << "No framesourse detected!" << endl;
+			cout << "No framesource detected!" << endl;
 		}
 	}
 	else {
@@ -265,15 +268,6 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 			{
 				Joint joints[JointType_Count];
 
-				/*
-				Unused code for hand status recognition
-
-				HandState leftHandState = HandState_Unknown;
-				HandState rightHandState = HandState_Unknown;
-				pBody->get_HandLeftState(&leftHandState);
-				pBody->get_HandRightState(&rightHandState);
-				*/
-
 				hr = pBody->GetJoints(_countof(joints), joints);
 
 				// If joints are obtained successfully, start data process
@@ -284,13 +278,8 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 					if (previousBodyLoad)
 					{
 						cout << "Activity Analysis value : " << ActivityAnalysis(pBody, pBodyPrevious) << endl;
+						drawSkeletals(bTracked, joints);
 					}
-
-					// Example to use single jonint data
-					// std::cout << joints[7].Position.Z << std::endl;
-
-					// Example to use all joints in a loop
-					//for (int j = 0; j < _countof(joints); ++j) {}
 				}
 			}
 		}
@@ -412,6 +401,32 @@ void SkeletalBasics::Calibration(IBody** ppBodies)
 	}
 }
 
+void SkeletalBasics::drawSkeletals(bool tracked, Joint joints[]) {
+	if (tracked) {
+		// Draw some arms
+		const CameraSpacePoint& lh = joints[6].Position; //wristleft
+		const CameraSpacePoint& le = joints[5].Position;//elbowleft
+		const CameraSpacePoint& ls = joints[4].Position;//shoulderleft
+		const CameraSpacePoint& rh = joints[10].Position;//wristright
+		const CameraSpacePoint& re = joints[9].Position;//elbowright
+		const CameraSpacePoint& rs = joints[8].Position;//shoulderright
+		glBegin(GL_LINES);
+		glColor3f(1.f, 0.f, 0.f);
+		// lower left arm
+		glVertex3f(lh.X, lh.Y, lh.Z);
+		glVertex3f(le.X, le.Y, le.Z);
+		// upper left arm
+		glVertex3f(le.X, le.Y, le.Z);
+		glVertex3f(ls.X, ls.Y, ls.Z);
+		// lower right arm
+		glVertex3f(rh.X, rh.Y, rh.Z);
+		glVertex3f(re.X, re.Y, re.Z);
+		// upper right arm
+		glVertex3f(re.X, re.Y, re.Z);
+		glVertex3f(rs.X, rs.Y, rs.Z);
+		glEnd();
+	}
+}
 
 void getKinectData(GLubyte* dest) {
 	IColorFrame* frame = NULL;
@@ -437,6 +452,7 @@ void drawKinectData() {
 	glVertex3f(0, height, 0.0f);
 	glEnd();
 }
+
 
 void draw() {
 	drawKinectData();
