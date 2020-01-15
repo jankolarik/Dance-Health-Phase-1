@@ -1,0 +1,2 @@
+#ignore files with permission issues:
+Kinect/SkeletalTracking/.vs/SkeletalTracking/v16/Browse.VC.opendb
