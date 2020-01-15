@@ -24,6 +24,10 @@ GLubyte dataGlu[width * height * 4];  // BGRA array containing the texture data
 IKinectSensor* sensor;         // Kinect sensor
 IColorFrameReader* reader;     // Kinect color data source
 
+// Body Tracking Variables
+BOOLEAN bTracked = false;
+Joint joints[JointType_Count];
+
 // No need to include the std keyword before cout
 using namespace std;
 
@@ -48,7 +52,7 @@ public:
 	// Destructor
 	~SkeletalBasics();
 
-	int Run();
+	int Run(int argc, char* argv[]);
 
 private:
 	// Current Kinect
@@ -81,9 +85,10 @@ private:
 
 	IBody*				 getSingleBody(IBody** ppBodies);
 
-	void				 drawSkeletals(bool tracked, Joint joints[]);
 };
 
+int kinectMain(int argc, char* argv[]);
+void drawSkeletals();
 
 SkeletalBasics::SkeletalBasics() :
 	m_pKinectSensor(NULL),
@@ -106,7 +111,7 @@ SkeletalBasics::~SkeletalBasics()
 }
 
 
-int SkeletalBasics::Run()
+int SkeletalBasics::Run(int argc, char* argv[])
 {
 	// Initialize Kinect Sensor
 	InitializeDefaultSensor();
@@ -115,6 +120,7 @@ int SkeletalBasics::Run()
 	{
 		// Keep updating data from sensor to the program
 		Update();
+		kinectMain(argc, argv);
 	}
 	return 0;
 }
@@ -156,7 +162,7 @@ HRESULT SkeletalBasics::InitializeDefaultSensor()
 
 		SafeRelease(pBodyFrameSource);
 	}
-
+	/*
 	// gets the color frame for the video display
 	HRESULT color = GetDefaultKinectSensor(&sensor);
 	if (FAILED(color)) {
@@ -181,7 +187,7 @@ HRESULT SkeletalBasics::InitializeDefaultSensor()
 	else {
 		cout << "No color sensor detected!" << endl;
 	}
-
+	*/
 	if (!m_pKinectSensor || FAILED(hr))
 	{
 		std::cout << "No Kinect Found!";
@@ -223,7 +229,7 @@ void SkeletalBasics::Update()
 			{
 				// The main function to process body data for each frame
 				ProcessBody(BODY_COUNT, ppBodies);
-
+				//kinectMain(argc, argv);
 				// Load the used frame data into the "previousframe" pointer to be used in the next frmae for comparison
 				hr = pBodyFrame->GetAndRefreshBodyData(_countof(m_pBodyFromPreviousFrame), m_pBodyFromPreviousFrame);
 			}
@@ -236,8 +242,6 @@ void SkeletalBasics::Update()
 	}
 	SafeRelease(pBodyFrame);
 }
-
-
 
 void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 {
@@ -259,8 +263,8 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 		}
 
 		if (pBody)
-		{
-			BOOLEAN bTracked = false;
+		{			
+			bTracked = false;
 			hr = pBody->get_IsTracked(&bTracked);
 
 			// If this body is being tracked
@@ -278,7 +282,6 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 					if (previousBodyLoad)
 					{
 						cout << "Activity Analysis value : " << ActivityAnalysis(pBody, pBodyPrevious) << endl;
-						drawSkeletals(bTracked, joints);
 					}
 				}
 			}
@@ -401,8 +404,62 @@ void SkeletalBasics::Calibration(IBody** ppBodies)
 	}
 }
 
-void SkeletalBasics::drawSkeletals(bool tracked, Joint joints[]) {
-	if (tracked) {
+bool initKinect() {
+	if (FAILED(GetDefaultKinectSensor(&sensor))) {
+		return false;
+	}
+	if (sensor) {
+		sensor->Open();
+
+		IColorFrameSource* framesource = NULL;
+		sensor->get_ColorFrameSource(&framesource);
+		framesource->OpenReader(&reader);
+		if (framesource) {
+			framesource->Release();
+			framesource = NULL;
+		}
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+void getKinectData(GLubyte* dest) {
+	IColorFrame* frame = NULL;
+	if (SUCCEEDED(reader->AcquireLatestFrame(&frame))) {
+		frame->CopyConvertedFrameDataToArray(width * height * 4, dataGlu, ColorImageFormat_Bgra);
+	}
+	if (frame) frame->Release();
+}
+
+void drawKinectData() {
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textureId);
+	getKinectData(dataGlu);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)dataGlu);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glTranslatef(0, -100, -700);//might help?
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex3f(0, 0, 0);
+	glTexCoord2f(1.0f, 0.0f);
+	glVertex3f(width, 0, 0);
+	glTexCoord2f(1.0f, 1.0f);
+	glVertex3f(width, height, 0.0f);
+	glTexCoord2f(0.0f, 1.0f);
+	glVertex3f(0, height, 0.0f);
+	glEnd();
+	drawSkeletals();
+}
+
+void draw() {
+	drawKinectData();//could use glut display overlay func as well
+	glutSwapBuffers();
+}
+
+void drawSkeletals() {
+	if (bTracked) {
 		// Draw some arms
 		const CameraSpacePoint& lh = joints[6].Position; //wristleft
 		const CameraSpacePoint& le = joints[5].Position;//elbowleft
@@ -410,6 +467,7 @@ void SkeletalBasics::drawSkeletals(bool tracked, Joint joints[]) {
 		const CameraSpacePoint& rh = joints[10].Position;//wristright
 		const CameraSpacePoint& re = joints[9].Position;//elbowright
 		const CameraSpacePoint& rs = joints[8].Position;//shoulderright
+		glEnable(GL_TEXTURE_2D);
 		glBegin(GL_LINES);
 		glColor3f(1.f, 0.f, 0.f);
 		// lower left arm
@@ -425,42 +483,8 @@ void SkeletalBasics::drawSkeletals(bool tracked, Joint joints[]) {
 		glVertex3f(re.X, re.Y, re.Z);
 		glVertex3f(rs.X, rs.Y, rs.Z);
 		glEnd();
+		//glutSwapBuffers();//we want to draw over the buffer, not clear the screen
 	}
-}
-
-void getKinectData(GLubyte* dest) {
-	IColorFrame* frame = NULL;
-	if (SUCCEEDED(reader->AcquireLatestFrame(&frame))) {
-		frame->CopyConvertedFrameDataToArray(width * height * 4, dataGlu, ColorImageFormat_Bgra);
-	}
-	if (frame) frame->Release();
-}
-
-void drawKinectData() {
-	glBindTexture(GL_TEXTURE_2D, textureId);
-	getKinectData(dataGlu);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)dataGlu);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f, 0.0f);
-	glVertex3f(0, 0, 0);
-	glTexCoord2f(1.0f, 0.0f);
-	glVertex3f(width, 0, 0);
-	glTexCoord2f(1.0f, 1.0f);
-	glVertex3f(width, height, 0.0f);
-	glTexCoord2f(0.0f, 1.0f);
-	glVertex3f(0, height, 0.0f);
-	glEnd();
-}
-
-
-void draw() {
-	drawKinectData();
-	glutSwapBuffers();
-}
-
-void execute() {
-	glutMainLoop();
 }
 
 bool init(int argc, char* argv[]) {
@@ -473,10 +497,9 @@ bool init(int argc, char* argv[]) {
 	return true;
 }
 
-int main(int argc, char* argv[]) {
+int kinectMain(int argc, char* argv[]) {
 	if (!init(argc, argv)) return 1;
-	SkeletalBasics application;
-
+	if (!initKinect()) return 1;
 	// Initialize textures
 	glGenTextures(1, &textureId);
 	glBindTexture(GL_TEXTURE_2D, textureId);
@@ -498,10 +521,12 @@ int main(int argc, char* argv[]) {
 	glOrtho(0, width, height, 0, 1, -1);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-
-
-	application.Run();
-
-	execute();
+	
+	glutMainLoop();
 	return 0;
+}
+
+int main(int argc, char* argv[]) {
+	SkeletalBasics application;
+	application.Run(argc,argv);
 }
