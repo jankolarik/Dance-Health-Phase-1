@@ -52,7 +52,9 @@ public:
 	// Destructor
 	~SkeletalBasics();
 
-	int Run(int argc, char* argv[]);
+	void				 Update();
+
+	HRESULT				 InitializeDefaultSensor();
 
 private:
 	// Current Kinect
@@ -70,11 +72,6 @@ private:
 	float				 m_fCalibrationValue;
 	clock_t				 m_nCalibrationStartTime;
 
-
-	void				 Update();
-
-	HRESULT				 InitializeDefaultSensor();
-
 	void				 ProcessBody(int nBodyCount, IBody** ppBodies);
 
 	float				 ActivityAnalysis(IBody* pBodyFromCurrentFrame, IBody* pBodyFromPreviousFrame);
@@ -87,7 +84,7 @@ private:
 
 };
 
-int kinectMain(int argc, char* argv[]);
+SkeletalBasics application;
 void drawSkeletals();
 
 SkeletalBasics::SkeletalBasics() :
@@ -109,22 +106,6 @@ SkeletalBasics::~SkeletalBasics()
 		m_pKinectSensor->Close();
 	}
 }
-
-
-int SkeletalBasics::Run(int argc, char* argv[])
-{
-	// Initialize Kinect Sensor
-	InitializeDefaultSensor();
-
-	while (true)
-	{
-		// Keep updating data from sensor to the program
-		Update();
-		kinectMain(argc, argv);
-	}
-	return 0;
-}
-
 
 HRESULT SkeletalBasics::InitializeDefaultSensor()
 {
@@ -454,6 +435,8 @@ void drawKinectData() {
 }
 
 void draw() {
+	//cout << "I get here draw" << endl;
+	application.Update();//this should work, as it's in a glut function?
 	drawKinectData();//could use glut display overlay func as well
 	glutSwapBuffers();
 }
@@ -483,11 +466,13 @@ void drawSkeletals() {
 		glVertex3f(re.X, re.Y, re.Z);
 		glVertex3f(rs.X, rs.Y, rs.Z);
 		glEnd();
-		//glutSwapBuffers();//we want to draw over the buffer, not clear the screen
+		glutSwapBuffers();//we want to draw over the buffer, not clear the screen, maybe this is unnecessary?
 	}
 }
 
 bool init(int argc, char* argv[]) {
+	application.InitializeDefaultSensor();
+	cout << "I get here init" << endl;
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowSize(width, height);
@@ -497,7 +482,7 @@ bool init(int argc, char* argv[]) {
 	return true;
 }
 
-int kinectMain(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
 	if (!init(argc, argv)) return 1;
 	if (!initKinect()) return 1;
 	// Initialize textures
@@ -521,12 +506,7 @@ int kinectMain(int argc, char* argv[]) {
 	glOrtho(0, width, height, 0, 1, -1);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	
+
 	glutMainLoop();
 	return 0;
-}
-
-int main(int argc, char* argv[]) {
-	SkeletalBasics application;
-	application.Run(argc,argv);
 }
