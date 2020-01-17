@@ -143,32 +143,7 @@ HRESULT SkeletalBasics::InitializeDefaultSensor()
 
 		SafeRelease(pBodyFrameSource);
 	}
-	/*
-	// gets the color frame for the video display
-	HRESULT color = GetDefaultKinectSensor(&sensor);
-	if (FAILED(color)) {
-		cout << "Failed to get sensor or color" << endl;
-		return color;
-	}
 
-	if (sensor) {
-		//cout << "I get here" << endl;
-		sensor->Open();
-		IColorFrameSource* framesource = NULL;
-		sensor->get_ColorFrameSource(&framesource);
-		framesource->OpenReader(&reader);
-		if (framesource) {
-			framesource->Release();
-			framesource = NULL;
-		}
-		else {
-			cout << "No framesource detected!" << endl;
-		}
-	}
-	else {
-		cout << "No color sensor detected!" << endl;
-	}
-	*/
 	if (!m_pKinectSensor || FAILED(hr))
 	{
 		std::cout << "No Kinect Found!";
@@ -339,7 +314,7 @@ void SkeletalBasics::Calibration(IBody** ppBodies)
 
 		if (pBody)
 		{
-			BOOLEAN bTracked = false;
+			bTracked = false;
 			hr = pBody->get_IsTracked(&bTracked);
 
 			// If this body is being tracked
@@ -415,12 +390,12 @@ void getKinectData(GLubyte* dest) {
 }
 
 void drawKinectData() {
+	glClearColor(0, 0, 0, 0);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, textureId);
 	getKinectData(dataGlu);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)dataGlu);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//glTranslatef(0, -100, -700);//might help?
 	glBegin(GL_QUADS);
 	glTexCoord2f(0.0f, 0.0f);
 	glVertex3f(0, 0, 0);
@@ -434,15 +409,17 @@ void drawKinectData() {
 	drawSkeletals();
 }
 
-void draw() {
-	//cout << "I get here draw" << endl;
-	application.Update();//this should work, as it's in a glut function?
-	drawKinectData();//could use glut display overlay func as well
+void draw() {	
+	application.Update();
+	drawKinectData();
 	glutSwapBuffers();
 }
 
 void drawSkeletals() {
-	if (bTracked) {
+	if (bTracked || !bTracked) {
+		/*
+		cout << "I found a body!" << endl;
+		
 		// Draw some arms
 		const CameraSpacePoint& lh = joints[6].Position; //wristleft
 		const CameraSpacePoint& le = joints[5].Position;//elbowleft
@@ -450,9 +427,11 @@ void drawSkeletals() {
 		const CameraSpacePoint& rh = joints[10].Position;//wristright
 		const CameraSpacePoint& re = joints[9].Position;//elbowright
 		const CameraSpacePoint& rs = joints[8].Position;//shoulderright
-		glEnable(GL_TEXTURE_2D);
+		glDisable(GL_TEXTURE_2D);//this should allow the line to appear as not a large rectangle
+		glLineWidth(4);
 		glBegin(GL_LINES);
 		glColor3f(1.f, 0.f, 0.f);
+		glLineWidth(4);
 		// lower left arm
 		glVertex3f(lh.X, lh.Y, lh.Z);
 		glVertex3f(le.X, le.Y, le.Z);
@@ -465,14 +444,25 @@ void drawSkeletals() {
 		// upper right arm
 		glVertex3f(re.X, re.Y, re.Z);
 		glVertex3f(rs.X, rs.Y, rs.Z);
+		glColor3f(1.0f, 1.0f, 1.0f);//this makes every vertex after white
 		glEnd();
-		glutSwapBuffers();//we want to draw over the buffer, not clear the screen, maybe this is unnecessary?
+		*/
+		glDisable(GL_TEXTURE_2D);//this should allow the line to appear as not a large rectangle
+		glLineWidth(4);
+		glBegin(GL_LINES);
+		glColor3f(1.f, 0.f, 0.f);//this makes every vertex after red
+		glVertex3f(0.0, 0.0, 0.0);
+		glVertex3f(150,100, 0);
+		glColor3f(1.0f, 1.0f, 1.0f);//this makes every vertex after white
+		glEnd();
+	}
+	else {
+		//cout << "oops! no body" << endl;
 	}
 }
 
 bool init(int argc, char* argv[]) {
 	application.InitializeDefaultSensor();
-	cout << "I get here init" << endl;
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowSize(width, height);
@@ -504,6 +494,7 @@ int main(int argc, char* argv[]) {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(0, width, height, 0, 1, -1);
+
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
