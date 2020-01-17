@@ -17,9 +17,8 @@ class InterfaceController: WKInterfaceController {
     
 // MARK: - Declaration of variables + actions
     @IBOutlet weak var timer: WKInterfaceTimer!
-    //@IBOutlet weak var xLabel: WKInterfaceLabel!
-    //@IBOutlet weak var yLabel: WKInterfaceLabel!
-    //@IBOutlet weak var zLabel: WKInterfaceLabel!
+    @IBOutlet weak var yGravityLabel: WKInterfaceLabel!
+    @IBOutlet weak var xRotationLabel: WKInterfaceLabel!
     @IBOutlet weak var spinsLabel: WKInterfaceLabel!
     @IBOutlet weak var startDancingButton: WKInterfaceButton!
     
@@ -173,16 +172,12 @@ class InterfaceController: WKInterfaceController {
             
             motion.startDeviceMotionUpdates(to: OperationQueue.current!) { (data, error) in
                 if let myData = data {
-                    //self.xLabel.setText(String(myData.userAcceleration.x))
-                    //self.yLabel.setText(String(myData.userAcceleration.y))
-                    //self.zLabel.setText(String(myData.userAcceleration.z))
+                    self.yGravityLabel.setText(String(myData.gravity.y))
+                    self.xRotationLabel.setText(String(myData.rotationRate.x))
+
                      
                     print("x: \(myData.userAcceleration.x) y: \(myData.userAcceleration.y) z: \(myData.userAcceleration.z) rotRateX: \(myData.rotationRate.x) rotRateY: \(myData.rotationRate.y) rotRateZ: \(myData.rotationRate.z)")
                     
-                    /*if abs(myData.userAcceleration.y) > 0.05 && abs(myData.userAcceleration.z) > 0.05 {
-                        print("Turn")
-                        self.noOfSpinsCompleted += 1
-                    }*/
                     if(abs(myData.rotationRate.x) > 7 && abs(myData.gravity.y) < 0.2){
                         self.noOfSpinsCompleted += 1
                     }
@@ -196,186 +191,5 @@ class InterfaceController: WKInterfaceController {
             motion.stopDeviceMotionUpdates()
             return
         }
-    }
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    // MARK: - Machine Learning Model
-   /*
-    
-    //https://github.com/skafos/ActivityClassifier/blob/master/ActivityClassifier/ViewController.swift
-    //https://developer.apple.com/documentation/coreml/integrating_a_core_ml_model_into_your_app
-    //https://developer.apple.com/documentation/createml/mlactivityclassifier
-    let model = DanceActivityTest_1()
-    
-
-    
-    struct MLActivityClassifier{
-        var accelerometerAccelerationX_G_ : Double
-        var accelerometerAccelerationY_G_ : Double
-        var accelerometerAccelerationZ_G_ : Double
-        var gyroRotationX_rad_s_ : Double
-        var gyroRotationY_rad_s_ : Double
-        var gyroRotationZ_rad_s_ : Double
-    }
-    
-    //let input = DanceActivityTest_1Input.init(accelerometerAccelerationX_G_: MLMultiArray, accelerometerAccelerationY_G_: MLMultiArray, accelerometerAccelerationZ_G_: MLMultiArray, gyroRotationX_rad_s_: MLMultiArray, gyroRotationY_rad_s_: <#T##MLMultiArray#>, gyroRotationZ_rad_s_: <#T##MLMultiArray#>)
-    
-    let output = DanceActivityTest_1Output.init(labelProbability: <#T##[String : Double]#>, label: <#T##String#>, stateOut: <#T##MLMultiArray#>)
-    
-    
-    var lastHiddenOutput = try? MLMultiArray(shape: [200 as NSNumber], dataType: MLMultiArrayDataType.double)
-    var lastHiddenCellOutput = try? MLMultiArray(shape: [200 as NSNumber], dataType: MLMultiArrayDataType.double)
-    let predictionWindowDataArray = try? MLMultiArray(shape: [1, 200, 6] as [NSNumber], dataType: MLMultiArrayDataType.double)
-
-    
-    guard let dataArray = predictionWindowDataArray else { return "Error!" }
-        
-    let modelPrediction = try? model.prediction(features: dataArray, hiddenIn: lastHiddenOutput, cellIn: lastHiddenCellOutput)
-    
-    lastHiddenOutput = modelPrediction?.hiddenOut
-    lastHiddenCellOutput = modelPrediction?.cellOut
-*/
-    
-    // MARK: - Delete (Not Used)
-
-    // https://developer.apple.com/documentation/coremotion/getting_raw_accelerometer_events
-        
-    func startAccelerometers() {
-       // Make sure the accelerometer hardware is available.
-       if self.motion.isAccelerometerAvailable {
-          self.motion.accelerometerUpdateInterval = 1.0 / 60.0  // 60 Hz
-          self.motion.startAccelerometerUpdates()
-
-          // Configure a timer to fetch the data.
-          /*self.timer = Timer(fire: Date(), interval: (1.0/60.0),
-                repeats: true, block: { (timer) in
-             // Get the accelerometer data.
-             if let data = self.motion.accelerometerData {
-                let x = data.acceleration.x
-                let y = data.acceleration.y
-                let z = data.acceleration.z
-
-                // Use the accelerometer data in your app.
-             }
-          })
-
-          // Add the timer to the current run loop.
-          RunLoop.current.add(self.timer!, forMode: .defaultRunLoopMode)*/
-       }
-    }
-    
-    //https://nshipster.com/cmdevicemotion/
-    func measure(){
-        sleep(500)
-        guard motion.isAccelerometerAvailable else {
-            return
-        }
-        motion.startAccelerometerUpdates()
-        if(!motion.isAccelerometerActive){
-            return
-        }
-        //xLabel.setText(String(motion.accelerometerData!.acceleration.x))
-        //yLabel.setText(String(motion.accelerometerData!.acceleration.y))
-        //zLabel.setText(String(motion.accelerometerData!.acceleration.z))
     }
 }
