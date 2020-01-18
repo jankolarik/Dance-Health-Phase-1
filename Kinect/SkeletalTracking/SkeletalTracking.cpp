@@ -170,7 +170,7 @@ void SkeletalBasics::Update()
 		IBody* ppBodies[BODY_COUNT] = { 0 };
 
 		hr = pBodyFrame->GetAndRefreshBodyData(_countof(ppBodies), ppBodies);
-
+		/* drawSkeletals();//tried to move it here to get multiple bodies in, but it just made the skeletals flash */
 		// If the Body data is refreshed successfully
 		if (SUCCEEDED(hr))
 		{
@@ -237,6 +237,7 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 					if (previousBodyLoad)
 					{
 						cout << "Activity Analysis value : " << ActivityAnalysis(pBody, pBodyPrevious) << endl;
+						
 					}
 				}
 			}
@@ -405,12 +406,12 @@ void drawKinectData() {
 	glTexCoord2f(0.0f, 1.0f);
 	glVertex3f(0, height, 0.0f);
 	glEnd();
-	drawSkeletals();
+	drawSkeletals();//want to move this line so it finds multiple bodies
 }
 
 void draw() {	
-	application.Update();
 	drawKinectData();
+	application.Update();
 	glutSwapBuffers();
 }
 
@@ -422,9 +423,9 @@ void drawSkeletals() {
 	so the coordinates are relative to the screen size
 	We've taken out the Z axis (depth) as it limits the detectability of the user when the distance from the camera is too large
 	*/
-	//restructure the following constants into an array
+	//restructures the cameraSpacePoints constants into an array:
 
-	float jointTranslate[JointType_Count][2];//copying the joints in
+	float jointTranslate[JointType_Count][2];
 	for (int i = 0; i < JointType_Count; i++) {
 		jointTranslate[i][0] = (float)((joints[i].Position.X) + 1) * width/2;
 		jointTranslate[i][1] = (float)((joints[i].Position.Y) - 1) * -height/2;
@@ -437,65 +438,63 @@ void drawSkeletals() {
 	glLineWidth(4);
 	/* test line: screen diagonal
 	glVertex3f(0, 0, 0);
-	glVertex3f(width, height, 0);*/
+	glVertex3f(width, height, 0);
+	test the coords: we want these values approx. between 0 and 1900, and 0 and 1000 respectively
+	cout << jointTranslate[6][0] << endl;
+	cout << jointTranslate[6][1] << endl;
+	*/
 
 	// neck
-	glVertex3f(jointTranslate[3][0], jointTranslate[3][1], 0);//jointTranslate[7][2]);
-	glVertex3f(jointTranslate[2][0], jointTranslate[2][1], 0);//jointTranslate[6][2]);
+	glVertex3f(jointTranslate[3][0], jointTranslate[3][1], 0);
+	glVertex3f(jointTranslate[2][0], jointTranslate[2][1], 0);
 	// left collarbone
-	glVertex3f(jointTranslate[2][0], jointTranslate[2][1], 0);//jointTranslate[7][2]);
-	glVertex3f(jointTranslate[4][0], jointTranslate[4][1], 0);//jointTranslate[6][2]);
+	glVertex3f(jointTranslate[2][0], jointTranslate[2][1], 0);
+	glVertex3f(jointTranslate[4][0], jointTranslate[4][1], 0);
 	// right collarbone
-	glVertex3f(jointTranslate[2][0], jointTranslate[2][1], 0);//jointTranslate[7][2]);
-	glVertex3f(jointTranslate[8][0], jointTranslate[8][1], 0);//jointTranslate[6][2])
+	glVertex3f(jointTranslate[2][0], jointTranslate[2][1], 0);
+	glVertex3f(jointTranslate[8][0], jointTranslate[8][1], 0);
 	// left hand
-	glVertex3f(jointTranslate[7][0], jointTranslate[7][1], 0);//jointTranslate[7][2]);
-	glVertex3f(jointTranslate[6][0], jointTranslate[6][1], 0);//jointTranslate[6][2]);
+	glVertex3f(jointTranslate[7][0], jointTranslate[7][1], 0);
+	glVertex3f(jointTranslate[6][0], jointTranslate[6][1], 0);
 	// lower left arm	
-	//we want these values approx. between 0 and 1900, and 0 and 100 respectively
-	//cout << jointTranslate[6][0] << endl;
-	//cout << jointTranslate[6][1] << endl;
-	glVertex3f(jointTranslate[6][0], jointTranslate[6][1], 0);//jointTranslate[6][2]);
-	glVertex3f(jointTranslate[5][0], jointTranslate[5][1], 0);//jointTranslate[5][2]);
+	glVertex3f(jointTranslate[6][0], jointTranslate[6][1], 0);
+	glVertex3f(jointTranslate[5][0], jointTranslate[5][1], 0);
 	// upper left arm
-	//we want these values approx. between 0 and 1900, and 0 and 100 respectively
-	//cout << jointTranslate[5][0] << endl;
-	//cout << jointTranslate[5][1] << endl;
-	glVertex3f(jointTranslate[5][0], jointTranslate[5][1], 0);//jointTranslate[5][2]);
-	glVertex3f(jointTranslate[4][0], jointTranslate[4][1], 0);//jointTranslate[4][2]);
+	glVertex3f(jointTranslate[5][0], jointTranslate[5][1], 0);
+	glVertex3f(jointTranslate[4][0], jointTranslate[4][1], 0);
 	// right hand
-	glVertex3f(jointTranslate[11][0], jointTranslate[11][1], 0);//jointTranslate[11][2]);
-	glVertex3f(jointTranslate[10][0], jointTranslate[10][1], 0);//jointTranslate[10][2]);
+	glVertex3f(jointTranslate[11][0], jointTranslate[11][1], 0);
+	glVertex3f(jointTranslate[10][0], jointTranslate[10][1], 0);
 	// lower right arm
-	glVertex3f(jointTranslate[10][0], jointTranslate[10][1], 0);//jointTranslate[10][2]);
-	glVertex3f(jointTranslate[9][0], jointTranslate[9][1], 0);//jointTranslate[9][2]);
+	glVertex3f(jointTranslate[10][0], jointTranslate[10][1], 0);
+	glVertex3f(jointTranslate[9][0], jointTranslate[9][1], 0);
 	// upper right arm
-	glVertex3f(jointTranslate[9][0], jointTranslate[9][1], 0);//jointTranslate[9][2]);
-	glVertex3f(jointTranslate[8][0], jointTranslate[8][1], 0);//jointTranslate[8][2]);
+	glVertex3f(jointTranslate[9][0], jointTranslate[9][1], 0);
+	glVertex3f(jointTranslate[8][0], jointTranslate[8][1], 0);
 	// upper spine
-	glVertex3f(jointTranslate[2][0], jointTranslate[2][1], 0);//jointTranslate[7][2]);
-	glVertex3f(jointTranslate[20][0], jointTranslate[20][1], 0);//jointTranslate[6][2]);
-	// mid spine -> it can't seem to find the midpoint. -> problematic for posture tracking?
-	glVertex3f(jointTranslate[20][0], jointTranslate[20][1], 0);//jointTranslate[7][2]);
-	glVertex3f(jointTranslate[1][0], jointTranslate[1][1], 0);//jointTranslate[6][2]);
+	glVertex3f(jointTranslate[2][0], jointTranslate[2][1], 0);
+	glVertex3f(jointTranslate[20][0], jointTranslate[20][1], 0);
+	// mid spine -> it can't seem to actually track the midpoint. -> problematic for posture tracking?
+	glVertex3f(jointTranslate[20][0], jointTranslate[20][1], 0);
+	glVertex3f(jointTranslate[1][0], jointTranslate[1][1], 0);
 	// lower spine
-	glVertex3f(jointTranslate[1][0], jointTranslate[1][1], 0);//jointTranslate[7][2]);
-	glVertex3f(jointTranslate[0][0], jointTranslate[0][1], 0);//jointTranslate[6][2]);
+	glVertex3f(jointTranslate[1][0], jointTranslate[1][1], 0);
+	glVertex3f(jointTranslate[0][0], jointTranslate[0][1], 0);
 	// left hand tip
-	glVertex3f(jointTranslate[7][0], jointTranslate[7][1], 0);//jointTranslate[7][2]);
-	glVertex3f(jointTranslate[21][0], jointTranslate[21][1], 0);//jointTranslate[6][2]);
+	glVertex3f(jointTranslate[7][0], jointTranslate[7][1], 0);
+	glVertex3f(jointTranslate[21][0], jointTranslate[21][1], 0);
 	// right hand tip
-	glVertex3f(jointTranslate[11][0], jointTranslate[11][1], 0);//jointTranslate[7][2]);
-	glVertex3f(jointTranslate[23][0], jointTranslate[23][1], 0);//jointTranslate[6][2]);
+	glVertex3f(jointTranslate[11][0], jointTranslate[11][1], 0);
+	glVertex3f(jointTranslate[23][0], jointTranslate[23][1], 0);
 	// left thumb
-	glVertex3f(jointTranslate[7][0], jointTranslate[7][1], 0);//jointTranslate[7][2]);
-	glVertex3f(jointTranslate[22][0], jointTranslate[22][1], 0);//jointTranslate[6][2]);
+	glVertex3f(jointTranslate[7][0], jointTranslate[7][1], 0);
+	glVertex3f(jointTranslate[22][0], jointTranslate[22][1], 0);
 	// right thumb
-	glVertex3f(jointTranslate[11][0], jointTranslate[11][1], 0);//jointTranslate[7][2]);
-	glVertex3f(jointTranslate[24][0], jointTranslate[24][1], 0);//jointTranslate[6][2]);
+	glVertex3f(jointTranslate[11][0], jointTranslate[11][1], 0);
+	glVertex3f(jointTranslate[24][0], jointTranslate[24][1], 0);
 	// left hip
-	glVertex3f(jointTranslate[0][0], jointTranslate[0][1], 0);//jointTranslate[7][2]);
-	glVertex3f(jointTranslate[12][0], jointTranslate[12][1], 0);//jointTranslate[6][2]);
+	glVertex3f(jointTranslate[0][0], jointTranslate[0][1], 0);
+	glVertex3f(jointTranslate[12][0], jointTranslate[12][1], 0);
 	// left thigh
 	glVertex3f(jointTranslate[12][0], jointTranslate[12][1], 0);//jointTranslate[7][2]);
 	glVertex3f(jointTranslate[13][0], jointTranslate[13][1], 0);//jointTranslate[6][2]);
