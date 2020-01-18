@@ -74,20 +74,32 @@
   <div class="container">
 
         <!-- Page Heading/Breadcrumbs -->
-        <h1 class="mt-4 mb-3">Full Width
-          <small>Subheading</small>
-        </h1>
+        <h1 class="mt-4 mb-3">Testing</h1>
     
         <ol class="breadcrumb">
           <li class="breadcrumb-item">
             <a href="index.html">Home</a>
           </li>
-          <li class="breadcrumb-item active">Full Width</li>
+          <li class="breadcrumb-item active">Testing</li>
         </ol>
     
-        <p>Most of Start Bootstrap's unstyled templates can be directly integrated into the Modern Business template. You can view all of our unstyled templates on our website at
-          <a href="http://startbootstrap.com/template-categories/unstyled">http://startbootstrap.com/template-categories/unstyled</a>.</p>
-    
+        <h3>Testing Method</h3>
+        <p>For each new method we create, we will test its functionality to make sure it produce a reliable result. </p>
+        <h3>Kinect - Calibration</h3>
+        <p>Calibration method is used to calculate the relative height of the person's feet compared to camera position, so that we can use it as floor height and calculate joints data relative to floor instead of camera position.</p>
+        <p><b>Testing method</b>: having a person stand in the same floor whit the camera position fixed, make this person stand in differnt places and comapred the calibration result.</p>
+        <p><b>Test result</b>: after</p>
+
+        <h3>Kinect - Activity Level</h3>
+        <p>Activity level is a method that calculate the average displacement of each joint moved between per frame, we can use this result to determine how active the person in front the camera is.</p>
+        <p><b>Test method</b>: having a person stand in front of camera, stand still for 5 seconds and perform some movements for another 5 seconds.</p>
+        <p><b>Test result</b>:</p>
+
+        <h3>Apple Watch - No of Spins</h3>
+        <p>We have a method using the gyroscope and accelerometer inside the apple watch to identify the number of turns the person performed.</p>
+        <p><b>Test method</b>: having a person performs turning with different angle and speed and compared result with the amount of turing actually happened.</p>
+        <p><b>Test result</b>: In most condition the turns are recognised properly, however when you are turning too fast, the method result is appeard to to higher than the actual result.</p>
+
       </div>
       <!-- /.container -->
 
