@@ -172,8 +172,8 @@ class InterfaceController: WKInterfaceController {
             
             motion.startDeviceMotionUpdates(to: OperationQueue.current!) { (data, error) in
                 if let myData = data {
-                    self.yGravityLabel.setText(String(format: "%.03f", myData.gravity.y))
-                    self.xRotationLabel.setText(String(format: "%.03f", myData.rotationRate.x))
+                    self.yGravityLabel.setText("y (gravity): " + String(format: "%.03f", myData.gravity.y))
+                    self.xRotationLabel.setText("x (rotation): " + String(format: "%.03f", myData.rotationRate.x))
 
                      
                     print("x: \(myData.userAcceleration.x) y: \(myData.userAcceleration.y) z: \(myData.userAcceleration.z) rotRateX: \(myData.rotationRate.x) rotRateY: \(myData.rotationRate.y) rotRateZ: \(myData.rotationRate.z)")
@@ -188,8 +188,8 @@ class InterfaceController: WKInterfaceController {
         else{
             self.spinsLabel.setText("Spins: \(self.noOfSpinsCompleted)")
             self.noOfSpinsCompleted = 0
-            self.yGravityLabel.setText("0")
-            self.xRotationLabel.setText("0")
+            self.yGravityLabel.setText("y (gravity): 0")
+            self.xRotationLabel.setText("x (rotation): 0")
             motion.stopDeviceMotionUpdates()
             return
         }
