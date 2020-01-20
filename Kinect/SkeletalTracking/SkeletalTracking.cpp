@@ -3,6 +3,9 @@
 #include <iostream>
 #include <cmath>
 #include <time.h>       /* clock_t, clock, CLOCKS_PER_SEC */
+#include <iostream>
+#include <fstream>
+#include <chrono>
 
 #include <Ole2.h>
 #include<gl/GL.h>
@@ -11,6 +14,7 @@
 
 // reference: cs Washington tutorial by Ed Zhang: https://homes.cs.washington.edu/~edzhang/tutorials/kinect2/kinect1.html
 
+#define CLOCKS_PER_SEC  ((clock_t)1000)
 #define width 1920
 #define height 1080
 #define GL_BGRA 0x80E1
@@ -66,10 +70,23 @@ private:
 	// Body from last frame
 	IBody* m_pBodyFromPreviousFrame[BODY_COUNT] = { 0 };
 
-	// Calibration Indicator
+	// Calibration
 	bool				 m_bCalibrationStatus;
-	float				 m_fCalibrationValue;
 	clock_t				 m_nCalibrationStartTime;
+	float				 m_fCalibrationDuration;
+	float				 m_fCalibrationValue;
+
+	// Session
+	bool				 m_bSessionStatus;
+	clock_t				 m_nSessionStartTime;
+	float                m_fSessionDuration;
+	float				 m_fSessionAvgJointDisplacement;
+	float				 m_fSessionJointsMaxheight[JointType_Count];
+
+	// Start & Stop posture
+	clock_t              m_nSpecialPostureStartTime;
+	float				 m_fSpecialPostureDuration;
+
 
 	void				 ProcessBody(int nBodyCount, IBody** ppBodies);
 
@@ -79,8 +96,11 @@ private:
 
 	void				 Calibration(IBody** ppBodies);
 
-	IBody*				 getSingleBody(IBody** ppBodies);
+	bool				 SpecialPostureIndicator(Joint joints[]);
 
+	void				 MaxJointsData(Joint joints[]);
+
+	void				 Summary();
 };
 
 SkeletalBasics application;
@@ -92,8 +112,21 @@ SkeletalBasics::SkeletalBasics() :
 	m_pBodyFrameReader(NULL),
 	m_bCalibrationStatus(false),
 	m_fCalibrationValue(0),
-	m_nCalibrationStartTime(0)
+	m_nCalibrationStartTime(0),
+	m_fCalibrationDuration(3),
+	m_bSessionStatus(false),
+	m_nSessionStartTime(0),
+	m_fSessionDuration(0),
+	m_fSessionAvgJointDisplacement(0),
+	m_fSessionJointsMaxheight(),
+	m_nSpecialPostureStartTime(0),
+	m_fSpecialPostureDuration(5)
 {
+	for (int i = 0; i < JointType_Count; i++)
+	{
+		// Set the initial value of max height to be low enough that any new height can replace it
+		m_fSessionJointsMaxheight[i] = -10;
+	}
 }
 
 
@@ -170,21 +203,30 @@ void SkeletalBasics::Update()
 		IBody* ppBodies[BODY_COUNT] = { 0 };
 
 		hr = pBodyFrame->GetAndRefreshBodyData(_countof(ppBodies), ppBodies);
+
 		// If the Body data is refreshed successfully
 		if (SUCCEEDED(hr))
 		{
+
 			// If the calibration hasn't done, continue calibration
 			if (!m_bCalibrationStatus)
 			{
 				Calibration(ppBodies);
 				cout << "Calibration value : " << m_fCalibrationValue << endl;
 			}
-			else
+			else if(!m_bSessionStatus)
 			{
 				// The main function to process body data for each frame
 				ProcessBody(BODY_COUNT, ppBodies);
+
 				// Load the used frame data into the "previousframe" pointer to be used in the next frmae for comparison
 				hr = pBodyFrame->GetAndRefreshBodyData(_countof(m_pBodyFromPreviousFrame), m_pBodyFromPreviousFrame);
+			}
+			else
+			{
+				// After the session finished, run summary
+				Summary();
+				exit(0);
 			}
 		}
 
@@ -194,6 +236,71 @@ void SkeletalBasics::Update()
 		}
 	}
 	SafeRelease(pBodyFrame);
+}
+
+void SkeletalBasics::Calibration(IBody** ppBodies)
+{
+	HRESULT hr;
+
+	//cout << "Please stand straight facing the camera, feet firmly planted, legs straight, at maximum 4 meters away." << endl;
+	//cout << "When you are ready to start calibration session, please raise both of your hands above your head." << endl;
+
+	for (int i = 0; i < BODY_COUNT; ++i)
+	{
+		IBody* pBody = ppBodies[i];
+
+		if (pBody)
+		{
+			BOOLEAN bTracked = false;
+			hr = pBody->get_IsTracked(&bTracked);
+			trackList[i] = bTracked;
+
+			// If this body is being tracked
+			if (SUCCEEDED(hr) && bTracked)
+			{
+				Joint joints[JointType_Count];
+
+				hr = pBody->GetJoints(_countof(joints), joints);
+				pBody->GetJoints(_countof(joints), jointsAll[i]);
+				if (SUCCEEDED(hr))
+				{
+					float leftHandHeight = joints[7].Position.Y;
+					float rightHandHeight = joints[23].Position.Y;
+					float headHeight = joints[3].Position.Y;
+
+					// Calibration starting position: both hands above head
+					if (SpecialPostureIndicator(joints))
+					{
+						// Initial calibration start time
+						if (!m_nCalibrationStartTime)
+						{
+							m_nCalibrationStartTime = clock();
+						}
+
+						float timeSpent = float((clock() - m_nCalibrationStartTime)) / CLOCKS_PER_SEC;
+
+						if (timeSpent > m_fCalibrationDuration)
+						{
+							m_bCalibrationStatus = true;
+						}
+
+						Joint leftFeet = joints[15];
+						Joint rightFeet = joints[19];
+
+						if (SUCCEEDED(leftFeet.TrackingState) && SUCCEEDED(rightFeet.TrackingState))
+						{
+							m_fCalibrationValue = (m_fCalibrationValue + (leftFeet.Position.Y + rightFeet.Position.Y)) / 2;
+						}
+					}
+					// If the posture not detected, reset the start time
+					else
+					{
+						m_nCalibrationStartTime = 0;
+					}
+				}
+			}
+		}
+	}
 }
 
 void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
@@ -228,21 +335,52 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 				
 				hr = pBody->GetJoints(_countof(joints), joints);
 				pBody->GetJoints(_countof(joints), jointsAll[i]);
+
 				// If joints are obtained successfully, start data process
 				if (SUCCEEDED(hr))
 				{
+					// Initialise Session start time
+					if (!m_nSessionStartTime)
+					{
+						m_nSessionStartTime = clock();
+					}
+
+					m_fSessionDuration = float((clock() - m_nSessionStartTime)) / CLOCKS_PER_SEC;
+
+					// Special posture recognition
+					if (SpecialPostureIndicator(joints))
+					{
+						if (!m_nSpecialPostureStartTime)
+						{
+							m_nSpecialPostureStartTime = clock();
+						}
+
+						float timeSpent = float((clock() - m_nSessionStartTime)) / CLOCKS_PER_SEC;
+
+						// If the special posture is performed for long enough time, finish session
+						if (timeSpent > m_fSpecialPostureDuration)
+						{
+							m_bSessionStatus = true;
+						}
+					}
+					else
+					{
+						// If the person stop performing the posture, reset the start time
+						m_nSpecialPostureStartTime = 0;
+					}
+
+					// Update max height of joints
+					MaxJointsData(joints);
 
 					// If the data from last frame is loaded, start comparison
 					if (previousBodyLoad)
 					{
 						cout << "Activity Analysis value : " << ActivityAnalysis(pBody, pBodyPrevious) << endl;
-						
 					}
 				}
 			}
 		}
 	}
-
 }
 
 float SkeletalBasics::ActivityAnalysis(IBody* pBodyFromCurrentFrame, IBody* pBodyFromPreviousFrame)
@@ -282,6 +420,9 @@ float SkeletalBasics::ActivityAnalysis(IBody* pBodyFromCurrentFrame, IBody* pBod
 
 	averageDistanceTravelPerJoint = totalDistanceTravelPerJoint / trackedJointNumber;
 
+	// Add the average joint displacement into the total displacement to get the displacement across whole seesion
+	m_fSessionAvgJointDisplacement += averageDistanceTravelPerJoint;
+
 	return averageDistanceTravelPerJoint;
 }
 
@@ -293,72 +434,53 @@ float SkeletalBasics::JointDisplacementCalculator(Joint firstJoint, Joint second
 	return distanceTraveled;
 }
 
-IBody* SkeletalBasics::getSingleBody(IBody** ppBodies)
-{
 
-	return nullptr;
+bool SkeletalBasics::SpecialPostureIndicator(Joint joints[])
+{
+	float leftHandHeight = joints[7].Position.Y;
+	float rightHandHeight = joints[23].Position.Y;
+	float headHeight = joints[3].Position.Y;
+
+	if ((leftHandHeight > headHeight) && (rightHandHeight > headHeight))
+	{
+		return true;
+	}
+
+	return false;
 }
 
 
-void SkeletalBasics::Calibration(IBody** ppBodies)
+void SkeletalBasics::MaxJointsData(Joint joints[])
 {
-	HRESULT hr;
-
-	//cout << "Please stand straight facing the camera, feet firmly planted, legs straight, at maximum 4 meters away." << endl;
-	//cout << "When you are ready to start calibration session, please raise both of your hands above your head." << endl;
-
-	for (int i = 0; i < BODY_COUNT; ++i)
+	for (int i = 0; i < JointType_Count; i++)
 	{
-		IBody* pBody = ppBodies[i];
-
-		if (pBody)
+		if (joints[i].Position.Y > m_fSessionJointsMaxheight[i])
 		{
-			BOOLEAN bTracked = false;
-			hr = pBody->get_IsTracked(&bTracked);
-			trackList[i] = bTracked;
-
-			// If this body is being tracked
-			if (SUCCEEDED(hr) && bTracked)
-			{
-				Joint joints[JointType_Count];
-
-				hr = pBody->GetJoints(_countof(joints), joints);
-				pBody->GetJoints(_countof(joints), jointsAll[i]);
-				if (SUCCEEDED(hr))
-				{
-					float leftHandHeight = joints[7].Position.Y;
-					float rightHandHeight = joints[23].Position.Y;
-					float headHeight = joints[3].Position.Y;
-
-					// Calibration starting position: both hands above head
-					if ((leftHandHeight > headHeight) && (rightHandHeight > headHeight))
-					{
-						// Initial calibration start time
-						if (!m_nCalibrationStartTime)
-						{
-							m_nCalibrationStartTime = clock();
-						}
-
-						float timeSpent = float((clock() - m_nCalibrationStartTime)) / CLOCKS_PER_SEC;
-
-						if (timeSpent > 5)
-						{
-							m_bCalibrationStatus = true;
-						}
-
-						Joint leftFeet = joints[15];
-						Joint rightFeet = joints[19];
-
-						if (SUCCEEDED(leftFeet.TrackingState) && SUCCEEDED(rightFeet.TrackingState))
-						{
-							m_fCalibrationValue = (m_fCalibrationValue + (leftFeet.Position.Y + rightFeet.Position.Y)) / 2;
-						}
-					}
-				}
-			}
+			m_fSessionJointsMaxheight[i] = joints[i].Position.Y;
 		}
 	}
 }
+
+
+void SkeletalBasics::Summary()
+{
+	auto currentTime = chrono::system_clock::now();
+	time_t time = std::chrono::system_clock::to_time_t(currentTime);
+
+	ofstream summaryFile;
+	summaryFile.open("Session_Summary.txt");
+	summaryFile << ctime(&time) << endl
+		<< "Session Duration: " << m_fSessionDuration << " seconds" << endl
+		<< "Average distance moved per joint in this session: " << m_fSessionAvgJointDisplacement << " meters" << endl << endl
+		<< "Max left  hand height: " << m_fSessionJointsMaxheight[7] << endl
+		<< "Max right hand height: " << m_fSessionJointsMaxheight[23] << endl
+		<< "Max left  knee height: " << m_fSessionJointsMaxheight[13] << endl
+		<< "Max right knee height: " << m_fSessionJointsMaxheight[17] << endl;
+
+	summaryFile.close();
+}
+
+
 
 bool initKinect() {
 	if (FAILED(GetDefaultKinectSensor(&sensor))) {
