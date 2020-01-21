@@ -16,6 +16,16 @@
   <!-- Custom styles for this template -->
   <link href="css/modern-business.css" rel="stylesheet">
 
+  <!--Table Style-->
+  <style>table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    }
+    th, td {
+    padding: 15px;
+    }
+    </style>
+
 </head>
 
 <body>
@@ -88,7 +98,7 @@
         <h3>Related Projects</h3>
         <p>After reasearching similar projects online we have found several articles which have similar goals with us. Thus we picked up two articels we think is most appropiate to compare with and comes up with following reviews.</p>
 
-        <h4>Dance Analysis using Multiple Kinect Sensors</h4>
+        <h4><b>Dance Analysis using Multiple Kinect Sensors</b></h4>
         <h5>by A. Kitsikidis et. al.</h5>
         <p>After viewing the whole paper we found there were quite a lot of useful information in it. It was extremely applicable to us, as the researchers used the same cameras as us, to the same or similar ends.</p>
         <p>The first part of the article is about calibration and fusion of using multiple kinect devices at the same time, due to the fact that the latest Kinect Azure synchronise sensors stream from multiple Kinect devices easily, so we decided not to go too deep with this part.</p>
@@ -97,7 +107,7 @@
         <p>In terms of their testing result, there are a couple of issues with this. First of all, this was set-up to just target a single dance, whereas our project encapsulates many more dances. Furthermore, the dance that is described in the paper was relatively easy to perform thus might have been the reason why they reached reasonable accuracy. </p>
         <p>In conclusion, the paper was a helpful insight in skeletal tracking specifically for dance with Kinect cameras, tailoring said tracking to a specific dance style, and dealing with object or human occlusions while tracking a dancer, and it will be considered in the development of our project.</p>
 
-        <h4>Development of an automated exercise detection and evaluation system using the kinect depth camera</h4>
+        <h4><b>Development of an automated exercise detection and evaluation system using the kinect depth camera</b></h4>
         <h5>master thesis, twente university, Frodo Muijzer</h5>
         <p>This article is describing the way to use Microsoft Kinect camera for automated rehabilitation exercise evaluation. The evaluation process is using the parameter that have been explicitly defined by a new parameterization method based on Labanotation. Due to the huge amount of information this article includes, only a few sections of this article is gonna be used.</p>
         <p>The first part is introducing the basic concepts about Kinect sensor, it go through the way Kinect recognise joints data from camera and also accuracy problem that occur at the same time. It contains some ideas that we are agreed with after our own testing, like the difficulty of recognising some specific body movements due to joints occlusion.</p>
@@ -108,12 +118,78 @@
       
         <h3>Related Technologies</h3>
         <p>Comparison sheet between Kinect 2, iPhone X and iPhone 11 Pro</p>
-        <img src="./images/ComparisonSheet.png" alt="Comparison Sheet" width="700" height="800">
+        <table style="width:100%">
+            <tr>
+                <th>Aspect</th>
+                <th>Kinect 2</th>
+                <th>iPhone X</th>
+                <th>iPhone 11 Pro</th>
+            </tr>
+            <tr>
+                <th>Price</th>
+                <th>Approx £100 (cable + camera)</th>
+                <th>Approx £400</th>
+                <th>Approx £1200</th>
+            </tr>
+            <tr>
+                <th>FPS</th>
+                <th>30</th>
+                <th>240</th>
+                <th>240</th>
+            </tr>
+            <tr>
+                <th>Video</th>
+                <th><a href="http://bit.ly/33v5kjB">Kinect 2 Video</a></th>
+                <th><a href="http://bit.ly/2R3oB9g">iPhone X Video</a></th>
+                <th>To be recorded if the department provides us the equipment</th>
+            </tr>
+            <tr>
+                <th>Time Of Flight Sensors</th>
+                <th>Yes</th>
+                <th>No</th>
+                <th>Yes</th>
+            </tr>
+            <tr>
+                <th>Built in multi-people recording</th>
+                <th>Yes</th>
+                <th>No</th>
+                <th>No</th>
+            </tr>
+            <tr>
+                <th>Kinect Azure compatibility</th>
+                <th>Yes</th>
+                <th>No</th>
+                <th>No</th>
+            </tr>
+            <tr>
+                <th>SDK licensing availability</th>
+                <th>Not need (product no longer sold, will be needed for Azure) </th>
+                <th>Yes</th>
+                <th>Yes</th>
+            </tr>
+            <tr>
+                <th>Communication with the Apple Watch</th>
+                <th>No</th>
+                <th>Yes</th>
+                <th>Yes</th>
+            </tr>
+            <tr>
+                <th>Requires laptop/computer to start:</th>
+                <th>Yes</th>
+                <th>No</th>
+                <th>No</th>
+            </tr>
+            <tr>
+                <th>Requires power supply:</th>
+                <th>Yes</th>
+                <th>No</th>
+                <th>No</th>
+            </tr>
+        </table>
+        
         <p></p>
-        <p><b>Kinect Video: </b> <a href="http://bit.ly/33v5kjB">click here for video</a></p> 
-        <p><b>iPhone Video: </b><a href="http://bit.ly/2R3oB9g">click here for video</a></p>
-
-        <p>We also compared with Intel Real Sense, and th latest Kinect Azure camera, the optimial solution is the Kinect Azure which is the newest realsed one with brand new SDK come with it and is also capable of synchornise multiple cameras which hugely improve the data accuracy and reduce occlusion problem. However we are not able to get it in UK so we choose to use Kinect 2 camera which is compatiable with the Azure camera.</p>
+        <h3>Conclusion</h3>
+        <p>We also compared with Intel Real Sense, and the latest Kinect Azure camera, the optimial solution is the Kinect Azure which is the newest realsed one with brand new SDK come with it and is also capable of synchornise multiple cameras which hugely improve the data accuracy and reduce occlusion problem. However we are not able to get it in UK so we choose to use Kinect 2 camera which is compatiable with the Azure camera.</p>
 
 
       </div>
