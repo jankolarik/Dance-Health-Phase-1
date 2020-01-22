@@ -108,6 +108,161 @@
             <li>Can track and store the activity level of users</li>
         </ul>
 
+        <table style="width:100%">
+            <col width = "40">
+            <col width = "">
+            <col width = "120">
+            <col width = "40">
+            <col width = "100">
+        <tr>
+            <th>ID</th>
+            <th>Requirements</th> 
+            <th>Priority</th>
+            <th>State</th>
+            <th>Contributors</th>
+        </tr>
+        <tr>
+            <th colspan="5">Must have</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>Relatively accurate body and skeletal tracking of a single person dancing</td>
+            <td>Must have</td>
+            <td>&#10004</td>
+            <td>Yide</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Apple Watch integration with health metrics available after session has ended. The health metrics from the Apple Watch include calories burned, average heart rate, duration of dance and the no. of steps taken)</td>
+            <td>Must have</td>
+            <td>&#10004</td>
+            <td>Jan</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>Researched, analyzed and considered alternative technologies to track and monitor health benefits of dance</td>
+            <td>Must have</td>
+            <td>&#10004</td>
+            <td>Jan,Yide,Alex</td>
+        </tr>
+        <tr>
+            <th colspan="5">Should have</th>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>Ability to save skeletal tracking video</td>
+            <td>Should have</td>
+            <td>&#10004</td>
+            <td>Alex</td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>The system should be easy to use and set-up</td>
+            <td>Should have</td>
+            <td>State</td>
+            <td>Contributors</td>
+        </tr>
+        <tr>
+            <td>6</td>
+            <td>Simple analysis on skeletal tracking / video that is health/dance related. As an example, the type of dance and how active it is could be defined.</td>
+            <td>Should have</td>
+            <td>&#10004</td>
+            <td>Yide</td>
+        </tr>
+        <tr>
+            <td>7</td>
+            <td>The Apple Watch data and skeletal tracking data should be viewable on a single integrated dashboard</td>
+            <td>Should have</td>
+            <td>&#10006</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>8</td>
+            <td>All the health metrics that are gathered and displayed should be relatively accurate and repeatable</td>
+            <td>Should have</td>
+            <td>&#10004</td>
+            <td>Jan,Yide</td>
+        </tr>
+        <tr>
+            <td>9</td>
+            <td>A user application, where all their dance sessions and health data would be visible for them (usable without the help of a technical person)</td>
+            <td>Should have</td>
+            <td>&#10006</td>
+            <td></td>
+        </tr>
+        <tr>
+            <th colspan="5">Could have</th>
+        </tr>
+        <tr>
+            <td>10</td>
+            <td>A simple user interface</td>
+            <td>Could have</td>
+            <td>&#10006</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>11</td>
+            <td>Automatic posture corrector via vibrations in the Apple Watch</td>
+            <td>Could have</td>
+            <td>&#10006</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>12</td>
+            <td>Relatively accurate body and skeletal tracking of two people</td>
+            <td>Could have</td>
+            <td>&#10004</td>
+            <td>Yide</td>
+        </tr>
+        <tr>
+            <td>13</td>
+            <td>Have the data be stored in a database semi-permanently</td>
+            <td>Could have</td>
+            <td>&#10006</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td colspan="5">Would have</td>
+        </tr>
+        <tr>
+            <td>14</td>
+            <td>User survey after each session to track their mental health</td>
+            <td>Would have</td>
+            <td>&#10006</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>15</td>
+            <td>Machine Learning implementation that recognises the different styles of dance</td>
+            <td>Would have</td>
+            <td>&#10006</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>16</td>
+            <td>Might turn into an iPhone-centric app</td>
+            <td>Would have</td>
+            <td>&#10006</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>17</td>
+            <td>Other wearable integration (smart shoes…)</td>
+            <td>Would have</td>
+            <td>&#10006</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td colspan="2">Key Functionalities (must have and should have)</td>
+            <td colspan="3" align="center">xx% completed</td>
+        </tr>
+        <tr>
+            <td colspan="2">Optional Functionalities (could have)</td>
+            <td colspan="3" align="center">xx% completed</td>
+        </tr>
+        </table>
+
+        <p></p>
         <h3>Known Bug Table</h3>
         <table style="width: 100%">
             <col width = "40">
@@ -119,51 +274,25 @@
                 <th>Priority</th>
             </tr>
             <tr>
-                <th>1</th>
-                <th>If the spin is performed quickly, the Apple Watch sometimes overestimate the number of spins</th>
-                <th>Medium</th>
+                <td>1</td>
+                <td>If the spin is performed quickly, the Apple Watch sometimes overestimate the number of spins</td>
+                <td>Medium</td>
             </tr>
             <tr>
-                <th>2</th>
-                <th>If the user deny the access to apple health data to the app, it occasionally cause crashes</th>
-                <th>High</th>
+                <td>2</td>
+                <td>If the user deny the access to apple health data to the app, it occasionally cause crashes</td>
+                <td>High</td>
             </tr>
             <tr>
-                <th>3</th>
-                <th>When user move further from the Kinect camera, the skeleton drawing on the screen will lose mapping to the actual body</th>
-                <th>Medium</th>
+                <td>3</td>
+                <td>The skeleton drawed on the screen keeps the same proportions and flooring all the time, if the user move away from the camera, the skleton will not overlay with the user's body</td>
+                <td>Medium</td>
             </tr>
             <tr>
-                <th>4</th>
-                <th>When joints are out of camera space or occluded, the joint data appear to be random numbers</th>
-                <th>Medium</th>
+                <td>4</td>
+                <td>When joints are out of camera space or occluded, the joint co-ordinate data appear to be random numbers</td>
+                <td>Medium</td>
             </tr>
-            <tr>
-                <th>ID</th>
-                <th>Bug Description</th>
-                <th>Priority</th>
-            </tr>
-            <tr>
-                <th>ID</th>
-                <th>Bug Description</th>
-                <th>Priority</th>
-            </tr>
-            <tr>
-                <th>ID</th>
-                <th>Bug Description</th>
-                <th>Priority</th>
-            </tr>
-            <tr>
-                <th>ID</th>
-                <th>Bug Description</th>
-                <th>Priority</th>
-            </tr>
-            <tr>
-                <th>ID</th>
-                <th>Bug Description</th>
-                <th>Priority</th>
-            </tr>
-
         </table>
         
         <h3>Contribution Table</h3>
