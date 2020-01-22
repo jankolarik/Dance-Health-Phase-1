@@ -18,6 +18,9 @@
     <ClCompile Include="SkeletalTracking.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -31,5 +34,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Debug\opencv_world420.dll" />
+    <None Include="x64\Release\opencv_world420.dll" />
+    <None Include="Release\opencv_world420.dll" />
   </ItemGroup>
 </Project>

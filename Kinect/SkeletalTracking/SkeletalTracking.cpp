@@ -12,7 +12,20 @@
 #include<gl/GLU.h>
 #include<gl/glut.h>
 
-// reference: cs Washington tutorial by Ed Zhang: https://homes.cs.washington.edu/~edzhang/tutorials/kinect2/kinect1.html
+#include<opencv2/opencv.hpp>
+#include<opencv2/videoio/videoio_c.h>
+#include<opencv2/highgui.hpp>
+
+/* references:
+cs Washington tutorial by Ed Zhang:
+https://homes.cs.washington.edu/~edzhang/tutorials/kinect2/kinect1.html
+https://github.com/kyzyx/Tutorials/tree/master/Kinect2SDK/1_Basics
+
+
+https://github.com/yzhong52/OpenGLFramebufferAsVideo
+*/
+
+static cv::VideoWriter outputVideo;
 
 #define CLOCKS_PER_SEC  ((clock_t)1000)
 #define width 1920
@@ -33,6 +46,7 @@ BOOLEAN trackList[BODY_COUNT];
 
 // No need to include the std keyword before cout
 using namespace std;
+using namespace cv;
 
 // Safe release for interfaces
 template<class Interface>
@@ -214,7 +228,7 @@ void SkeletalBasics::Update()
 				Calibration(ppBodies);
 				cout << "Calibration value : " << m_fCalibrationValue << endl;
 			}
-			else if(!m_bSessionStatus)
+			else if (!m_bSessionStatus)
 			{
 				// The main function to process body data for each frame
 				ProcessBody(BODY_COUNT, ppBodies);
@@ -226,6 +240,7 @@ void SkeletalBasics::Update()
 			{
 				// After the session finished, run summary
 				Summary();
+				outputVideo.release();
 				exit(0);
 			}
 		}
@@ -323,7 +338,7 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 		}
 
 		if (pBody)
-		{			
+		{
 			BOOLEAN bTracked = false;
 			hr = pBody->get_IsTracked(&bTracked);
 			trackList[i] = bTracked;
@@ -332,7 +347,7 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 			if (SUCCEEDED(hr) && bTracked)
 			{
 				Joint joints[JointType_Count];
-				
+
 				hr = pBody->GetJoints(_countof(joints), joints);
 				pBody->GetJoints(_countof(joints), jointsAll[i]);
 
@@ -530,10 +545,28 @@ void drawKinectData() {
 	drawSkeletals();//want to move this line so it finds multiple bodies
 }
 
-void draw() {	
+void setupVideo() {
+	outputVideo.open("video0.avi", 0, 30, cv::Size(width, height), true);//eventually we want this to change each session                      
+}
+void writeToVideo() {
+	cv::Mat pixels(height, width, CV_8UC3);
+	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels.data);
+	cv::Mat cv_pixels(height, width, CV_8UC3);
+	for (int y = 0; y < height; y++) for (int x = 0; x < width; x++)
+	{
+		cv_pixels.at<cv::Vec3b>(y, x)[2] = pixels.at<cv::Vec3b>(height - y - 1, x)[0];
+		cv_pixels.at<cv::Vec3b>(y, x)[1] = pixels.at<cv::Vec3b>(height - y - 1, x)[1];
+		cv_pixels.at<cv::Vec3b>(y, x)[0] = pixels.at<cv::Vec3b>(height - y - 1, x)[2];
+		//cout << "\ncv pixels length: " << cv_pixels.size() << endl;
+	}
+	outputVideo << cv_pixels;
+}
+
+void draw() {
 	drawKinectData();
 	application.Update();
 	glutSwapBuffers();
+	writeToVideo();
 }
 
 void drawSkeletals() {
