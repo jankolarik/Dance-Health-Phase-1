@@ -195,3 +195,83 @@ class InterfaceController: WKInterfaceController {
         }
     }
 }
+
+
+    // MARK: - Creating URL Requests
+    //https://www.youtube.com/watch?v=BFaZaUTF6m4
+
+func getURLRequests(){
+    let session = URLSession(configuration: .ephemeral)
+    
+    var url = URL(string: "http://localhost:3000/posts")
+    var request = URLRequest(url : url!)
+
+    request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
+    request.networkServiceType = .background
+    
+    //Part 3
+    request.allowsCellularAccess = false
+    
+    //Part 4
+    let taskWithRequest = session.dataTask(with: request)
+    
+    //Part 5
+    taskWithRequest.currentRequest?.httpMethod
+    
+    //Part 6
+    request.httpMethod = "POST"
+    
+    //Part 7
+    request.addValue("application/json", forHTTPHeaderField: "content-type")
+    
+    //Part 8
+    struct Post: Codable {
+        //let id: Int
+        let author: String
+        let title: String
+    }
+    
+    let encoder = JSONEncoder()
+    let post = Post(author: "Example Author", title: "Example Title")
+    do {
+        let data = try encoder.encode(post)
+        request.httpBody = data
+    } catch let encoderError as NSError {
+        //print("Encoder error: \(encodeError.localizedError.localizedDescription)")
+    }
+    
+    //Part 9
+    taskWithRequest.currentRequest?.httpMethod
+    
+    //Part 10
+    let postTask = session.dataTask(with: request){ data, response, error in
+        defer{}
+        guard let data = data, let response = response as? HTTPURLResponse, response.statusCode == 201 else{
+            print("No data or status code not created")
+            return
+        }
+    
+    
+        let decoder = JSONDecoder()
+        do {
+            let post = try decoder.decode(Post.self, from: data)
+            post
+        } catch let decodeError as NSError {
+            //Print
+            return
+        }
+    }
+    
+    //Part 11
+    postTask.currentRequest?.httpMethod
+    postTask.currentRequest?.allHTTPHeaderFields
+    postTask.currentRequest?.httpBody
+
+    //Part 12
+    postTask.resume()
+    
+    //Part 13
+    postTask.currentRequest?.httpBody
+}
+
+
