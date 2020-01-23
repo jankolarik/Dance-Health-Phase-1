@@ -85,13 +85,29 @@
           <li class="breadcrumb-item active">Prototype</li>
         </ol>
 
-        <h3>System Deisgn Architecture</h3>
-        <p>The following is a system design diagram of how the Kinect Apple Watch will be integrated in the future.</p>
+    <h3>Prototype 1:</h3>
+    <p>Our first prototype consisted of a functional and presentable Apple Watch App as well as a fully functional Kinect App.
+      The Apple Watch app uses the gyroscope, accelerometer, and heartrate sensor to detect user activity, spins, and health data, and outputs them in a <a href="https://www.hl7.org/fhir/">FHIR</a> Standard format.
+      The Kinect App can detect user skeletals and calculate activity rate of the user as well as other health metrics (like maximum limb height, for example, which could be useful in the
+      context of rehabilitation and physical therapy), and outputs these metrics in a file. It can also display the live video feed, and overlay the live skeletals over it.
+      In addition, it can create a video file for the user to see their session later.</p>
+    </p>
+        <h3>System Architecture Plan:</h3>
+        <p>The following is a system design diagram of how the Kinect Apple Watch will be integrated in the future: while the separate systems for both devices are currently mostly finished, the integration is still in the works.</p>
         <img src="./images/Architecture sketch.png" alt="System Architecture Design" width="1040" height="700">
 
-        <h3>Apple Watch UI Sketch</h3>
-        <p>The following is a design of how the Apple Watch interface will look like:</p>
-        <img src="./images/AppleWatchDesign.png" alt="Apple Watch Design" width="500" height="820">
+    <h3>Prototype Demo:</h3>
+    <p>We filmed a demo of our first prototype:</p>
+    <div class="col-lg-6">
+      <iframe width="700" height="450" src="https://www.youtube.com/embed/7ev9H3-h-ls" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+    <br/>
+    <h3>Elevator Pitch</h3>
+    <p>We also gave a 2 minute pitch for this prototype:</p>
+    <div class = "row">
+    <iframe src="https://drive.google.com/file/d/1LxDHvAkr5QiPOquA5d4hkEAJDB7IEnx1/preview" width="610" height="400"></iframe>
+      <img src="./images/PicPitch.png" alt="Pitch" width="510" height="400">
+    </div>
       </div>
       <!-- /.container -->
 
