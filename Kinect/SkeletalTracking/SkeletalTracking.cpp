@@ -413,7 +413,7 @@ float SkeletalBasics::ActivityAnalysis(IBody* pBodyFromCurrentFrame, IBody* pBod
 
 	hr = pBodyFromCurrentFrame->GetJoints(_countof(currentjoints), currentjoints);
 
-	// Current frame data loaded 
+	// Current frame data loaded
 	if (SUCCEEDED(hr))
 	{
 		hr = pBodyFromPreviousFrame->GetJoints(_countof(previousjoints), previousjoints);
@@ -546,7 +546,7 @@ void drawKinectData() {
 }
 
 void setupVideo() {
-	outputVideo.open("video0.avi", 0, 30, cv::Size(width, height), true);//eventually we want this to change each session                      
+	outputVideo.open("video0.avi", 0, 30, cv::Size(width, height), true);//eventually we want this to change each session
 }
 void writeToVideo() {
 	cv::Mat pixels(height, width, CV_8UC3);
@@ -611,7 +611,7 @@ void drawSkeletals() {
 			// left hand
 			glVertex3f(jointTranslate[7][0], jointTranslate[7][1], 0);
 			glVertex3f(jointTranslate[6][0], jointTranslate[6][1], 0);
-			// lower left arm	
+			// lower left arm
 			glVertex3f(jointTranslate[6][0], jointTranslate[6][1], 0);
 			glVertex3f(jointTranslate[5][0], jointTranslate[5][1], 0);
 			// upper left arm
@@ -668,7 +668,7 @@ void drawSkeletals() {
 			// right shin
 			glVertex3f(jointTranslate[17][0], jointTranslate[17][1], 0);
 			glVertex3f(jointTranslate[18][0], jointTranslate[18][1], 0);
-			// right foot 
+			// right foot
 			glVertex3f(jointTranslate[18][0], jointTranslate[18][1], 0);
 			glVertex3f(jointTranslate[19][0], jointTranslate[19][1], 0);
 		}
@@ -689,6 +689,7 @@ bool init(int argc, char* argv[]) {
 }
 
 int main(int argc, char* argv[]) {
+	setupVideo();
 	if (!init(argc, argv)) return 1;
 	if (!initKinect()) return 1;
 	// Initialize textures
