@@ -21,7 +21,11 @@ cs Washington tutorial by Ed Zhang:
 https://homes.cs.washington.edu/~edzhang/tutorials/kinect2/kinect1.html
 https://github.com/kyzyx/Tutorials/tree/master/Kinect2SDK/1_Basics
 
+OpenGL to OpenCV video saving basics by Tommy Chheng:
+https://github.com/tc/opengl-to-video-sample
+https://tommy.chheng.com/post/123568080616/encode-opengl-to-video-with-opencv
 
+OpenGL to OpenCV video saving tutorial by YZhong52, Jeff Molofee, and Frederic Echols:
 https://github.com/yzhong52/OpenGLFramebufferAsVideo
 */
 
@@ -31,6 +35,7 @@ static cv::VideoWriter outputVideo;
 #define width 1920
 #define height 1080
 #define GL_BGRA 0x80E1
+#define GL_RGB 0x1907
 
 // OpenGL Variables
 GLuint textureId;              // ID of the texture to contain Kinect RGB Data
@@ -149,6 +154,8 @@ SkeletalBasics::SkeletalBasics() :
 
 SkeletalBasics::~SkeletalBasics()
 {
+	//close the video to prevent it from corrupting
+	outputVideo.release();
 	// close the Kinect Sensor
 	if (m_pKinectSensor)
 	{
@@ -557,12 +564,19 @@ void drawKinectData() {
 	glTexCoord2f(0.0f, 1.0f);
 	glVertex3f(0, height, 0.0f);
 	glEnd();
-	drawSkeletals();//want to move this line so it finds multiple bodies
+	drawSkeletals();
 }
 
 void setupVideo() {
-	outputVideo.open("video0.avi", 0, 30, cv::Size(width, height), true);//eventually we want this to change each session
+	//eventually we want the video name to change each session
+	//it needs to contain a number
+	//Figure out the frames per second for video speed to be right
+	outputVideo.open("video0.avi", CV_FOURCC('M', 'J', 'P', 'G'), 08.0, cv::Size(width, height), true);
+	if (!outputVideo.isOpened()) {
+		cout << "video writer failed to open" << endl;
+	}
 }
+
 void writeToVideo() {
 	cv::Mat pixels(height, width, CV_8UC3);
 	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels.data);
@@ -572,7 +586,6 @@ void writeToVideo() {
 		cv_pixels.at<cv::Vec3b>(y, x)[2] = pixels.at<cv::Vec3b>(height - y - 1, x)[0];
 		cv_pixels.at<cv::Vec3b>(y, x)[1] = pixels.at<cv::Vec3b>(height - y - 1, x)[1];
 		cv_pixels.at<cv::Vec3b>(y, x)[0] = pixels.at<cv::Vec3b>(height - y - 1, x)[2];
-		//cout << "\ncv pixels length: " << cv_pixels.size() << endl;
 	}
 	outputVideo << cv_pixels;
 }
@@ -580,8 +593,8 @@ void writeToVideo() {
 void draw() {
 	drawKinectData();
 	application.Update();
-	glutSwapBuffers();
 	writeToVideo();
+	glutSwapBuffers();
 }
 
 void drawSkeletals() {
@@ -592,27 +605,6 @@ void drawSkeletals() {
 	glLineWidth(4);
 	for (int i = 0; i < BODY_COUNT; i++) {
 		if (trackList[i]) {
-			/*
-			since we get the joint coordinates in cameraSpacePoints between -1 and 1
-			here, we need to move the joint positions by 1 so they're between 0 and 2 (they're currently between -1 and 1),
-			half them, as we've doubled the range, then multiply them by the height (X) or width (Y) respectively
-			so the coordinates are relative to the screen size
-			We've taken out the Z axis (depth) as it limits the detectability of the user when the distance from the camera is too large
-			*/
-			//restructures the cameraSpacePoints constants into an array:
-
-			/* test line: screen diagonal
-			glVertex3f(0, 0, 0);
-			glVertex3f(width, height, 0);
-			test the coords: we want these values approx. between 0 and 1900, and 0 and 1000 respectively
-			cout << jointTranslate[6][0] << endl;
-			cout << jointTranslate[6][1] << endl;
-			*/
-
-
-
-
-
 			// neck
 			glVertex3f(colorPoints[i][3].X, colorPoints[i][3].Y, 0);
 			glVertex3f(colorPoints[i][2].X, colorPoints[i][2].Y, 0);
