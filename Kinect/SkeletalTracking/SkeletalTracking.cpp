@@ -46,7 +46,6 @@ IKinectSensor* sensor;         // Kinect sensor
 IColorFrameReader* reader;     // Kinect color data source
 
 // Body Tracking Variables
-Joint jointsAll[BODY_COUNT][JointType_Count];
 BOOLEAN trackList[BODY_COUNT];
 ColorSpacePoint colorPoints[BODY_COUNT][JointType_Count];
 
@@ -286,7 +285,6 @@ void SkeletalBasics::Calibration(IBody** ppBodies)
 				Joint joints[JointType_Count];
 
 				hr = pBody->GetJoints(_countof(joints), joints);
-				pBody->GetJoints(_countof(joints), jointsAll[i]);
 				if (SUCCEEDED(hr))
 				{
 					float leftHandHeight = joints[7].Position.Y;
@@ -359,7 +357,6 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 				Joint joints[JointType_Count];
 
 				hr = pBody->GetJoints(_countof(joints), joints);
-				pBody->GetJoints(_countof(joints), jointsAll[i]);
 
 				// If joints are obtained successfully, start data process
 				if (SUCCEEDED(hr))
@@ -568,18 +565,24 @@ void drawKinectData() {
 }
 
 void setupVideo() {
-	//eventually we want the video name to change each session
-	//it needs to contain a number
-	//Figure out the frames per second for video speed to be right
-	outputVideo.open("video0.avi", CV_FOURCC('M', 'J', 'P', 'G'), 08.0, cv::Size(width, height), true);
+	//eventually we want the video name to change each session: the writer will create a new video file.
+	//maximum speed (fps here) it'll accept is 14.5; we calibrated it frame by frame to be true to real time
+	//10.0 was 28% too fast so we found 7.81 was correct, we might have to use the time library to perfect this
+	outputVideo.open("video0.avi", CV_FOURCC('M', 'J', 'P', 'G'), 7.81, cv::Size(width, height), true);
 	if (!outputVideo.isOpened()) {
 		cout << "video writer failed to open" << endl;
 	}
 }
 
 void writeToVideo() {
+	//this gets the x and y window coordinates of the viewport, followed by its width and height
+	double ViewPortParams[4];
+	glGetDoublev(GL_VIEWPORT, ViewPortParams);
+	//cout << ViewPortParams[2] << " " << ViewPortParams[3] << endl;
+	cv::Mat gl_pixels(ViewPortParams[3], ViewPortParams[2], CV_8UC3);
+	glReadPixels(0, 0, ViewPortParams[2], ViewPortParams[3], GL_RGB, GL_UNSIGNED_BYTE, gl_pixels.data);
 	cv::Mat pixels(height, width, CV_8UC3);
-	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels.data);
+	resize(gl_pixels, pixels, cv::Size(width, height));
 	cv::Mat cv_pixels(height, width, CV_8UC3);
 	for (int y = 0; y < height; y++) for (int x = 0; x < width; x++)
 	{
