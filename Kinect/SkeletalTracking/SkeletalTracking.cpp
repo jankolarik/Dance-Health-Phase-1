@@ -43,6 +43,7 @@ IColorFrameReader* reader;     // Kinect color data source
 // Body Tracking Variables
 Joint jointsAll[BODY_COUNT][JointType_Count];
 BOOLEAN trackList[BODY_COUNT];
+ColorSpacePoint colorPoints[BODY_COUNT][JointType_Count];
 
 // No need to include the std keyword before cout
 using namespace std;
@@ -115,6 +116,8 @@ private:
 	void				 MaxJointsData(Joint joints[]);
 
 	void				 Summary();
+
+	ColorSpacePoint	         	 CameraToColor(const CameraSpacePoint& bodyPoint);
 };
 
 SkeletalBasics application;
@@ -384,6 +387,11 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 						m_nSpecialPostureStartTime = 0;
 					}
 
+					for (int j = 0; j < _countof(joints); ++j)
+					{
+						colorPoints[i][j] = CameraToColor(joints[j].Position);
+					}
+
 					// Update max height of joints
 					MaxJointsData(joints);
 
@@ -495,6 +503,13 @@ void SkeletalBasics::Summary()
 	summaryFile.close();
 }
 
+ColorSpacePoint SkeletalBasics::CameraToColor(const CameraSpacePoint& bodyPoint)
+{
+	ColorSpacePoint colorPoint;
+	m_pCoordinateMapper->MapCameraPointsToColorSpace(1, &bodyPoint, 1, &colorPoint);
+	return colorPoint;
+}
+
 
 
 bool initKinect() {
@@ -586,11 +601,6 @@ void drawSkeletals() {
 			*/
 			//restructures the cameraSpacePoints constants into an array:
 
-			float jointTranslate[JointType_Count][2];
-			for (int j = 0; j < JointType_Count; j++) {
-				jointTranslate[j][0] = (float)((jointsAll[i][j].Position.X) + 1) * width / 2;
-				jointTranslate[j][1] = (float)((jointsAll[i][j].Position.Y) - 1) * -height / 2;
-			}
 			/* test line: screen diagonal
 			glVertex3f(0, 0, 0);
 			glVertex3f(width, height, 0);
@@ -599,78 +609,82 @@ void drawSkeletals() {
 			cout << jointTranslate[6][1] << endl;
 			*/
 
+
+
+
+
 			// neck
-			glVertex3f(jointTranslate[3][0], jointTranslate[3][1], 0);
-			glVertex3f(jointTranslate[2][0], jointTranslate[2][1], 0);
+			glVertex3f(colorPoints[i][3].X, colorPoints[i][3].Y, 0);
+			glVertex3f(colorPoints[i][2].X, colorPoints[i][2].Y, 0);
 			// left collarbone
-			glVertex3f(jointTranslate[2][0], jointTranslate[2][1], 0);
-			glVertex3f(jointTranslate[4][0], jointTranslate[4][1], 0);
+			glVertex3f(colorPoints[i][2].X, colorPoints[i][2].Y, 0);
+			glVertex3f(colorPoints[i][4].X, colorPoints[i][4].Y, 0);
 			// right collarbone
-			glVertex3f(jointTranslate[2][0], jointTranslate[2][1], 0);
-			glVertex3f(jointTranslate[8][0], jointTranslate[8][1], 0);
+			glVertex3f(colorPoints[i][2].X, colorPoints[i][2].Y, 0);
+			glVertex3f(colorPoints[i][8].X, colorPoints[i][8].Y, 0);
 			// left hand
-			glVertex3f(jointTranslate[7][0], jointTranslate[7][1], 0);
-			glVertex3f(jointTranslate[6][0], jointTranslate[6][1], 0);
+			glVertex3f(colorPoints[i][7].X, colorPoints[i][7].Y, 0);
+			glVertex3f(colorPoints[i][6].X, colorPoints[i][6].Y, 0);
 			// lower left arm
-			glVertex3f(jointTranslate[6][0], jointTranslate[6][1], 0);
-			glVertex3f(jointTranslate[5][0], jointTranslate[5][1], 0);
+			glVertex3f(colorPoints[i][6].X, colorPoints[i][6].Y, 0);
+			glVertex3f(colorPoints[i][5].X, colorPoints[i][5].Y, 0);
 			// upper left arm
-			glVertex3f(jointTranslate[5][0], jointTranslate[5][1], 0);
-			glVertex3f(jointTranslate[4][0], jointTranslate[4][1], 0);
+			glVertex3f(colorPoints[i][5].X, colorPoints[i][5].Y, 0);
+			glVertex3f(colorPoints[i][4].X, colorPoints[i][4].Y, 0);
 			// right hand
-			glVertex3f(jointTranslate[11][0], jointTranslate[11][1], 0);
-			glVertex3f(jointTranslate[10][0], jointTranslate[10][1], 0);
+			glVertex3f(colorPoints[i][11].X, colorPoints[i][11].Y, 0);
+			glVertex3f(colorPoints[i][10].X, colorPoints[i][10].Y, 0);
 			// lower right arm
-			glVertex3f(jointTranslate[10][0], jointTranslate[10][1], 0);
-			glVertex3f(jointTranslate[9][0], jointTranslate[9][1], 0);
+			glVertex3f(colorPoints[i][10].X, colorPoints[i][10].Y, 0);
+			glVertex3f(colorPoints[i][9].X, colorPoints[i][9].Y, 0);
 			// upper right arm
-			glVertex3f(jointTranslate[9][0], jointTranslate[9][1], 0);
-			glVertex3f(jointTranslate[8][0], jointTranslate[8][1], 0);
+			glVertex3f(colorPoints[i][9].X, colorPoints[i][9].Y, 0);
+			glVertex3f(colorPoints[i][8].X, colorPoints[i][8].Y, 0);
 			// upper spine
-			glVertex3f(jointTranslate[2][0], jointTranslate[2][1], 0);
-			glVertex3f(jointTranslate[20][0], jointTranslate[20][1], 0);
+			glVertex3f(colorPoints[i][2].X, colorPoints[i][2].Y, 0);
+			glVertex3f(colorPoints[i][20].X, colorPoints[i][20].Y, 0);
 			// mid spine -> it can't seem to actually track the midpoint. -> problematic for posture tracking?
-			glVertex3f(jointTranslate[20][0], jointTranslate[20][1], 0);
-			glVertex3f(jointTranslate[1][0], jointTranslate[1][1], 0);
+			glVertex3f(colorPoints[i][20].X, colorPoints[i][20].Y, 0);
+			glVertex3f(colorPoints[i][1].X, colorPoints[i][1].Y, 0);
 			// lower spine
-			glVertex3f(jointTranslate[1][0], jointTranslate[1][1], 0);
-			glVertex3f(jointTranslate[0][0], jointTranslate[0][1], 0);
+			glVertex3f(colorPoints[i][1].X, colorPoints[i][1].Y, 0);
+			glVertex3f(colorPoints[i][0].X, colorPoints[i][0].Y, 0);
 			// left hand tip
-			glVertex3f(jointTranslate[7][0], jointTranslate[7][1], 0);
-			glVertex3f(jointTranslate[21][0], jointTranslate[21][1], 0);
+			glVertex3f(colorPoints[i][7].X, colorPoints[i][7].Y, 0);
+			glVertex3f(colorPoints[i][21].X, colorPoints[i][21].Y, 0);
 			// right hand tip
-			glVertex3f(jointTranslate[11][0], jointTranslate[11][1], 0);
-			glVertex3f(jointTranslate[23][0], jointTranslate[23][1], 0);
+			glVertex3f(colorPoints[i][11].X, colorPoints[i][11].Y, 0);
+			glVertex3f(colorPoints[i][23].X, colorPoints[i][23].Y, 0);
 			// left thumb
-			glVertex3f(jointTranslate[7][0], jointTranslate[7][1], 0);
-			glVertex3f(jointTranslate[22][0], jointTranslate[22][1], 0);
+			glVertex3f(colorPoints[i][7].X, colorPoints[i][7].Y, 0);
+			glVertex3f(colorPoints[i][22].X, colorPoints[i][22].Y, 0);
 			// right thumb
-			glVertex3f(jointTranslate[11][0], jointTranslate[11][1], 0);
-			glVertex3f(jointTranslate[24][0], jointTranslate[24][1], 0);
+			glVertex3f(colorPoints[i][11].X, colorPoints[i][11].Y, 0);
+			glVertex3f(colorPoints[i][24].X, colorPoints[i][24].Y, 0);
 			// left hip
-			glVertex3f(jointTranslate[0][0], jointTranslate[0][1], 0);
-			glVertex3f(jointTranslate[12][0], jointTranslate[12][1], 0);
+			glVertex3f(colorPoints[i][0].X, colorPoints[i][0].Y, 0);
+			glVertex3f(colorPoints[i][12].X, colorPoints[i][12].Y, 0);
 			// left thigh
-			glVertex3f(jointTranslate[12][0], jointTranslate[12][1], 0);
-			glVertex3f(jointTranslate[13][0], jointTranslate[13][1], 0);
+			glVertex3f(colorPoints[i][12].X, colorPoints[i][12].Y, 0);
+			glVertex3f(colorPoints[i][13].X, colorPoints[i][13].Y, 0);
 			// left shin
-			glVertex3f(jointTranslate[13][0], jointTranslate[13][1], 0);
-			glVertex3f(jointTranslate[14][0], jointTranslate[14][1], 0);
+			glVertex3f(colorPoints[i][13].X, colorPoints[i][13].Y, 0);
+			glVertex3f(colorPoints[i][14].X, colorPoints[i][14].Y, 0);
 			// left foot
-			glVertex3f(jointTranslate[14][0], jointTranslate[14][1], 0);
-			glVertex3f(jointTranslate[15][0], jointTranslate[15][1], 0);
+			glVertex3f(colorPoints[i][14].X, colorPoints[i][14].Y, 0);
+			glVertex3f(colorPoints[i][15].X, colorPoints[i][15].Y, 0);
 			// right hip
-			glVertex3f(jointTranslate[0][0], jointTranslate[0][1], 0);
-			glVertex3f(jointTranslate[16][0], jointTranslate[16][1], 0);
+			glVertex3f(colorPoints[i][0].X, colorPoints[i][0].Y, 0);
+			glVertex3f(colorPoints[i][16].X, colorPoints[i][16].Y, 0);
 			// right thigh
-			glVertex3f(jointTranslate[16][0], jointTranslate[16][1], 0);
-			glVertex3f(jointTranslate[17][0], jointTranslate[17][1], 0);
+			glVertex3f(colorPoints[i][16].X, colorPoints[i][16].Y, 0);
+			glVertex3f(colorPoints[i][17].X, colorPoints[i][17].Y, 0);
 			// right shin
-			glVertex3f(jointTranslate[17][0], jointTranslate[17][1], 0);
-			glVertex3f(jointTranslate[18][0], jointTranslate[18][1], 0);
+			glVertex3f(colorPoints[i][17].X, colorPoints[i][17].Y, 0);
+			glVertex3f(colorPoints[i][18].X, colorPoints[i][18].Y, 0);
 			// right foot
-			glVertex3f(jointTranslate[18][0], jointTranslate[18][1], 0);
-			glVertex3f(jointTranslate[19][0], jointTranslate[19][1], 0);
+			glVertex3f(colorPoints[i][18].X, colorPoints[i][18].Y, 0);
+			glVertex3f(colorPoints[i][19].X, colorPoints[i][19].Y, 0);
 		}
 	}
 	glColor3f(1.0f, 1.0f, 1.0f);//this makes every vertex after white, which clears the color
