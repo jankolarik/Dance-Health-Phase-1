@@ -1,41 +1,7 @@
-#include <Windows.h>
-#include "Kinect.h"
-#include <iostream>
-#include <cmath>
-#include <time.h>       /* clock_t, clock, CLOCKS_PER_SEC */
-#include <iostream>
-#include <fstream>
-#include <chrono>
-
-#include <Ole2.h>
-#include<gl/GL.h>
-#include<gl/GLU.h>
-#include<gl/glut.h>
-
-#include<opencv2/opencv.hpp>
-#include<opencv2/videoio/videoio_c.h>
-#include<opencv2/highgui.hpp>
-
-/* references:
-cs Washington tutorial by Ed Zhang:
-https://homes.cs.washington.edu/~edzhang/tutorials/kinect2/kinect1.html
-https://github.com/kyzyx/Tutorials/tree/master/Kinect2SDK/1_Basics
-
-OpenGL to OpenCV video saving basics by Tommy Chheng:
-https://github.com/tc/opengl-to-video-sample
-https://tommy.chheng.com/post/123568080616/encode-opengl-to-video-with-opencv
-
-OpenGL to OpenCV video saving tutorial by YZhong52, Jeff Molofee, and Frederic Echols:
-https://github.com/yzhong52/OpenGLFramebufferAsVideo
-*/
+#include "stdafx.h"
+#include "SkeletalTracking.h"
 
 static cv::VideoWriter outputVideo;
-
-#define CLOCKS_PER_SEC  ((clock_t)1000)
-#define width 1920
-#define height 1080
-#define GL_BGRA 0x80E1
-#define GL_RGB 0x1907
 
 // OpenGL Variables
 GLuint textureId;              // ID of the texture to contain Kinect RGB Data
@@ -49,83 +15,7 @@ IColorFrameReader* reader;     // Kinect color data source
 BOOLEAN trackList[BODY_COUNT];
 ColorSpacePoint colorPoints[BODY_COUNT][JointType_Count];
 
-// No need to include the std keyword before cout
-using namespace std;
-using namespace cv;
-
-// Safe release for interfaces
-template<class Interface>
-inline void SafeRelease(Interface*& pInterfaceToRelease)
-{
-	if (pInterfaceToRelease != NULL)
-	{
-		pInterfaceToRelease->Release();
-		pInterfaceToRelease = NULL;
-	}
-}
-
-
-class SkeletalBasics
-{
-public:
-	// Constructor
-	SkeletalBasics();
-
-	// Destructor
-	~SkeletalBasics();
-
-	void				 Update();
-
-	HRESULT				 InitializeDefaultSensor();
-
-private:
-	// Current Kinect
-	IKinectSensor* m_pKinectSensor;
-	ICoordinateMapper* m_pCoordinateMapper;
-
-	// Body reader
-	IBodyFrameReader* m_pBodyFrameReader;
-
-	// Body from last frame
-	IBody* m_pBodyFromPreviousFrame[BODY_COUNT] = { 0 };
-
-	// Calibration
-	bool				 m_bCalibrationStatus;
-	clock_t				 m_nCalibrationStartTime;
-	float				 m_fCalibrationDuration;
-	float				 m_fCalibrationValue;
-
-	// Session
-	bool				 m_bSessionStatus;
-	clock_t				 m_nSessionStartTime;
-	float                m_fSessionDuration;
-	float				 m_fSessionAvgJointDisplacement;
-	float				 m_fSessionJointsMaxheight[JointType_Count];
-
-	// Start & Stop posture
-	clock_t              m_nSpecialPostureStartTime;
-	float				 m_fSpecialPostureDuration;
-
-
-	void				 ProcessBody(int nBodyCount, IBody** ppBodies);
-
-	float				 ActivityAnalysis(IBody* pBodyFromCurrentFrame, IBody* pBodyFromPreviousFrame);
-
-	float				 JointDisplacementCalculator(Joint firstJoint, Joint secondJoint);
-
-	void				 Calibration(IBody** ppBodies);
-
-	bool				 SpecialPostureIndicator(Joint joints[]);
-
-	void				 MaxJointsData(Joint joints[]);
-
-	void				 Summary();
-
-	ColorSpacePoint	         	 CameraToColor(const CameraSpacePoint& bodyPoint);
-};
-
 SkeletalBasics application;
-void drawSkeletals();
 
 SkeletalBasics::SkeletalBasics() :
 	m_pKinectSensor(NULL),
@@ -146,7 +36,7 @@ SkeletalBasics::SkeletalBasics() :
 	for (int i = 0; i < JointType_Count; i++)
 	{
 		// Set the initial value of max height to be low enough that any new height can replace it
-		m_fSessionJointsMaxheight[i] = -10;
+		m_fSessionJointsMaxheight[i] = -FLT_MIN;
 	}
 }
 
@@ -537,69 +427,6 @@ bool initKinect() {
 	}
 }
 
-void getKinectData(GLubyte* dest) {
-	IColorFrame* frame = NULL;
-	if (SUCCEEDED(reader->AcquireLatestFrame(&frame))) {
-		frame->CopyConvertedFrameDataToArray(width * height * 4, dataGlu, ColorImageFormat_Bgra);
-	}
-	if (frame) frame->Release();
-}
-
-void drawKinectData() {
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, textureId);
-	getKinectData(dataGlu);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)dataGlu);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f, 0.0f);
-	glVertex3f(0, 0, 0);
-	glTexCoord2f(1.0f, 0.0f);
-	glVertex3f(width, 0, 0);
-	glTexCoord2f(1.0f, 1.0f);
-	glVertex3f(width, height, 0.0f);
-	glTexCoord2f(0.0f, 1.0f);
-	glVertex3f(0, height, 0.0f);
-	glEnd();
-	drawSkeletals();
-}
-
-void setupVideo() {
-	//eventually we want the video name to change each session: the writer will create a new video file.
-	//maximum speed (fps here) it'll accept is 14.5; we calibrated it frame by frame to be true to real time
-	//10.0 was 28% too fast so we found 7.81 was correct, we might have to use the time library to perfect this
-	outputVideo.open("video0.avi", CV_FOURCC('M', 'J', 'P', 'G'), 7.81, cv::Size(width, height), true);
-	if (!outputVideo.isOpened()) {
-		cout << "video writer failed to open" << endl;
-	}
-}
-
-void writeToVideo() {
-	//this gets the x and y window coordinates of the viewport, followed by its width and height
-	double ViewPortParams[4];
-	glGetDoublev(GL_VIEWPORT, ViewPortParams);
-	//cout << ViewPortParams[2] << " " << ViewPortParams[3] << endl;
-	cv::Mat gl_pixels(ViewPortParams[3], ViewPortParams[2], CV_8UC3);
-	glReadPixels(0, 0, ViewPortParams[2], ViewPortParams[3], GL_RGB, GL_UNSIGNED_BYTE, gl_pixels.data);
-	cv::Mat pixels(height, width, CV_8UC3);
-	resize(gl_pixels, pixels, cv::Size(width, height));
-	cv::Mat cv_pixels(height, width, CV_8UC3);
-	for (int y = 0; y < height; y++) for (int x = 0; x < width; x++)
-	{
-		cv_pixels.at<cv::Vec3b>(y, x)[2] = pixels.at<cv::Vec3b>(height - y - 1, x)[0];
-		cv_pixels.at<cv::Vec3b>(y, x)[1] = pixels.at<cv::Vec3b>(height - y - 1, x)[1];
-		cv_pixels.at<cv::Vec3b>(y, x)[0] = pixels.at<cv::Vec3b>(height - y - 1, x)[2];
-	}
-	outputVideo << cv_pixels;
-}
-
-void draw() {
-	drawKinectData();
-	application.Update();
-	writeToVideo();
-	glutSwapBuffers();
-}
-
 void drawSkeletals() {
 	glDisable(GL_TEXTURE_2D);//this should allow the line to appear without transparancy, as it makes it hard to see
 	glLineWidth(4);
@@ -685,6 +512,71 @@ void drawSkeletals() {
 	glColor3f(1.0f, 1.0f, 1.0f);//this makes every vertex after white, which clears the color
 	glEnd();
 }
+
+void getKinectData(GLubyte* dest) {
+	IColorFrame* frame = NULL;
+	if (SUCCEEDED(reader->AcquireLatestFrame(&frame))) {
+		frame->CopyConvertedFrameDataToArray(width * height * 4, dataGlu, ColorImageFormat_Bgra);
+	}
+	if (frame) frame->Release();
+}
+
+void drawKinectData() {
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textureId);
+	getKinectData(dataGlu);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)dataGlu);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex3f(0, 0, 0);
+	glTexCoord2f(1.0f, 0.0f);
+	glVertex3f(width, 0, 0);
+	glTexCoord2f(1.0f, 1.0f);
+	glVertex3f(width, height, 0.0f);
+	glTexCoord2f(0.0f, 1.0f);
+	glVertex3f(0, height, 0.0f);
+	glEnd();
+	drawSkeletals();
+}
+
+void setupVideo() {
+	//eventually we want the video name to change each session: the writer will create a new video file.
+	//maximum speed (fps here) it'll accept is 14.5; we calibrated it frame by frame to be true to real time
+	//10.0 was 28% too fast so we found 7.81 was correct, we might have to use the time library to perfect this
+	outputVideo.open("video0.avi", CV_FOURCC('M', 'J', 'P', 'G'), 7.81, cv::Size(width, height), true);
+	if (!outputVideo.isOpened()) {
+		cout << "video writer failed to open" << endl;
+	}
+}
+
+void writeToVideo() {
+	//this gets the x and y window coordinates of the viewport, followed by its width and height
+	double ViewPortParams[4];
+	glGetDoublev(GL_VIEWPORT, ViewPortParams);
+	//cout << ViewPortParams[2] << " " << ViewPortParams[3] << endl;
+	cv::Mat gl_pixels(ViewPortParams[3], ViewPortParams[2], CV_8UC3);
+	glReadPixels(0, 0, ViewPortParams[2], ViewPortParams[3], GL_RGB, GL_UNSIGNED_BYTE, gl_pixels.data);
+	cv::Mat pixels(height, width, CV_8UC3);
+	resize(gl_pixels, pixels, cv::Size(width, height));
+	cv::Mat cv_pixels(height, width, CV_8UC3);
+	for (int y = 0; y < height; y++) for (int x = 0; x < width; x++)
+	{
+		cv_pixels.at<cv::Vec3b>(y, x)[2] = pixels.at<cv::Vec3b>(height - y - 1, x)[0];
+		cv_pixels.at<cv::Vec3b>(y, x)[1] = pixels.at<cv::Vec3b>(height - y - 1, x)[1];
+		cv_pixels.at<cv::Vec3b>(y, x)[0] = pixels.at<cv::Vec3b>(height - y - 1, x)[2];
+	}
+	outputVideo << cv_pixels;
+}
+
+void draw() {
+	drawKinectData();
+	application.Update();
+	writeToVideo();
+	glutSwapBuffers();
+}
+
+
 
 bool init(int argc, char* argv[]) {
 	application.InitializeDefaultSensor();
