@@ -169,6 +169,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Drawing.cpp" />
     <ClCompile Include="SkeletalTracking.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>

@@ -13,20 +13,26 @@ public:
 	// Destructor
 	~SkeletalBasics();
 
+	// Current Kinect
+	IKinectSensor*       m_pKinectSensor;
+	ICoordinateMapper*   m_pCoordinateMapper;
+
+	// Body & Color reader
+	IBodyFrameReader*    m_pBodyFrameReader;
+	IColorFrameReader*   m_pColorFrameReader;
+
+	// Drawing 
+	bool                 m_bTrackList[BODY_COUNT];
+	ColorSpacePoint      m_cColorPoints[BODY_COUNT][JointType_Count];
+
 	void				 Update();
 
 	HRESULT				 InitializeDefaultSensor();
 
 private:
-	// Current Kinect
-	IKinectSensor* m_pKinectSensor;
-	ICoordinateMapper* m_pCoordinateMapper;
 
-	// Body reader
-	IBodyFrameReader* m_pBodyFrameReader;
-
-	// Body from last frame
-	IBody* m_pBodyFromPreviousFrame[BODY_COUNT] = { 0 };
+	// Body from previous frame
+	IBody*               m_pBodyFromPreviousFrame[BODY_COUNT] = { 0 };
 
 	// Calibration
 	bool				 m_bCalibrationStatus;
@@ -44,7 +50,6 @@ private:
 	// Start & Stop posture
 	clock_t              m_nSpecialPostureStartTime;
 	float				 m_fSpecialPostureDuration;
-
 
 	void				 ProcessBody(int nBodyCount, IBody** ppBodies);
 
