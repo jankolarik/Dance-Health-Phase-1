@@ -1,12 +1,14 @@
 #ignore files with permission issues:
 Kinect/SkeletalTracking/.vs/SkeletalTracking/v16/Browse.VC.opendb
 Kinect/SkeletalTracking/.vs/SkeletalTracking/v16/ipch/AutoPCH/
+Kinect/SkeletalTracking/.vs/SkeletalTracking/v16/Browse.VC.db
+Kinect/SkeletalTracking/.vs/SkeletalTracking/v16/.suo
 Kinect/SkeletalTracking/packages/opencv/build/x64/vc14/bin/opencv_world420d.dll
 Kinect/SkeletalTracking/packages/opencv/build/x64/vc14/bin/opencv_world420d.pdb
 Kinect/SkeletalTracking/packages/opencv/build/x64/vc15/bin/opencv_world420d.dll
 Kinect/SkeletalTracking/packages/opencv/build/x64/vc15/bin/opencv_world420d.pdb
 Kinect/SkeletalTracking/packages/opencv/build/x64/vc15/lib/opencv_world420d.lib
 Kinect/SkeletalTracking/packages/opencv/build/x64/vc14/lib/opencv_world420d.lib
-
-
-
+Kinect/SkeletalTracking/video0.avi
+Kinect/SkeletalTracking/BadBackup.cpp
+server.js
