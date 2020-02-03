@@ -31,8 +31,6 @@
 #include <fstream>
 #include <chrono>
 
-#pragma warning(pop)
-
 #define CLOCKS_PER_SEC  ((clock_t)1000)
 #define width 1920
 #define height 1080
@@ -41,6 +39,9 @@
 
 using namespace std;
 using namespace cv;
+
+static cv::VideoWriter outputVideo;
+extern cv::VideoWriter outputVideo;
 
 // Safe release for interfaces
 template<class Interface>
