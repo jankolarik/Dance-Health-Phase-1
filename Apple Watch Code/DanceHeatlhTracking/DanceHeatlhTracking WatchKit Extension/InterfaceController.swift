@@ -201,10 +201,10 @@ class InterfaceController: WKInterfaceController {
     //https://www.youtube.com/watch?v=BFaZaUTF6m4
     
 
-func getURLRequests(){
+/*func getURLRequests(){
     let session = URLSession(configuration: .ephemeral)
     
-    var url = URL(string: "http://localhost:3000/posts")
+    var url = URL(string: "https://dancehealth.azurewebsites.net/users")
     var request = URLRequest(url : url!)
 
     request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
@@ -273,6 +273,6 @@ func getURLRequests(){
     
     //Part 13
     postTask.currentRequest?.httpBody
-}
+}*/
 
 
