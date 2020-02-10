@@ -13,18 +13,19 @@ import HealthKit
 import CoreML
 
 
-class InterfaceController: WKInterfaceController {
+class InterfaceController: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorkoutBuilderDelegate {
     
 // MARK: - Declaration of variables + actions
     @IBOutlet weak var timer: WKInterfaceTimer!
-    @IBOutlet weak var yGravityLabel: WKInterfaceLabel!
-    @IBOutlet weak var xRotationLabel: WKInterfaceLabel!
+    @IBOutlet weak var heartRateLabel: WKInterfaceLabel!
+    @IBOutlet weak var caloriesLabel: WKInterfaceLabel!
+    
+    @IBOutlet weak var distanceLabel: WKInterfaceLabel!
     @IBOutlet weak var spinsLabel: WKInterfaceLabel!
     @IBOutlet weak var startDancingButton: WKInterfaceButton!
     
     let healthStore = HKHealthStore()
     let motion = CMMotionManager()
-    //let orientation = CMAttitude()
     var session: HKWorkoutSession!
     var builder: HKLiveWorkoutBuilder!
     var configuration: HKWorkoutConfiguration!
@@ -32,6 +33,12 @@ class InterfaceController: WKInterfaceController {
     var currentState : Int = 0
     var noOfSpinsCompleted : Int = 0
     var isAutorotating : Bool = true
+    
+    var avgHeartRate : Double = 0
+    var minHeartRate : Double = 0
+    var maxHeartRate : Double = 0
+    var distanceTravelled : Double = 0
+    var caloriesBurned : Double = 0
     
     @IBAction func startDancingButtonClick() {
         if(currentState == 0){
@@ -62,7 +69,6 @@ class InterfaceController: WKInterfaceController {
     
 // MARK: - Session Management
     func startSession(){
-        print("Start")
         createHKWorkoutSession()
         currentState = 1
         startDancingButton.setTitle("Stop Dancing")
@@ -71,6 +77,10 @@ class InterfaceController: WKInterfaceController {
         builder.beginCollection(withStart: Date()) { (success, error) in
             self.setDurationTimerDate(.running)
         }
+        
+        // Setup session and builder.
+        session.delegate = self
+        builder.delegate = self
     }
         
     func endSession(){
@@ -78,9 +88,9 @@ class InterfaceController: WKInterfaceController {
         self.setDurationTimerDate(.ended)
         endCollectionOfWorkout()
         currentState = 0
-        print("Stop")
         motionData()
         startDancingButton.setTitle("Start Dancing")
+        //CREATE JSON AND SEND IT
     }
     
     //Used from SpeedySloth example code
@@ -109,19 +119,12 @@ class InterfaceController: WKInterfaceController {
     func authenticator(){
         // The quantity type to write to the health store.
         let typesToShare: Set = [
-            //HKQuantityType.workoutType()
-            HKQuantityType.quantityType(forIdentifier: .heartRate)!,
-            HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!,
-            HKQuantityType.quantityType(forIdentifier: .distanceWalkingRunning)!,
-            HKQuantityType.quantityType(forIdentifier: .stepCount)!
+            HKQuantityType.workoutType()
         ]
 
         // The quantity types to read from the health store.
         let typesToRead: Set = [
-            HKQuantityType.quantityType(forIdentifier: .heartRate)!,
-            HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!,
-            HKQuantityType.quantityType(forIdentifier: .distanceWalkingRunning)!,
-            HKQuantityType.quantityType(forIdentifier: .stepCount)!
+            HKQuantityType.workoutType()
         ]
 
         // Request authorization for those quantity types.
@@ -161,6 +164,7 @@ class InterfaceController: WKInterfaceController {
     }
     
     
+    
     // MARK: - Motion Manager
 
     //https://stackoverflow.com/questions/46756274/how-to-work-with-accelerometer-data-from-the-apple-watch
@@ -169,15 +173,8 @@ class InterfaceController: WKInterfaceController {
         if(self.currentState == 1){
             motion.deviceMotionUpdateInterval = 0.3
 
-            
             motion.startDeviceMotionUpdates(to: OperationQueue.current!) { (data, error) in
                 if let myData = data {
-                    self.yGravityLabel.setText("y (gravity): " + String(format: "%.03f", myData.gravity.y))
-                    self.xRotationLabel.setText("x (rotation): " + String(format: "%.03f", myData.rotationRate.x))
-
-                     
-                    print("x: \(myData.userAcceleration.x) y: \(myData.userAcceleration.y) z: \(myData.userAcceleration.z) rotRateX: \(myData.rotationRate.x) rotRateY: \(myData.rotationRate.y) rotRateZ: \(myData.rotationRate.z)")
-                    
                     if(abs(myData.rotationRate.x) > 7 && abs(myData.gravity.y) < 0.2){
                         self.noOfSpinsCompleted += 1
                     }
@@ -188,16 +185,110 @@ class InterfaceController: WKInterfaceController {
         else{
             self.spinsLabel.setText("Spins: \(self.noOfSpinsCompleted)")
             self.noOfSpinsCompleted = 0
-            self.yGravityLabel.setText("y (gravity): 0")
-            self.xRotationLabel.setText("x (rotation): 0")
             motion.stopDeviceMotionUpdates()
             return
         }
     }
+    
+
+    // MARK: - HKLiveWorkoutBuilderDelegate
+    
+    func workoutBuilder(_ workoutBuilder: HKLiveWorkoutBuilder, didCollectDataOf collectedTypes: Set<HKSampleType>) {
+            
+        let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate)!
+        if let statistics = workoutBuilder.statistics(for: heartRateType){
+            let heartRateUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
+            let value = statistics.mostRecentQuantity()?.doubleValue(for: heartRateUnit)
+            let roundedValue = Double( round( 1 * value! ) / 1 )
+            heartRateLabel.setText("\(roundedValue) BPM")
+            avgHeartRate = roundedValue
+            
+            let minValue = statistics.minimumQuantity()?.doubleValue(for: heartRateUnit)
+            let minRoundedValue = Double( round( 1 * minValue! ) / 1 )
+            minHeartRate = minRoundedValue
+            
+            let maxValue = statistics.maximumQuantity()?.doubleValue(for: heartRateUnit)
+            let maxRoundedValue = Double( round( 1 * maxValue! ) / 1 )
+            maxHeartRate = maxRoundedValue
+        }
+        
+        let distanceType = HKQuantityType.quantityType(forIdentifier: .distanceWalkingRunning)!
+        if let statistics = workoutBuilder.statistics(for: distanceType){
+            let meterUnit = HKUnit.meter()
+            let value = statistics.sumQuantity()?.doubleValue(for: meterUnit)
+            let roundedValue = Double( round( 1 * value! ) / 1 )
+            distanceLabel.setText("\(roundedValue) m")
+            distanceTravelled = roundedValue
+        }
+        
+        let calorieType = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!
+        if let statistics = workoutBuilder.statistics(for: calorieType){
+            let energyUnit = HKUnit.kilocalorie()
+            let value = statistics.sumQuantity()?.doubleValue(for: energyUnit)
+            let roundedValue = Double( round( 1 * value! ) / 1 )
+            caloriesLabel.setText("\(roundedValue) cal")
+            caloriesBurned = roundedValue
+        }
+    }
+    
+    // MARK: - Update the interface
+    
+    // Track elapsed time.
+    func workoutBuilderDidCollectEvent(_ workoutBuilder: HKLiveWorkoutBuilder) {
+        // Retreive the workout event.
+        guard let workoutEventType = workoutBuilder.workoutEvents.last?.type else { return }
+        
+        // Update the timer based on the event received.
+        switch workoutEventType {
+        case .pause: // The user paused the workout.
+            setDurationTimerDate(.paused)
+        case .resume: // The user resumed the workout.
+            setDurationTimerDate(.running)
+        default:
+            return
+            
+        }
+    }
+    
+    // MARK: - HKWorkoutSessionDelegate
+    func workoutSession(
+        _ workoutSession: HKWorkoutSession,
+        didChangeTo toState: HKWorkoutSessionState,
+        from fromState: HKWorkoutSessionState,
+        date: Date
+    ) {
+        // Dispatch to main, because we are updating the interface.
+        DispatchQueue.main.async {
+            //self.setupMenuItemsForWorkoutSessionState(toState)
+        }
+    }
+    
+    func workoutSession(_ workoutSession: HKWorkoutSession, didFailWithError error: Error) {
+        // No error handling in this sample project.
+    }
+    
+    // MARK: - JSON Object
+    func createJSON(){
+        let jsonObject: [String: Any] = [
+            "session_id": 0,
+            "minHeartRate": minHeartRate,
+            "maxHeartRate": maxHeartRate,
+            "averageHeartRate": avgHeartRate,
+            "caloriesBurned": caloriesBurned,
+            "distanceTravelled": distanceTravelled
+        ]
+
+        if(JSONSerialization.isValidJSONObject(jsonObject)){
+        }
+        else{
+            //Error Handling
+        }
+    }
+    
+    
 }
 
-
-    // MARK: - Creating URL Requests
+// MARK: - Creating URL Requests
     //https://www.youtube.com/watch?v=BFaZaUTF6m4
     
 
@@ -274,5 +365,6 @@ class InterfaceController: WKInterfaceController {
     //Part 13
     postTask.currentRequest?.httpBody
 }*/
+
 
 

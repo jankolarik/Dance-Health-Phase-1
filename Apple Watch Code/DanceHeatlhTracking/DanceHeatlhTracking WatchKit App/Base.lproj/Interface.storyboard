@@ -18,8 +18,9 @@
                                 </label>
                             </items>
                         </group>
-                        <label alignment="left" text="y (gravity): " id="VX4-8s-fDy"/>
-                        <label alignment="left" text="x (rotation): " id="PSQ-kY-XYg"/>
+                        <label alignment="left" text="Heart rate: " id="Lgp-Oc-k7B"/>
+                        <label alignment="left" text="Calories: " id="nmP-nd-tG4"/>
+                        <label alignment="left" text="Distance: " id="24n-I6-guW"/>
                         <group width="1" alignment="left" id="ZmD-2v-ci0">
                             <items>
                                 <label alignment="left" text="Spins: " id="xZO-fn-zcM"/>
@@ -41,11 +42,12 @@
                         </group>
                     </items>
                     <connections>
+                        <outlet property="caloriesLabel" destination="nmP-nd-tG4" id="Nbd-UA-yLl"/>
+                        <outlet property="distanceLabel" destination="24n-I6-guW" id="cyg-vi-C5a"/>
+                        <outlet property="heartRateLabel" destination="Lgp-Oc-k7B" id="RLj-NV-dDD"/>
                         <outlet property="spinsLabel" destination="xZO-fn-zcM" id="IMa-PK-1QY"/>
                         <outlet property="startDancingButton" destination="zle-77-e63" id="bpe-al-sRh"/>
                         <outlet property="timer" destination="wu3-gE-MFL" id="Zfk-by-12K"/>
-                        <outlet property="xRotationLabel" destination="PSQ-kY-XYg" id="1eC-OP-uOo"/>
-                        <outlet property="yGravityLabel" destination="VX4-8s-fDy" id="tIl-PB-DH7"/>
                     </connections>
                 </controller>
             </objects>
