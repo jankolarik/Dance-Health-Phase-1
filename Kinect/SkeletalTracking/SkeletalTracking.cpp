@@ -104,7 +104,8 @@ void SkeletalBasics::Update()
 		// If the body data is refreshed successfully
 		if (SUCCEEDED(hr))
 		{
-			if (!m_bSessionFinished)
+			//if (!m_bSessionFinished)
+			if (m_fSessionDuration<5)//for testing purposes
 			{
 				// The main function to process body data e.g. joints
 				ProcessBody(BODY_COUNT, ppBodies);
@@ -368,7 +369,8 @@ void SkeletalBasics::Summary()
 	time_t time = std::chrono::system_clock::to_time_t(currentTime);
 
 	ofstream summaryFile;
-	summaryFile.open("Session_Summary.txt");
+	String filename = "SessionSummary" + SessionDate + ".txt";//this will be a json eventually
+	summaryFile.open(filename);
 	summaryFile << ctime(&time) << endl
 		<< "Session Duration: " << m_fSessionDuration << " seconds" << endl
 		<< "Average distance moved per joint in this session: " << m_fSessionAvgJointDisplacement << " meters" << endl << endl

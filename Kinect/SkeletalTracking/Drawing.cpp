@@ -145,10 +145,15 @@ void drawKinectData() {
 }
 
 void setupVideo() {
-	//eventually we want the video name to change each session: the writer will create a new video file.
+	const time_t now = time(0);
+	application.SessionDate = ctime(&now);
+	application.SessionDate.erase(remove_if(application.SessionDate.begin(), application.SessionDate.end(), isspace), application.SessionDate.end());
+	application.SessionDate.erase(remove(application.SessionDate.begin(), application.SessionDate.end(), ':'), application.SessionDate.end());
+	String vidName = "vide0" + application.SessionDate + ".avi";
+	//cout << vidName<<endl;
 	//maximum speed (fps here) it'll accept is 14.5; we calibrated it frame by frame to be true to real time
 	//10.0 was 28% too fast so we found 7.81 was correct, we might have to use the time library to perfect this
-	outputVideo.open("video0.avi", CV_FOURCC('M', 'J', 'P', 'G'), 7.81, cv::Size(width, height), true);
+	outputVideo.open(vidName, CV_FOURCC('M', 'J', 'P', 'G'), 7.81, cv::Size(width, height), true);
 	if (!outputVideo.isOpened()) {
 		cout << "video writer failed to open" << endl;
 	}

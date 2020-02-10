@@ -29,6 +29,8 @@ public:
 
 	HRESULT				 InitializeDefaultSensor();
 
+	String				 SessionDate;
+
 private:
 
 	// Body from previous frame
