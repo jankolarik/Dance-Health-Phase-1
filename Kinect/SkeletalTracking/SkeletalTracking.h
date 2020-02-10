@@ -21,7 +21,7 @@ public:
 	IBodyFrameReader*    m_pBodyFrameReader;
 	IColorFrameReader*   m_pColorFrameReader;
 
-	// Drawing 
+	// Drawing
 	bool                 m_bTrackList[BODY_COUNT];
 	ColorSpacePoint      m_cColorPoints[BODY_COUNT][JointType_Count];
 
@@ -34,14 +34,11 @@ private:
 	// Body from previous frame
 	IBody*               m_pBodyFromPreviousFrame[BODY_COUNT] = { 0 };
 
-	// Calibration
-	bool				 m_bCalibrationStatus;
-	clock_t				 m_nCalibrationStartTime;
-	float				 m_fCalibrationDuration;
-	float				 m_fCalibrationValue;
+	// Floor Height for calibration
+	float				 m_fFloorHeight;
 
 	// Session
-	bool				 m_bSessionStatus;
+	bool				 m_bSessionFinished;
 	clock_t				 m_nSessionStartTime;
 	float                m_fSessionDuration;
 	float				 m_fSessionAvgJointDisplacement;
@@ -57,13 +54,23 @@ private:
 
 	float				 JointDisplacementCalculator(Joint firstJoint, Joint secondJoint);
 
-	void				 Calibration(IBody** ppBodies);
+	float				 GetJointAngle(Joint joints[],int jointNumber);
 
-	bool				 SpecialPostureIndicator(Joint joints[]);
+	float                SingleJointAngleCalculator(Joint centerJoint, Joint endJoint);
+
+	float                SingleJointAngleCalculator(Joint centerJoint1, Joint endJoint1, Joint centerJoint2, Joint endJoint2);
 
 	void				 MaxJointsData(Joint joints[]);
 
+	bool				 SessionStart(Joint joints[]);
+
+	bool                 SessionEnd(Joint joints[]);
+
+	void                 UpdateFloorHeight(IBodyFrame* ppBodyframe);
+
+	float                Calibrate(float num);
+
 	void				 Summary();
 
-	ColorSpacePoint	         	 CameraToColor(const CameraSpacePoint& bodyPoint);
+	ColorSpacePoint	     CameraToColor(const CameraSpacePoint& bodyPoint);
 };

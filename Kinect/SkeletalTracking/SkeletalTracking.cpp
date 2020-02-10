@@ -7,11 +7,8 @@ SkeletalBasics::SkeletalBasics() :
 	m_pCoordinateMapper(NULL),
 	m_pBodyFrameReader(NULL),
 	m_pColorFrameReader(NULL),
-	m_bCalibrationStatus(false),
-	m_fCalibrationValue(0),
-	m_nCalibrationStartTime(0),
-	m_fCalibrationDuration(3),
-	m_bSessionStatus(false),
+	m_fFloorHeight(0),
+	m_bSessionFinished(false),
 	m_nSessionStartTime(0),
 	m_fSessionDuration(0),
 	m_fSessionAvgJointDisplacement(0),
@@ -37,6 +34,7 @@ SkeletalBasics::~SkeletalBasics()
 		m_pKinectSensor->Close();
 	}
 }
+
 
 HRESULT SkeletalBasics::InitializeDefaultSensor()
 {
@@ -103,19 +101,12 @@ void SkeletalBasics::Update()
 
 		hr = pBodyFrame->GetAndRefreshBodyData(_countof(ppBodies), ppBodies);
 
-		// If the Body data is refreshed successfully
+		// If the body data is refreshed successfully
 		if (SUCCEEDED(hr))
 		{
-
-			// If the calibration hasn't done, continue calibration
-			if (!m_bCalibrationStatus)
+			if (!m_bSessionFinished)
 			{
-				Calibration(ppBodies);
-				cout << "Calibration value : " << m_fCalibrationValue << endl;
-			}
-			else if (!m_bSessionStatus)
-			{
-				// The main function to process body data for each frame
+				// The main function to process body data e.g. joints
 				ProcessBody(BODY_COUNT, ppBodies);
 
 				// Load the used frame data into the "previousframe" pointer to be used in the next frmae for comparison
@@ -123,6 +114,7 @@ void SkeletalBasics::Update()
 			}
 			else
 			{
+				UpdateFloorHeight(pBodyFrame);
 				// After the session finished, run summary
 				Summary();
 				outputVideo.release();
@@ -138,68 +130,24 @@ void SkeletalBasics::Update()
 	SafeRelease(pBodyFrame);
 }
 
-void SkeletalBasics::Calibration(IBody** ppBodies)
+
+void SkeletalBasics::UpdateFloorHeight(IBodyFrame* ppBodyframe)
 {
 	HRESULT hr;
-
-	//cout << "Please stand straight facing the camera, feet firmly planted, legs straight, at maximum 4 meters away." << endl;
-	//cout << "When you are ready to start calibration session, please raise both of your hands above your head." << endl;
-
-	for (int i = 0; i < BODY_COUNT; ++i)
+	Vector4 floorClipPlane;
+	hr = ppBodyframe->get_FloorClipPlane(&floorClipPlane);
+	float floorHeight = 0;
+	if (SUCCEEDED(hr))
 	{
-		IBody* pBody = ppBodies[i];
-
-		if (pBody)
-		{
-			BOOLEAN bTracked = false;
-			hr = pBody->get_IsTracked(&bTracked);
-			m_bTrackList[i] = bTracked;
-
-			// If this body is being tracked
-			if (SUCCEEDED(hr) && bTracked)
-			{
-				Joint joints[JointType_Count];
-
-				hr = pBody->GetJoints(_countof(joints), joints);
-				if (SUCCEEDED(hr))
-				{
-					float leftHandHeight = joints[7].Position.Y;
-					float rightHandHeight = joints[23].Position.Y;
-					float headHeight = joints[3].Position.Y;
-
-					// Calibration starting position: both hands above head
-					if (SpecialPostureIndicator(joints))
-					{
-						// Initial calibration start time
-						if (!m_nCalibrationStartTime)
-						{
-							m_nCalibrationStartTime = clock();
-						}
-
-						float timeSpent = float((clock() - m_nCalibrationStartTime)) / CLOCKS_PER_SEC;
-
-						if (timeSpent > m_fCalibrationDuration)
-						{
-							m_bCalibrationStatus = true;
-						}
-
-						Joint leftFeet = joints[15];
-						Joint rightFeet = joints[19];
-
-						if (SUCCEEDED(leftFeet.TrackingState) && SUCCEEDED(rightFeet.TrackingState))
-						{
-							m_fCalibrationValue = (m_fCalibrationValue + (leftFeet.Position.Y + rightFeet.Position.Y)) / 2;
-						}
-					}
-					// If the posture not detected, reset the start time
-					else
-					{
-						m_nCalibrationStartTime = 0;
-					}
-				}
-			}
-		}
+		floorHeight = floorClipPlane.y;
 	}
+	m_fFloorHeight = floorHeight;
+}
+
+// Adding the floor height to the joint coordinate
+float SkeletalBasics::Calibrate(float num)
+{
+	return num + m_fFloorHeight;
 }
 
 void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
@@ -237,49 +185,39 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 				// If joints are obtained successfully, start data process
 				if (SUCCEEDED(hr))
 				{
-					// Initialise Session start time
-					if (!m_nSessionStartTime)
-					{
-						m_nSessionStartTime = clock();
-					}
 
-					m_fSessionDuration = float((clock() - m_nSessionStartTime)) / CLOCKS_PER_SEC;
-
-					// Special posture recognition
-					if (SpecialPostureIndicator(joints))
+					if (SessionStart(joints)) 
 					{
-						if (!m_nSpecialPostureStartTime)
+						// Initialise Session start time
+						if (!m_nSessionStartTime)
 						{
-							m_nSpecialPostureStartTime = clock();
+							m_nSessionStartTime = clock();
+						}
+						m_fSessionDuration = float((clock() - m_nSessionStartTime)) / CLOCKS_PER_SEC;
+
+						// Map joints points from Camera point to Color point for displaying purpose
+						for (int j = 0; j < _countof(joints); ++j)
+						{
+							m_cColorPoints[i][j] = CameraToColor(joints[j].Position);
 						}
 
-						float timeSpent = float((clock() - m_nSessionStartTime)) / CLOCKS_PER_SEC;
+						// Update max height of joints
+						MaxJointsData(joints);
 
-						// If the special posture is performed for long enough time, finish session
-						if (timeSpent > m_fSpecialPostureDuration)
+						// Joint angle calculation
+						cout << "Angle: " << GetJointAngle(joints, 8) << endl;
+
+						// If the data from last frame is loaded, start comparison2
+						if (previousBodyLoad)
 						{
-							m_bSessionStatus = true;
+							cout << "Activity Analysis value : " << ActivityAnalysis(pBody, pBodyPrevious) << endl;
 						}
 					}
-					else
+					if (SessionEnd(joints))
 					{
-						// If the person stop performing the posture, reset the start time
-						m_nSpecialPostureStartTime = 0;
+						m_bSessionFinished = TRUE;
 					}
-
-					for (int j = 0; j < _countof(joints); ++j)
-					{
-						m_cColorPoints[i][j] = CameraToColor(joints[j].Position);
-					}
-
-					// Update max height of joints
-					MaxJointsData(joints);
-
-					// If the data from last frame is loaded, start comparison
-					if (previousBodyLoad)
-					{
-						cout << "Activity Analysis value : " << ActivityAnalysis(pBody, pBodyPrevious) << endl;
-					}
+					m_bSessionFinished = SessionEnd(joints);
 				}
 			}
 		}
@@ -297,7 +235,6 @@ float SkeletalBasics::ActivityAnalysis(IBody* pBodyFromCurrentFrame, IBody* pBod
 	float averageDistanceTravelPerJoint = 0;
 
 	int   trackedJointNumber = 0;
-
 
 	hr = pBodyFromCurrentFrame->GetJoints(_countof(currentjoints), currentjoints);
 
@@ -338,17 +275,77 @@ float SkeletalBasics::JointDisplacementCalculator(Joint firstJoint, Joint second
 }
 
 
-bool SkeletalBasics::SpecialPostureIndicator(Joint joints[])
+float SkeletalBasics::GetJointAngle(Joint joints[],int jointNumber)
 {
-	float leftHandHeight = joints[7].Position.Y;
-	float rightHandHeight = joints[23].Position.Y;
-	float headHeight = joints[3].Position.Y;
-
-	if ((leftHandHeight > headHeight) && (rightHandHeight > headHeight))
-	{
-		return true;
+	float jointAngle = 0;
+	if (joints[jointNumber].JointType == JointType_ElbowLeft) {
+		jointAngle = SingleJointAngleCalculator(joints[5], joints[4], joints[5], joints[6]);
 	}
+	if (joints[jointNumber].JointType == JointType_ElbowRight) {
+		jointAngle = SingleJointAngleCalculator(joints[9], joints[8], joints[9], joints[10]);
+	}
+	if (joints[jointNumber].JointType == JointType_KneeLeft) {
+		jointAngle = SingleJointAngleCalculator(joints[13], joints[12], joints[13], joints[14]);
+	}
+	if (joints[jointNumber].JointType == JointType_KneeRight) {
+		jointAngle = SingleJointAngleCalculator(joints[17], joints[16], joints[17], joints[18]);
+	}
+	// Joints below are calculated relative to the spine
+	if (joints[jointNumber].JointType == JointType_ShoulderLeft) {
+		jointAngle = SingleJointAngleCalculator(joints[4], joints[5], joints[20], joints[0]);
+	}
+	if (joints[jointNumber].JointType == JointType_ShoulderRight) {
+		jointAngle = SingleJointAngleCalculator(joints[8], joints[9], joints[20], joints[0]);
+	}
+	if (joints[jointNumber].JointType == JointType_HipLeft) {
+		jointAngle = SingleJointAngleCalculator(joints[12], joints[13], joints[0], joints[20]);
+	}
+	if (joints[jointNumber].JointType == JointType_HipRight) {
+		jointAngle = SingleJointAngleCalculator(joints[16], joints[17], joints[0], joints[20]);
+	}
+	return jointAngle;
+}
 
+// Get joint angle relative to the vertical given another joint connected to it
+float SkeletalBasics::SingleJointAngleCalculator(Joint centerJoint, Joint endJoint)
+{
+	float vector1[] = { endJoint.Position.X - centerJoint.Position.X, endJoint.Position.Y - centerJoint.Position.Y, endJoint.Position.Z - centerJoint.Position.Z };
+	float vector2[] = { -1, 0, 0 };
+
+	float magnitude1 = sqrt(pow(vector1[0], 2) + pow(vector1[1], 2) + pow(vector1[2], 2));
+	float magnitude2 = 1;
+
+	float dotProduct = vector1[0] * vector2[0] + vector1[1] * vector2[1] + vector1[2] * vector2[2];
+
+	float angleRadian = acos(dotProduct / (magnitude1 * magnitude2));
+	float angleDegree = angleRadian * 180 / 3.1415;
+	return angleDegree;
+}
+
+// Get joint angle given two bones (each bone is defined by connecting two joints together)
+float SkeletalBasics::SingleJointAngleCalculator(Joint centerJoint1, Joint endJoint1, Joint centerJoint2, Joint endJoint2)
+{
+	float vector1[] = { endJoint1.Position.X - centerJoint1.Position.X, endJoint1.Position.Y - centerJoint1.Position.Y, endJoint1.Position.Z - centerJoint1.Position.Z };
+	float vector2[] = { endJoint2.Position.X - centerJoint2.Position.X, endJoint2.Position.Y - centerJoint2.Position.Y, endJoint2.Position.Z - centerJoint2.Position.Z };
+
+	float magnitude1 = sqrt(pow(vector1[0], 2) + pow(vector1[1], 2) + pow(vector1[2], 2));
+	float magnitude2 = sqrt(pow(vector2[0], 2) + pow(vector2[1], 2) + pow(vector2[2], 2));
+
+	float dotProduct = vector1[0] * vector2[0] + vector1[1] * vector2[1] + vector1[2] * vector2[2];
+
+	float angleRadian = acos(dotProduct / (magnitude1 * magnitude2));
+	float angleDegree = angleRadian * 180 / 3.1415;
+	return angleDegree;
+}
+
+
+bool SkeletalBasics::SessionStart(Joint joints[])
+{
+	return true;
+}
+
+bool SkeletalBasics::SessionEnd(Joint joints[])
+{
 	return false;
 }
 
@@ -375,10 +372,10 @@ void SkeletalBasics::Summary()
 	summaryFile << ctime(&time) << endl
 		<< "Session Duration: " << m_fSessionDuration << " seconds" << endl
 		<< "Average distance moved per joint in this session: " << m_fSessionAvgJointDisplacement << " meters" << endl << endl
-		<< "Max left  hand height: " << m_fSessionJointsMaxheight[7] << endl
-		<< "Max right hand height: " << m_fSessionJointsMaxheight[23] << endl
-		<< "Max left  knee height: " << m_fSessionJointsMaxheight[13] << endl
-		<< "Max right knee height: " << m_fSessionJointsMaxheight[17] << endl;
+		<< "Max left  hand height: " << Calibrate(m_fSessionJointsMaxheight[7])  << endl
+		<< "Max right hand height: " << Calibrate(m_fSessionJointsMaxheight[23]) << endl
+		<< "Max left  knee height: " << Calibrate(m_fSessionJointsMaxheight[13]) << endl
+		<< "Max right knee height: " << Calibrate(m_fSessionJointsMaxheight[17]) << endl;
 
 	summaryFile.close();
 }
@@ -389,4 +386,3 @@ ColorSpacePoint SkeletalBasics::CameraToColor(const CameraSpacePoint& bodyPoint)
 	m_pCoordinateMapper->MapCameraPointsToColorSpace(1, &bodyPoint, 1, &colorPoint);
 	return colorPoint;
 }
-

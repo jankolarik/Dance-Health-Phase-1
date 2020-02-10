@@ -43,10 +43,10 @@ void drawSkeletals() {
 			glVertex3f(application.m_cColorPoints[i][3].X, application.m_cColorPoints[i][3].Y, 0);
 			glVertex3f(application.m_cColorPoints[i][2].X, application.m_cColorPoints[i][2].Y, 0);
 			// left collarbone
-			glVertex3f(application.m_cColorPoints[i][2].X, application.m_cColorPoints[i][2].Y, 0);
+			glVertex3f(application.m_cColorPoints[i][20].X, application.m_cColorPoints[i][20].Y, 0);
 			glVertex3f(application.m_cColorPoints[i][4].X, application.m_cColorPoints[i][4].Y, 0);
 			// right collarbone
-			glVertex3f(application.m_cColorPoints[i][2].X, application.m_cColorPoints[i][2].Y, 0);
+			glVertex3f(application.m_cColorPoints[i][20].X, application.m_cColorPoints[i][20].Y, 0);
 			glVertex3f(application.m_cColorPoints[i][8].X, application.m_cColorPoints[i][8].Y, 0);
 			// left hand
 			glVertex3f(application.m_cColorPoints[i][7].X, application.m_cColorPoints[i][7].Y, 0);
