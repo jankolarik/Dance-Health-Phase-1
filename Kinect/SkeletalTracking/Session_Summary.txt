@@ -1,9 +1,0 @@
-Mon Feb  3 16:39:31 2020
-
-Session Duration: 11.414 seconds
-Average distance moved per joint in this session: 5.63893 meters
-
-Max left  hand height: 0.426265
-Max right hand height: 0.507984
-Max left  knee height: 0.0331092
-Max right knee height: 0.0214

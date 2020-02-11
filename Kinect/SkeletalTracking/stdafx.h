@@ -30,6 +30,7 @@
 #include <iostream>
 #include <fstream>
 #include <chrono>
+#include <stdio.h>
 
 #define CLOCKS_PER_SEC  ((clock_t)1000)
 #define width 1920

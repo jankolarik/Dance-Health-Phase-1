@@ -116,9 +116,8 @@ void SkeletalBasics::Update()
 			else
 			{
 				UpdateFloorHeight(pBodyFrame);
-				// After the session finished, run summary
-				Summary();
-				outputVideo.release();
+				//this creates all the files properly
+				CloseClean();
 				exit(0);
 			}
 		}
@@ -387,4 +386,30 @@ ColorSpacePoint SkeletalBasics::CameraToColor(const CameraSpacePoint& bodyPoint)
 	ColorSpacePoint colorPoint;
 	m_pCoordinateMapper->MapCameraPointsToColorSpace(1, &bodyPoint, 1, &colorPoint);
 	return colorPoint;
+}
+
+void SkeletalBasics::CloseClean() {
+	//this gets date and time (at the end of the session) for the naming of the video file and summary
+	const time_t now = time(0);
+	SessionDate = ctime(&now);
+	SessionDate.erase(remove_if(SessionDate.begin(), SessionDate.end(), isspace), SessionDate.end());
+	SessionDate.erase(remove(SessionDate.begin(), SessionDate.end(), ':'), SessionDate.end());
+	string vidName = "vid" + SessionDate + ".avi";
+	// After the session finished, run summary
+	Summary();
+	//end timer here and calculate time difference
+	videoTimer = time(0) - videoTimer;//gets the length of the video in seconds
+	//close the video writer
+	outputVideo.release();
+	//calculates the fps we want to set the playback speed to, and sets the commands we want to run in the command line
+	int newFPS = frameCounter / videoTimer;
+	string commandFfmpeg = "ffmpeg -r 10 -i vide0.avi -c:v copy -r " + to_string(newFPS) + " " + vidName;
+	//runs ffmpeg video manipulation in command line
+	//using "system" is technically insecure, but cross-platform in case the user is using an opensource Mac kinect driver
+	system(commandFfmpeg.c_str());
+	//deletes the old file with the wrong fps
+	int deleteVid = remove("vide0.avi");
+	if (deleteVid) {
+		cout << "failed to delete obsolete file" << endl;
+	}
 }

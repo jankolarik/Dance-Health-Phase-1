@@ -9,7 +9,6 @@ SkeletalBasics application;
 IKinectSensor* kinectSensor = application.m_pKinectSensor;
 IColorFrameReader* colorFrameReader = application.m_pColorFrameReader;
 
-
 bool initKinect() {
 	if (FAILED(GetDefaultKinectSensor(&kinectSensor))) {
 		return false;
@@ -145,15 +144,11 @@ void drawKinectData() {
 }
 
 void setupVideo() {
-	const time_t now = time(0);
-	application.SessionDate = ctime(&now);
-	application.SessionDate.erase(remove_if(application.SessionDate.begin(), application.SessionDate.end(), isspace), application.SessionDate.end());
-	application.SessionDate.erase(remove(application.SessionDate.begin(), application.SessionDate.end(), ':'), application.SessionDate.end());
-	String vidName = "vide0" + application.SessionDate + ".avi";
-	//cout << vidName<<endl;
-	//maximum speed (fps here) it'll accept is 14.5; we calibrated it frame by frame to be true to real time
-	//10.0 was 28% too fast so we found 7.81 was correct, we might have to use the time library to perfect this
-	outputVideo.open(vidName, CV_FOURCC('M', 'J', 'P', 'G'), 7.81, cv::Size(width, height), true);
+	outputVideo.open("vide0.avi", CV_FOURCC('M', 'J', 'P', 'G'), 10, cv::Size(width, height), true);
+	//start timer for first frame here, end it before the exit: this will adjust the playback speed to fit "real life"
+	application.videoTimer = time(0);
+	//initialise frame counter here: we'll increment it each time we write to the video
+	application.frameCounter = 0;
 	if (!outputVideo.isOpened()) {
 		cout << "video writer failed to open" << endl;
 	}
@@ -163,7 +158,6 @@ void writeToVideo() {
 	//this gets the x and y window coordinates of the viewport, followed by its width and height
 	double ViewPortParams[4];
 	glGetDoublev(GL_VIEWPORT, ViewPortParams);
-	//cout << ViewPortParams[2] << " " << ViewPortParams[3] << endl;
 	cv::Mat gl_pixels(ViewPortParams[3], ViewPortParams[2], CV_8UC3);
 	glReadPixels(0, 0, ViewPortParams[2], ViewPortParams[3], GL_RGB, GL_UNSIGNED_BYTE, gl_pixels.data);
 	cv::Mat pixels(height, width, CV_8UC3);
@@ -175,7 +169,10 @@ void writeToVideo() {
 		cv_pixels.at<cv::Vec3b>(y, x)[1] = pixels.at<cv::Vec3b>(height - y - 1, x)[1];
 		cv_pixels.at<cv::Vec3b>(y, x)[0] = pixels.at<cv::Vec3b>(height - y - 1, x)[2];
 	}
+	//writes to the video
 	outputVideo << cv_pixels;
+	//increments the video counter
+	application.frameCounter++;
 }
 
 void draw() {
@@ -199,7 +196,6 @@ bool init(int argc, char* argv[]) {
 }
 
 int main(int argc, char* argv[]) {
-	setupVideo();
 	if (!init(argc, argv)) return 1;
 	if (!initKinect()) return 1;
 	// Initialize textures
@@ -224,7 +220,7 @@ int main(int argc, char* argv[]) {
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-
+	setupVideo();
 	glutMainLoop();
 	return 0;
 }

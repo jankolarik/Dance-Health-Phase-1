@@ -9,6 +9,7 @@ Kinect/SkeletalTracking/packages/opencv/build/x64/vc15/bin/opencv_world420d.dll
 Kinect/SkeletalTracking/packages/opencv/build/x64/vc15/bin/opencv_world420d.pdb
 Kinect/SkeletalTracking/packages/opencv/build/x64/vc15/lib/opencv_world420d.lib
 Kinect/SkeletalTracking/packages/opencv/build/x64/vc14/lib/opencv_world420d.lib
-Kinect/SkeletalTracking/vide0*
+Kinect/SkeletalTracking/vid*
+Kinect/SkeletalTracking/Session*
 Kinect/SkeletalTracking/BadBackup.cpp
 server.js

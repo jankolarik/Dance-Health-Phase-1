@@ -29,7 +29,12 @@ public:
 
 	HRESULT				 InitializeDefaultSensor();
 
-	String				 SessionDate;
+	//video and file saving
+	string				 SessionDate;
+
+	long				 videoTimer;
+
+	int					 frameCounter;
 
 private:
 
@@ -75,4 +80,6 @@ private:
 	void				 Summary();
 
 	ColorSpacePoint	     CameraToColor(const CameraSpacePoint& bodyPoint);
+
+	void				 CloseClean();
 };
