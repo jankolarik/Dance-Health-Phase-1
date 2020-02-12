@@ -371,15 +371,19 @@ void SkeletalBasics::Summary()
 	time_t time = std::chrono::system_clock::to_time_t(currentTime);
 
 	ofstream summaryFile;
-	String filename = "SessionSummary" + SessionDate + ".txt";//this will be a json eventually
+	String filename = "SessionSummary" + SessionDate + ".json";
 	summaryFile.open(filename);
-	summaryFile << ctime(&time) << endl
-		<< "Session Duration: " << m_fSessionDuration << " seconds" << endl
-		<< "Average distance moved per joint in this session: " << m_fSessionAvgJointDisplacement << " meters" << endl << endl
-		<< "Max left  hand height: " << Calibrate(m_fSessionJointsMaxheight[7])  << endl
-		<< "Max right hand height: " << Calibrate(m_fSessionJointsMaxheight[23]) << endl
-		<< "Max left  knee height: " << Calibrate(m_fSessionJointsMaxheight[13]) << endl
-		<< "Max right knee height: " << Calibrate(m_fSessionJointsMaxheight[17]) << endl;
+	summaryFile << "{" << endl
+		<< "\"session\" : [{" << endl
+		<< "	\"timestamp\" : \"" << SessionDate << "\"," << endl
+		<< "	\"duration\" : \"" << m_fSessionDuration << " seconds\"," << endl
+		<< "	\"avgJointDistMoved\" : \"" << m_fSessionAvgJointDisplacement << " meters\"," << endl
+		<< "	\"maxLeftHandHeight\" : \"" << Calibrate(m_fSessionJointsMaxheight[7]) << "\"," << endl
+		<< "	\"maxRightHandHeight\" : \"" << Calibrate(m_fSessionJointsMaxheight[23]) << "\"," << endl
+		<< "	\"maxLeftKneeHeight\" : \"" << Calibrate(m_fSessionJointsMaxheight[13]) << "\"," << endl
+		<< "	\"maxRightKneeHeight\" : \"" << Calibrate(m_fSessionJointsMaxheight[17]) << "\"" << endl
+		<< "	}]" << endl
+		<< "}" << endl;
 
 	summaryFile.close();
 }
