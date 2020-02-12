@@ -50,6 +50,7 @@ private:
 	float                m_fSessionDuration;
 	float				 m_fSessionAvgJointDisplacement;
 	float				 m_fSessionJointsMaxheight[JointType_Count];
+	long				 LastBodyDetectTime;
 
 	// Start & Stop posture
 	clock_t              m_nSpecialPostureStartTime;
@@ -82,4 +83,5 @@ private:
 	ColorSpacePoint	     CameraToColor(const CameraSpacePoint& bodyPoint);
 
 	void				 CloseClean();
+
 };

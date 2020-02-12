@@ -105,12 +105,13 @@ void SkeletalBasics::Update()
 		if (SUCCEEDED(hr))
 		{
 			//if (!m_bSessionFinished)
-			if (m_fSessionDuration<5)//for testing purposes
+			//ends after user left screen for 7 seconds or more
+			if (((time(0) - LastBodyDetectTime) < 7) || m_nSessionStartTime == 0)
 			{
 				// The main function to process body data e.g. joints
 				ProcessBody(BODY_COUNT, ppBodies);
 
-				// Load the used frame data into the "previousframe" pointer to be used in the next frmae for comparison
+				// Load the used frame data into the "previousframe" pointer to be used in the next frame for comparison
 				hr = pBodyFrame->GetAndRefreshBodyData(_countof(m_pBodyFromPreviousFrame), m_pBodyFromPreviousFrame);
 			}
 			else
@@ -185,7 +186,6 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 				// If joints are obtained successfully, start data process
 				if (SUCCEEDED(hr))
 				{
-
 					if (SessionStart(joints)) 
 					{
 						// Initialise Session start time
@@ -212,6 +212,9 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 						{
 							cout << "Activity Analysis value : " << ActivityAnalysis(pBody, pBodyPrevious) << endl;
 						}
+
+						//get the time since last body was detected
+						LastBodyDetectTime = time(0);
 					}
 					if (SessionEnd(joints))
 					{
@@ -403,13 +406,16 @@ void SkeletalBasics::CloseClean() {
 	outputVideo.release();
 	//calculates the fps we want to set the playback speed to, and sets the commands we want to run in the command line
 	int newFPS = frameCounter / videoTimer;
-	string commandFfmpeg = "ffmpeg -r 10 -i vide0.avi -c:v copy -r " + to_string(newFPS) + " " + vidName;
+	string commandFfmpeg = "ffmpeg -r " + to_string(newFPS) + " -i vide0.mjpeg -c copy " + vidName;
 	//runs ffmpeg video manipulation in command line
-	//using "system" is technically insecure, but cross-platform in case the user is using an opensource Mac kinect driver
+	//using "system" is technically not secure, but cross-platform
+	system("ffmpeg.exe -i vide0.avi -c copy -f mjpeg vide0.mjpeg");
 	system(commandFfmpeg.c_str());
-	//deletes the old file with the wrong fps
+
+	//deletes the old file with the wrong fps (and the intermediate mjpeg)
+	remove("vide0.mjpeg");
 	int deleteVid = remove("vide0.avi");
-	if (deleteVid) {
-		cout << "failed to delete obsolete file" << endl;
+	if (deleteVid != 0) {
+		perror("failed to delete obsolete file");
 	}
 }

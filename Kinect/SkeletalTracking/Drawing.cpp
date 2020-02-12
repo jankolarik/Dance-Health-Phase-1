@@ -144,7 +144,7 @@ void drawKinectData() {
 }
 
 void setupVideo() {
-	outputVideo.open("vide0.avi", CV_FOURCC('M', 'J', 'P', 'G'), 10, cv::Size(width, height), true);
+	outputVideo.open("vide0.avi", CV_FOURCC('M', 'J', 'P', 'G'), 5, cv::Size(width, height), true);
 	//start timer for first frame here, end it before the exit: this will adjust the playback speed to fit "real life"
 	application.videoTimer = time(0);
 	//initialise frame counter here: we'll increment it each time we write to the video
