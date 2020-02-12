@@ -375,6 +375,8 @@ void SkeletalBasics::Summary()
 	summaryFile.open(filename);
 	summaryFile << "{" << endl
 		<< "\"session\" : [{" << endl
+		//currently using date and timeas session id
+		<< "	\"id\" : \"" << SessionDate << "\"," << endl
 		<< "	\"timestamp\" : \"" << SessionDate << "\"," << endl
 		<< "	\"duration\" : \"" << m_fSessionDuration << " seconds\"," << endl
 		<< "	\"avgJointDistMoved\" : \"" << m_fSessionAvgJointDisplacement << " meters\"," << endl
