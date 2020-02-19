@@ -371,19 +371,23 @@ void SkeletalBasics::Summary()
 	time_t time = std::chrono::system_clock::to_time_t(currentTime);
 
 	ofstream summaryFile;
-	String filename = "SessionSummary" + SessionDate + ".json";
+	String filename = "SessionSummary" + SessionDate + ".json";//clinical resource json in fhir?
 	summaryFile.open(filename);
 	summaryFile << "{" << endl
 		<< "\"session\" : [{" << endl
-		//currently using date and timeas session id
-		<< "	\"id\" : \"" << SessionDate << "\"," << endl
+		<< "	\"session_id\" : " << 0 << "," << endl//this should be modified by the Apple Watch code
+		<< "	\"minHeartRate\" : " << 0 << "," << endl//this should be modified by the Apple Watch code
+		<< "	\"maxHeartRate\" : " << 0 << "," << endl//this should be modified by the Apple Watch code
+		<< "	\"averageHeartRate\" : " << 0 << "," << endl//this should be modified by the Apple Watch code
+		<< "	\"caloriesBurned\" : " << 0 << "," << endl//this should be modified by the Apple Watch code
+		<< "	\"distanceTravelled\" : " << 0 << "," << endl//this should be modified by the Apple Watch code
 		<< "	\"timestamp\" : \"" << SessionDate << "\"," << endl
-		<< "	\"duration\" : \"" << m_fSessionDuration << " seconds\"," << endl
-		<< "	\"avgJointDistMoved\" : \"" << m_fSessionAvgJointDisplacement << " meters\"," << endl
-		<< "	\"maxLeftHandHeight\" : \"" << Calibrate(m_fSessionJointsMaxheight[7]) << "\"," << endl
-		<< "	\"maxRightHandHeight\" : \"" << Calibrate(m_fSessionJointsMaxheight[23]) << "\"," << endl
-		<< "	\"maxLeftKneeHeight\" : \"" << Calibrate(m_fSessionJointsMaxheight[13]) << "\"," << endl
-		<< "	\"maxRightKneeHeight\" : \"" << Calibrate(m_fSessionJointsMaxheight[17]) << "\"" << endl
+		<< "	\"durationInSec\" : " << m_fSessionDuration << "," << endl
+		<< "	\"avgJointDistMoved\" : " << m_fSessionAvgJointDisplacement << "," << endl
+		<< "	\"maxLeftHandHeight\" : " << Calibrate(m_fSessionJointsMaxheight[7]) << "," << endl
+		<< "	\"maxRightHandHeight\" : " << Calibrate(m_fSessionJointsMaxheight[23]) << "," << endl
+		<< "	\"maxLeftKneeHeight\" : " << Calibrate(m_fSessionJointsMaxheight[13]) << "," << endl
+		<< "	\"maxRightKneeHeight\" : " << Calibrate(m_fSessionJointsMaxheight[17]) << endl
 		<< "	}]" << endl
 		<< "}" << endl;
 
