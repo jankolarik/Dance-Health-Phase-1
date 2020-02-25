@@ -12,14 +12,16 @@ import CoreMotion
 import HealthKit
 import CoreML
 
-
 class InterfaceController: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorkoutBuilderDelegate {
     
 // MARK: - Declaration of variables + actions
+    //Need to replace '!' with '?' and handle errors!
+    //Maybe move code to seperate classes?
     @IBOutlet weak var timer: WKInterfaceTimer!
     @IBOutlet weak var heartRateLabel: WKInterfaceLabel!
     @IBOutlet weak var caloriesLabel: WKInterfaceLabel!
     
+    @IBOutlet weak var idTextField: WKInterfaceTextField!
     @IBOutlet weak var distanceLabel: WKInterfaceLabel!
     @IBOutlet weak var spinsLabel: WKInterfaceLabel!
     @IBOutlet weak var startDancingButton: WKInterfaceButton!
@@ -29,6 +31,9 @@ class InterfaceController: WKInterfaceController, HKWorkoutSessionDelegate, HKLi
     var session: HKWorkoutSession!
     var builder: HKLiveWorkoutBuilder!
     var configuration: HKWorkoutConfiguration!
+    //enum HKWorkoutSessionState : Int
+    //https://developer.apple.com/documentation/healthkit/hkworkoutsessionstate
+    
     
     var currentState : Int = 0
     var noOfSpinsCompleted : Int = 0
@@ -78,19 +83,25 @@ class InterfaceController: WKInterfaceController, HKWorkoutSessionDelegate, HKLi
             self.setDurationTimerDate(.running)
         }
         
+        
         // Setup session and builder.
         session.delegate = self
         builder.delegate = self
     }
         
     func endSession(){
-        session.end()
-        self.setDurationTimerDate(.ended)
-        endCollectionOfWorkout()
-        currentState = 0
-        motionData()
-        startDancingButton.setTitle("Start Dancing")
-        //CREATE JSON AND SEND IT
+        //if(self.idTextField){
+        //    idTextField.setText("You must enter an ID")
+        //}
+        //else{
+            session.end()
+            self.setDurationTimerDate(.ended)
+            endCollectionOfWorkout()
+            currentState = 0
+            motionData()
+            startDancingButton.setTitle("Start Dancing")
+            postData()
+        //}
     }
     
     //Used from SpeedySloth example code
@@ -115,7 +126,6 @@ class InterfaceController: WKInterfaceController, HKWorkoutSessionDelegate, HKLi
 // MARK: - HealthKit Management
     
     //https://developer.apple.com/documentation/healthkit/setting_up_healthkit
-    
     func authenticator(){
         // The quantity type to write to the health store.
         let typesToShare: Set = [
@@ -167,6 +177,7 @@ class InterfaceController: WKInterfaceController, HKWorkoutSessionDelegate, HKLi
     
     // MARK: - Motion Manager
 
+
     //https://stackoverflow.com/questions/46756274/how-to-work-with-accelerometer-data-from-the-apple-watch
     
     func motionData(){
@@ -195,8 +206,8 @@ class InterfaceController: WKInterfaceController, HKWorkoutSessionDelegate, HKLi
     
     func workoutBuilder(_ workoutBuilder: HKLiveWorkoutBuilder, didCollectDataOf collectedTypes: Set<HKSampleType>) {
             
-        let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate)!
-        if let statistics = workoutBuilder.statistics(for: heartRateType){
+        
+        if let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate), let statistics = workoutBuilder.statistics(for: heartRateType){
             let heartRateUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
             let value = statistics.mostRecentQuantity()?.doubleValue(for: heartRateUnit)
             let roundedValue = Double( round( 1 * value! ) / 1 )
@@ -212,8 +223,8 @@ class InterfaceController: WKInterfaceController, HKWorkoutSessionDelegate, HKLi
             maxHeartRate = maxRoundedValue
         }
         
-        let distanceType = HKQuantityType.quantityType(forIdentifier: .distanceWalkingRunning)!
-        if let statistics = workoutBuilder.statistics(for: distanceType){
+        
+        if let distanceType = HKQuantityType.quantityType(forIdentifier: .distanceWalkingRunning), let statistics = workoutBuilder.statistics(for: distanceType){
             let meterUnit = HKUnit.meter()
             let value = statistics.sumQuantity()?.doubleValue(for: meterUnit)
             let roundedValue = Double( round( 1 * value! ) / 1 )
@@ -221,8 +232,8 @@ class InterfaceController: WKInterfaceController, HKWorkoutSessionDelegate, HKLi
             distanceTravelled = roundedValue
         }
         
-        let calorieType = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!
-        if let statistics = workoutBuilder.statistics(for: calorieType){
+        
+        if let calorieType = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned), let statistics = workoutBuilder.statistics(for: calorieType){
             let energyUnit = HKUnit.kilocalorie()
             let value = statistics.sumQuantity()?.doubleValue(for: energyUnit)
             let roundedValue = Double( round( 1 * value! ) / 1 )
@@ -284,87 +295,47 @@ class InterfaceController: WKInterfaceController, HKWorkoutSessionDelegate, HKLi
             //Error Handling
         }
     }
-    
-    
-}
 
 // MARK: - Creating URL Requests
-    //https://www.youtube.com/watch?v=BFaZaUTF6m4
-    
+    //Mongo DB Docs
+    //https://docs.mongodb.com/stitch/services/http-actions/http.post/
+    func postData(){
+        let jsonDanceObject: [String: Any] = [
+            "id": -1,
+            "duration": -1,
+            "minHeartRate": minHeartRate,
+            "maxHeartRate": maxHeartRate,
+            "averageHeartRate": avgHeartRate,
+            "caloriesBurned": caloriesBurned,
+            "distanceTravelled": distanceTravelled,
+            "twists" : noOfSpinsCompleted,
+            "timeStamp" : -1,
+            "durationInSec" : -1,
+            "avgJointDistanceMoved" : -1,
+            "maxLeftHandHeight" : -1,
+            "maxRightHandHeight" : -1,
+            "maxLeftKneeHeight" : -1,
+            "maxRightKneeHeight": -1,
+            "linkToVideo": -1
+        ]
+        
+        
+        let jsonDanceObjectSerialized = try? JSONSerialization.data(withJSONObject: jsonDanceObject)
+        
+        //https://learnappmaking.com/urlsession-swift-networking-how-to/
+        //Create new betton to send data (Provide success/failure of data sent?
+        
+        let session = URLSession.shared
+        let url = URL(string: "http://51.11.52.98:3300/dance")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.httpBody = jsonDanceObjectSerialized
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
-/*func getURLRequests(){
-    let session = URLSession(configuration: .ephemeral)
-    
-    var url = URL(string: "https://dancehealth.azurewebsites.net/users")
-    var request = URLRequest(url : url!)
-
-    request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-    request.networkServiceType = .background
-    
-    //Part 3
-    request.allowsCellularAccess = false
-    
-    //Part 4
-    let taskWithRequest = session.dataTask(with: request)
-    
-    //Part 5
-    taskWithRequest.currentRequest?.httpMethod
-    
-    //Part 6
-    request.httpMethod = "POST"
-    
-    //Part 7
-    request.addValue("application/json", forHTTPHeaderField: "content-type")
-    
-    //Part 8
-    struct Post: Codable {
-        //let id: Int
-        let author: String
-        let title: String
-    }
-    
-    let encoder = JSONEncoder()
-    let post = Post(author: "Example Author", title: "Example Title")
-    do {
-        let data = try encoder.encode(post)
-        request.httpBody = data
-    } catch let encoderError as NSError {
-        //print("Encoder error: \(encodeError.localizedError.localizedDescription)")
-    }
-    
-    //Part 9
-    taskWithRequest.currentRequest?.httpMethod
-    
-    //Part 10
-    let postTask = session.dataTask(with: request){ data, response, error in
-        defer{}
-        guard let data = data, let response = response as? HTTPURLResponse, response.statusCode == 201 else{
-            print("No data or status code not created")
-            return
+        
+        let task = session.uploadTask(with: request, from: jsonDanceObjectSerialized) { data, response, error in
+            // Do something...
         }
-    
-    
-        let decoder = JSONDecoder()
-        do {
-            let post = try decoder.decode(Post.self, from: data)
-            post
-        } catch let decodeError as NSError {
-            //Print
-            return
-        }
+        task.resume()
     }
-    
-    //Part 11
-    postTask.currentRequest?.httpMethod
-    postTask.currentRequest?.allHTTPHeaderFields
-    postTask.currentRequest?.httpBody
-
-    //Part 12
-    postTask.resume()
-    
-    //Part 13
-    postTask.currentRequest?.httpBody
-}*/
-
-
-
+}
