@@ -14,7 +14,8 @@ SkeletalBasics::SkeletalBasics() :
 	m_fSessionAvgJointDisplacement(0),
 	m_fSessionJointsMaxheight(),
 	m_nSpecialPostureStartTime(0),
-	m_fSpecialPostureDuration(5)
+	m_fSpecialPostureDuration(5),
+	session_id("")
 {
 	for (int i = 0; i < JointType_Count; i++)
 	{
@@ -88,6 +89,13 @@ void SkeletalBasics::Update()
 	if (!m_pBodyFrameReader)
 	{
 		return;
+	}
+
+	if (session_id == "") {
+		cout << "Please input a session ID. It should match the one entered in the Apple Watch, and differ from all session IDs used within the same day." << endl;
+		cout << "It can contain any characters, but it should not be blank (in which case you wil be re-prompted)." << endl;
+		cout << "Example: \"Alex 1\"." << endl;
+		cin >> session_id;
 	}
 
 	IBodyFrame* pBodyFrame = NULL;
@@ -375,7 +383,7 @@ void SkeletalBasics::Summary()
 	summaryFile.open(filename);
 	summaryFile << "{" << endl
 		<< "\"session\" : [{" << endl
-		<< "	\"session_id\" : " << 0 << "," << endl//this should be modified by the Apple Watch code
+		<< "	\"session_id\" : \"" << session_id << "\"," << endl//this should be modified by the Apple Watch code
 		<< "	\"minHeartRate\" : " << 0 << "," << endl//this should be modified by the Apple Watch code
 		<< "	\"maxHeartRate\" : " << 0 << "," << endl//this should be modified by the Apple Watch code
 		<< "	\"averageHeartRate\" : " << 0 << "," << endl//this should be modified by the Apple Watch code
