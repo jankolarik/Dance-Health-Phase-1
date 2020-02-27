@@ -146,9 +146,9 @@ void drawKinectData() {
 void setupVideo() {
 	outputVideo.open("vide0.avi", CV_FOURCC('M', 'J', 'P', 'G'), 5, cv::Size(width, height), true);
 	//start timer for first frame here, end it before the exit: this will adjust the playback speed to fit "real life"
-	application.videoTimer = time(0);
+	application.m_videoTimer = time(0);
 	//initialise frame counter here: we'll increment it each time we write to the video
-	application.frameCounter = 0;
+	application.m_frameCounter = 0;
 	if (!outputVideo.isOpened()) {
 		cout << "video writer failed to open" << endl;
 	}
@@ -172,7 +172,7 @@ void writeToVideo() {
 	//writes to the video
 	outputVideo << cv_pixels;
 	//increments the video counter
-	application.frameCounter++;
+	application.m_frameCounter++;
 }
 
 void draw() {

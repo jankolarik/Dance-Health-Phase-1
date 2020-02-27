@@ -10,7 +10,7 @@
 #include <Windows.h>
 
 // Kinect Header Files
-#include "Kinect.h"
+#include <Kinect.h>
 
 // OpenGL Header Files
 #include <Ole2.h>
@@ -22,6 +22,9 @@
 #include<opencv2/opencv.hpp>
 #include<opencv2/videoio/videoio_c.h>
 #include<opencv2/highgui.hpp>
+
+// Curl header Files
+#include <curl.h>
 
 // Other libraries
 #include <iostream>
