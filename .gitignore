@@ -13,4 +13,5 @@ Kinect/SkeletalTracking/vid*
 Kinect/SkeletalTracking/Session*
 Kinect/SkeletalTracking/.json
 Kinect/SkeletalTracking/BadBackup.cpp
+Kinect/SkeletalTracking/packages/FFmpeg.Nightly.20200115.0.0
 server.js

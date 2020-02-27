@@ -73,21 +73,40 @@
   <div class="container">
 
         <!-- Page Heading/Breadcrumbs -->
-        <h1 class="mt-4 mb-3">Full Width
-          <small>Subheading</small>
-        </h1>
+        <h1 class="mt-4 mb-3">Algorithms</h1>
     
         <ol class="breadcrumb">
           <li class="breadcrumb-item">
             <a href="index.html">Home</a>
           </li>
-          <li class="breadcrumb-item active">Full Width</li>
+          <li class="breadcrumb-item active">Algorithms</li>
         </ol>
-    
-        <p>Most of Start Bootstrap's unstyled templates can be directly integrated into the Modern Business template. You can view all of our unstyled templates on our website at
-          <a href="http://startbootstrap.com/template-categories/unstyled">http://startbootstrap.com/template-categories/unstyled</a>.</p>
-    
-      </div>
+    <!--Models
+— Describe the key idea of your chosen algorithms
+▪  Experiment Setup
+—  Dataset
+—  Preprocess (if applicable)
+—  Training and testing scheme
+▪  Experiment results
+—  Investigation of the optional Hyperparameters
+—  Experiment results should be presented by quantified values
+—  Use plots or tables to show the performance comparison results
+▪  Discussions
+—  Why the algorithm fails for some test examples
+—  Suggestions to improve the performance
+▪  Conclusion
+-->
+    <h2>JSON Merging with Verification</h2>
+    <p>The server receives 2 separate JSON files each session: 1 from the Kinect, and 1 from the Apple Watch.<br>
+      We need to merge the JSON files received by the server before displaying them.<br>
+      We wanted to make sure that if any part of the system failed, no past sessions could be overwritten and we could not merge two files from two different sessions.<br>
+      We started by choosing to delete the received JSONs after they'd been merged, but we were worried that if the system crashed before the files got deleted, it wouldn't be enough. <br>
+      To remedy this, we added a user-entered session ID that needs to match in both JSON files in order for the merging process to happen:
+    <div style="display: inline-block">
+      <img src="./images/algo2.png" style="float: left; position: relative" width="500" height="350">
+      <img src="./images/algoSketch2.jpg" style="float: right; position: relative" width="500" height="350"></div><br>
+  The main problem with this algorithm is the introduction of the possibility of user error: if the user does not type the session ID properly, it could cause merging issues.</p>
+  </div>
       <!-- /.container -->
 
   <!-- Footer -->
