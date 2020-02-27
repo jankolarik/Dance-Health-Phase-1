@@ -1,0 +1,17 @@
+{
+"session" : [{
+	"session_id" : 1,
+	"minHeartRate" : 0,
+	"maxHeartRate" : 0,
+	"averageHeartRate" : 0,
+	"caloriesBurned" : 0,
+	"distanceTravelled" : 0,
+	"timestamp" : "MonFeb171821102020",
+	"durationInSec" : 3.697,
+	"avgJointDistMoved" : 4.6612,
+	"maxLeftHandHeight" : 1.33154,
+	"maxRightHandHeight" : 1.46443,
+	"maxLeftKneeHeight" : 0.981489,
+	"maxRightKneeHeight" : 1.07272
+	}]
+}

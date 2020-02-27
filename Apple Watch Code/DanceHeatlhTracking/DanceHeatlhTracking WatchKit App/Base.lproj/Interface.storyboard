@@ -1,11 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="15705" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="AgC-eL-Hgc">
+<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="15705" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="8hb-ZL-GMe">
     <device id="watch38"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15706"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="15501"/>
     </dependencies>
     <scenes>
+        <!--Interface Controller-->
+        <scene sceneID="AoU-rq-VJl">
+            <objects>
+                <controller id="8hb-ZL-GMe">
+                    <items>
+                        <group width="1" alignment="left" id="cTx-hD-twl">
+                            <items>
+                                <label alignment="center" verticalAlignment="center" text="Dance for Health" textAlignment="center" id="oPg-94-hOP">
+                                    <fontDescription key="font" style="UICTFontTextStyleHeadline"/>
+                                </label>
+                            </items>
+                        </group>
+                        <group width="1" alignment="left" id="yY3-hS-RgT">
+                            <items>
+                                <textField width="1" alignment="left" text="Enter ID" id="ahi-fw-xXz">
+                                    <connections>
+                                        <action selector="startDancingButtonClick" destination="AgC-eL-Hgc" id="Yq0-Nl-AR9"/>
+                                    </connections>
+                                </textField>
+                            </items>
+                        </group>
+                        <button width="1" height="61" alignment="left" title="Start Dancing" id="KFF-9v-guW">
+                            <connections>
+                                <segue destination="AgC-eL-Hgc" kind="modal" id="cC3-sv-EjC"/>
+                            </connections>
+                        </button>
+                    </items>
+                </controller>
+            </objects>
+            <point key="canvasLocation" x="-310" y="17"/>
+        </scene>
         <!--Interface Controller-->
         <scene sceneID="aou-V4-d1y">
             <objects>
