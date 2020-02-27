@@ -1,19 +1,17 @@
 {
-  "session": [
-    {
-      "session_id": "Alex1",
-      "minHeartRate": 70,
-      "maxHeartRate": 107,
-      "averageHeartRate": 89,
-      "caloriesBurned": 200,
-      "distanceTravelled": 12,
-      "timestamp": "MonFeb171821102020",
-      "durationInSec": 3.697,
-      "avgJointDistMoved": 4.6612,
-      "maxLeftHandHeight": 1.33154,
-      "maxRightHandHeight": 1.46443,
-      "maxLeftKneeHeight": 0.981489,
-      "maxRightKneeHeight": 1.07272
-    }
-  ]
+  "id": "Alex1",
+  "watchDuration": "3.50",
+  "minHeartRate": "78",
+  "maxHeartRate": "123",
+  "averageHeartRate": "89",
+  "caloriesBurned": "110",
+  "distanceTravelled": "5",
+  "twists": "3",
+  "timestamp": "MonFeb171821102020",
+  "kinectDurationInSec": "0",
+  "avgJointDistMoved": "4.6612",
+  "maxLeftHandHeight": "1.33154",
+  "maxRightHandHeight": "1.46443",
+  "maxLeftKneeHeight": "0.981489",
+  "maxRightKneeHeight": "1.07272"
 }

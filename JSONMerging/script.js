@@ -1,23 +1,21 @@
 const fs = require('fs');
 var kinect;
 var watch;
-var merged = {
-"session" : [{
-  "session_id" : 0,
-  "minHeartRate" : 0,
-  "maxHeartRate" : 0,
-  "averageHeartRate" : 0,
-  "caloriesBurned" : 0,
-  "distanceTravelled" : 0,
-  "timestamp" : "N/A",
-  "durationInSec" : 0,
-  "avgJointDistMoved" : 0,
-  "maxLeftHandHeight" : 0,
-  "maxRightHandHeight" : 0,
-  "maxLeftKneeHeight" : 0,
-  "maxRightKneeHeight" : 0
-}]
-}
+var merged = {"id" : "0",
+"watchDuration" : "0",
+"minHeartRate" : "0",
+"maxHeartRate" : "0",
+"averageHeartRate" : "0",
+"caloriesBurned" : "0",
+"distanceTravelled" : "0",
+"twists" : "0",
+"timestamp" : "NA",
+"kinectDurationInSec" : "0",
+"avgJointDistMoved" : "0",
+"maxLeftHandHeight" : "0",
+"maxRightHandHeight" : "0",
+"maxLeftKneeHeight" : "0",
+"maxRightKneeHeight" : "0"}
 
 //I tried refactoring this but failed miserably lol
 //Putting the repeating code in a function causes scope errors, will refactor and fix once functional verion of this is produced
@@ -50,20 +48,22 @@ try {
 //console.log(watch);
 
 if (kinect != undefined && watch != undefined){
-  if(kinect.session[0].session_id == watch.session[0].session_id){
-    merged.session[0].session_id = kinect.session[0].session_id;
-    merged.session[0].minHeartRate = watch.session[0].minHeartRate;
-    merged.session[0].maxHeartRate = watch.session[0].maxHeartRate;
-    merged.session[0].averageHeartRate = watch.session[0].averageHeartRate;
-    merged.session[0].caloriesBurned = watch.session[0].caloriesBurned;
-    merged.session[0].distanceTravelled = watch.session[0].distanceTravelled;
-    merged.session[0].timestamp = kinect.session[0].timestamp;
-    merged.session[0].durationInSec = kinect.session[0].durationInSec;
-    merged.session[0].avgJointDistMoved = kinect.session[0].avgJointDistMoved;
-    merged.session[0].maxLeftHandHeight = kinect.session[0].maxLeftHandHeight;
-    merged.session[0].maxRightHandHeight = kinect.session[0].maxRightHandHeight;
-    merged.session[0].maxLeftKneeHeight = kinect.session[0].maxLeftKneeHeight;
-    merged.session[0].maxRightKneeHeight = kinect.session[0].maxRightKneeHeight;
+  if(kinect.id == watch.id){
+    merged.id = kinect.id;
+    merged.watchDuration = watch.watchDuration;
+    merged.minHeartRate = watch.minHeartRate;
+    merged.maxHeartRate = watch.maxHeartRate;
+    merged.averageHeartRate = watch.averageHeartRate;
+    merged.caloriesBurned = watch.caloriesBurned;
+    merged.distanceTravelled = watch.distanceTravelled;
+    merged.twists = watch.twists;
+    merged.timestamp = kinect.timestamp;
+    merged.durationInSec = kinect.durationInSec;
+    merged.avgJointDistMoved = kinect.avgJointDistMoved;
+    merged.maxLeftHandHeight = kinect.maxLeftHandHeight;
+    merged.maxRightHandHeight = kinect.maxRightHandHeight;
+    merged.maxLeftKneeHeight = kinect.maxLeftKneeHeight;
+    merged.maxRightKneeHeight = kinect.maxRightKneeHeight;
   }
   else {
     console.error("The session IDs do not match: the session will not be saved.");
@@ -102,8 +102,7 @@ fs.unlink("watch.json", function (err) {
 //console.log(merged);
 
 //if can get same format timestamp from the AppleWatch as the Kinect!
-var timestamp = merged.session[0].timestamp; //otherwise will use js Date.getTime();
-var title = "Session_Summary_" + timestamp + ".json";
+var title = "Session_Summary_" + merged.timestamp + ".json";
 
 //console.log(title);
 
