@@ -30,11 +30,11 @@ public:
 	HRESULT				 InitializeDefaultSensor();
 
 	//video and file saving
-	string				 SessionDate;
+	string				 m_SessionDate;
 
-	long				 videoTimer;
+	long				 m_videoTimer;
 
-	int					 frameCounter;
+	int					 m_frameCounter;
 
 private:
 
@@ -50,7 +50,7 @@ private:
 	float                m_fSessionDuration;
 	float				 m_fSessionAvgJointDisplacement;
 	float				 m_fSessionJointsMaxheight[JointType_Count];
-	long				 LastBodyDetectTime;
+	long				 m_fLatestBodyDetectedTime;
 
 	// Start & Stop posture
 	clock_t              m_nSpecialPostureStartTime;
@@ -69,10 +69,6 @@ private:
 	float                SingleJointAngleCalculator(Joint centerJoint1, Joint endJoint1, Joint centerJoint2, Joint endJoint2);
 
 	void				 MaxJointsData(Joint joints[]);
-
-	bool				 SessionStart(Joint joints[]);
-
-	bool                 SessionEnd(Joint joints[]);
 
 	void                 UpdateFloorHeight(IBodyFrame* ppBodyframe);
 

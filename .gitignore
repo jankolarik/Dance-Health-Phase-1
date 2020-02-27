@@ -11,5 +11,6 @@ Kinect/SkeletalTracking/packages/opencv/build/x64/vc15/lib/opencv_world420d.lib
 Kinect/SkeletalTracking/packages/opencv/build/x64/vc14/lib/opencv_world420d.lib
 Kinect/SkeletalTracking/vid*
 Kinect/SkeletalTracking/Session*
+Kinect/SkeletalTracking/.json
 Kinect/SkeletalTracking/BadBackup.cpp
 server.js

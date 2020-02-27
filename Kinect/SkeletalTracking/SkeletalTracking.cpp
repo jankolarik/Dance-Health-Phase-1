@@ -104,9 +104,8 @@ void SkeletalBasics::Update()
 		// If the body data is refreshed successfully
 		if (SUCCEEDED(hr))
 		{
-			//if (!m_bSessionFinished)
 			//ends after user left screen for 7 seconds or more
-			if (((time(0) - LastBodyDetectTime) < 7) || m_nSessionStartTime == 0)
+			if ((time(0) - m_fLatestBodyDetectedTime < 7) || (m_nSessionStartTime == 0))
 			{
 				// The main function to process body data e.g. joints
 				ProcessBody(BODY_COUNT, ppBodies);
@@ -116,6 +115,7 @@ void SkeletalBasics::Update()
 			}
 			else
 			{
+				cout << "close" << endl;
 				UpdateFloorHeight(pBodyFrame);
 				//this creates all the files properly
 				CloseClean();
@@ -131,7 +131,7 @@ void SkeletalBasics::Update()
 	SafeRelease(pBodyFrame);
 }
 
-
+// Get the floor height and saved the height into m_fFloorHeight
 void SkeletalBasics::UpdateFloorHeight(IBodyFrame* ppBodyframe)
 {
 	HRESULT hr;
@@ -186,41 +186,33 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 				// If joints are obtained successfully, start data process
 				if (SUCCEEDED(hr))
 				{
-					if (SessionStart(joints)) 
+					// Initialise Session start time
+					if (!m_nSessionStartTime)
 					{
-						// Initialise Session start time
-						if (!m_nSessionStartTime)
-						{
-							m_nSessionStartTime = clock();
-						}
-						m_fSessionDuration = float((clock() - m_nSessionStartTime)) / CLOCKS_PER_SEC;
-
-						// Map joints points from Camera point to Color point for displaying purpose
-						for (int j = 0; j < _countof(joints); ++j)
-						{
-							m_cColorPoints[i][j] = CameraToColor(joints[j].Position);
-						}
-
-						// Update max height of joints
-						MaxJointsData(joints);
-
-						// Joint angle calculation
-						cout << "Angle: " << GetJointAngle(joints, 8) << endl;
-
-						// If the data from last frame is loaded, start comparison2
-						if (previousBodyLoad)
-						{
-							cout << "Activity Analysis value : " << ActivityAnalysis(pBody, pBodyPrevious) << endl;
-						}
-
-						//get the time since last body was detected
-						LastBodyDetectTime = time(0);
+						m_nSessionStartTime = clock();
 					}
-					if (SessionEnd(joints))
+					m_fSessionDuration = float((clock() - m_nSessionStartTime)) / CLOCKS_PER_SEC;
+
+					// Map joints points from Camera point to Color point for displaying purpose
+					for (int j = 0; j < _countof(joints); ++j)
 					{
-						m_bSessionFinished = TRUE;
+						m_cColorPoints[i][j] = CameraToColor(joints[j].Position);
 					}
-					m_bSessionFinished = SessionEnd(joints);
+
+					// Update max height of joints
+					MaxJointsData(joints);
+
+					// Joint angle calculation
+					cout << "Angle: " << GetJointAngle(joints, 8) << endl;
+
+					// If the data from last frame is loaded, start comparison2
+					if (previousBodyLoad)
+					{
+						cout << "Activity Analysis value : " << ActivityAnalysis(pBody, pBodyPrevious) << endl;
+					}
+
+					// Update the latest time that a body is detected on the screen
+					m_fLatestBodyDetectedTime = time(0);
 				}
 			}
 		}
@@ -342,17 +334,6 @@ float SkeletalBasics::SingleJointAngleCalculator(Joint centerJoint1, Joint endJo
 }
 
 
-bool SkeletalBasics::SessionStart(Joint joints[])
-{
-	return true;
-}
-
-bool SkeletalBasics::SessionEnd(Joint joints[])
-{
-	return false;
-}
-
-
 void SkeletalBasics::MaxJointsData(Joint joints[])
 {
 	for (int i = 0; i < JointType_Count; i++)
@@ -367,30 +348,44 @@ void SkeletalBasics::MaxJointsData(Joint joints[])
 
 void SkeletalBasics::Summary()
 {
+	// Build the summary data in json
+	string json;
+	json += "{\"id\" : \"0\",";
+	json += "\"duration\" : \"0\",";
+	json += " \"minHeartRate\" : \"0\", \"maxHeartRate\" : \"0\", \"averageHeartRate\" : \"0\", \"caloriesBurned\" : \"0\", \"distanceTravelled\" : \"0\", \"twists\" : \"0\", ";
+	json += "\"timeStamp\" : \"" + m_SessionDate + "\"," +"\"durationInSec\" : \"" + to_string(m_fSessionDuration) +  "\"," + "\"avgJointDistanceMoved\" : \"" + to_string(m_fSessionAvgJointDisplacement) + "\","
+		 + "\"maxLeftHandHeight\" : \"" + to_string(Calibrate(m_fSessionJointsMaxheight[7])) + "\"," + "\"maxRightHandHeight\" : \"" + to_string(Calibrate(m_fSessionJointsMaxheight[23])) + "\","
+		 + "\"maxLeftKneeHeight\" : \"" + to_string(Calibrate(m_fSessionJointsMaxheight[13])) + "\"," + "\"maxRightKneeHeight\" : \"" + to_string(Calibrate(m_fSessionJointsMaxheight[17])) + "\",";
+	json += "\"linkToVideo\" : \"0\"}";
+
+	// Initialise the curl handle to send the summary json to server
+	CURL* curl = curl_easy_init();
+	
+	// Define http header file
+	struct curl_slist *headers = NULL;
+	headers = curl_slist_append(headers, "Accept: application/json");
+	headers = curl_slist_append(headers, "Content-Type: application/json");
+	headers = curl_slist_append(headers, "charsets: utf-8");
+
+	if (curl)
+	{
+		curl_easy_setopt(curl, CURLOPT_URL, "http://51.11.52.98:3300/dance");
+		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json.c_str());
+
+		curl_easy_perform(curl);
+	}
+
+	// Get the current date and time
 	auto currentTime = chrono::system_clock::now();
 	time_t time = std::chrono::system_clock::to_time_t(currentTime);
 
+	// Each summary file will be named with the SessionDate and saved as a json file
 	ofstream summaryFile;
-	String filename = "SessionSummary" + SessionDate + ".json";//clinical resource json in fhir?
-	summaryFile.open(filename);
-	summaryFile << "{" << endl
-		<< "\"session\" : [{" << endl
-		<< "	\"session_id\" : " << 0 << "," << endl//this should be modified by the Apple Watch code
-		<< "	\"minHeartRate\" : " << 0 << "," << endl//this should be modified by the Apple Watch code
-		<< "	\"maxHeartRate\" : " << 0 << "," << endl//this should be modified by the Apple Watch code
-		<< "	\"averageHeartRate\" : " << 0 << "," << endl//this should be modified by the Apple Watch code
-		<< "	\"caloriesBurned\" : " << 0 << "," << endl//this should be modified by the Apple Watch code
-		<< "	\"distanceTravelled\" : " << 0 << "," << endl//this should be modified by the Apple Watch code
-		<< "	\"timestamp\" : \"" << SessionDate << "\"," << endl
-		<< "	\"durationInSec\" : " << m_fSessionDuration << "," << endl
-		<< "	\"avgJointDistMoved\" : " << m_fSessionAvgJointDisplacement << "," << endl
-		<< "	\"maxLeftHandHeight\" : " << Calibrate(m_fSessionJointsMaxheight[7]) << "," << endl
-		<< "	\"maxRightHandHeight\" : " << Calibrate(m_fSessionJointsMaxheight[23]) << "," << endl
-		<< "	\"maxLeftKneeHeight\" : " << Calibrate(m_fSessionJointsMaxheight[13]) << "," << endl
-		<< "	\"maxRightKneeHeight\" : " << Calibrate(m_fSessionJointsMaxheight[17]) << endl
-		<< "	}]" << endl
-		<< "}" << endl;
+	String filename = "SessionSummary" + m_SessionDate + ".json";//clinical resource json in fhir?
 
+	summaryFile.open(filename);
+	summaryFile << json;
 	summaryFile.close();
 }
 
@@ -404,18 +399,18 @@ ColorSpacePoint SkeletalBasics::CameraToColor(const CameraSpacePoint& bodyPoint)
 void SkeletalBasics::CloseClean() {
 	//this gets date and time (at the end of the session) for the naming of the video file and summary
 	const time_t now = time(0);
-	SessionDate = ctime(&now);
-	SessionDate.erase(remove_if(SessionDate.begin(), SessionDate.end(), isspace), SessionDate.end());
-	SessionDate.erase(remove(SessionDate.begin(), SessionDate.end(), ':'), SessionDate.end());
-	string vidName = "vid" + SessionDate + ".avi";
+	m_SessionDate = ctime(&now);
+	m_SessionDate.erase(remove_if(m_SessionDate.begin(), m_SessionDate.end(), isspace), m_SessionDate.end());
+	m_SessionDate.erase(remove(m_SessionDate.begin(), m_SessionDate.end(), ':'), m_SessionDate.end());
+	string vidName = "vid" + m_SessionDate + ".avi";
 	// After the session finished, run summary
 	Summary();
 	//end timer here and calculate time difference
-	videoTimer = time(0) - videoTimer;//gets the length of the video in seconds
+	m_videoTimer = time(0) - m_videoTimer;//gets the length of the video in seconds
 	//close the video writer
 	outputVideo.release();
 	//calculates the fps we want to set the playback speed to, and sets the commands we want to run in the command line
-	int newFPS = frameCounter / videoTimer;
+	int newFPS = m_frameCounter / m_videoTimer;
 	string commandFfmpeg = "ffmpeg -r " + to_string(newFPS) + " -i vide0.mjpeg -c copy " + vidName;
 	//runs ffmpeg video manipulation in command line
 	//using "system" is technically not secure, but cross-platform

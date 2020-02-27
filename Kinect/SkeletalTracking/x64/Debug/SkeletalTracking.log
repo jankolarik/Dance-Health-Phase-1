@@ -1,0 +1,16 @@
+﻿  Drawing.cpp
+C:\Users\98397\OneDrive\Course\COMP0016 System Eng\Dance-Health-Phase-1\Kinect\SkeletalTracking\Drawing.cpp(149,31): warning C4244: '=': conversion from 'time_t' to 'long', possible loss of data
+C:\Users\98397\OneDrive\Course\COMP0016 System Eng\Dance-Health-Phase-1\Kinect\SkeletalTracking\Drawing.cpp(161,55): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\98397\OneDrive\Course\COMP0016 System Eng\Dance-Health-Phase-1\Kinect\SkeletalTracking\Drawing.cpp(161,36): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\98397\OneDrive\Course\COMP0016 System Eng\Dance-Health-Phase-1\Kinect\SkeletalTracking\Drawing.cpp(162,56): warning C4244: 'argument': conversion from 'double' to 'GLsizei', possible loss of data
+C:\Users\98397\OneDrive\Course\COMP0016 System Eng\Dance-Health-Phase-1\Kinect\SkeletalTracking\Drawing.cpp(162,37): warning C4244: 'argument': conversion from 'double' to 'GLsizei', possible loss of data
+  SkeletalTracking.cpp
+C:\Users\98397\OneDrive\Course\COMP0016 System Eng\Dance-Health-Phase-1\Kinect\SkeletalTracking\SkeletalTracking.cpp(222,32): warning C4244: '=': conversion from 'time_t' to 'long', possible loss of data
+C:\Users\98397\OneDrive\Course\COMP0016 System Eng\Dance-Health-Phase-1\Kinect\SkeletalTracking\SkeletalTracking.cpp(329,20): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\98397\OneDrive\Course\COMP0016 System Eng\Dance-Health-Phase-1\Kinect\SkeletalTracking\SkeletalTracking.cpp(345,20): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\98397\OneDrive\Course\COMP0016 System Eng\Dance-Health-Phase-1\Kinect\SkeletalTracking\SkeletalTracking.cpp(419,23): warning C4244: '=': conversion from 'time_t' to 'long', possible loss of data
+C:\Users\98397\OneDrive\Course\COMP0016 System Eng\Dance-Health-Phase-1\Kinect\SkeletalTracking\SkeletalTracking.cpp(412,1): warning C4996: 'ctime': This function or variable may be unsafe. Consider using ctime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\ucrt\time.h(476): message : see declaration of 'ctime'
+  Generating Code...
+Drawing.obj : error LNK2019: unresolved external symbol "void __cdecl cv::resize(class cv::debug_build_guard::_InputArray const &,class cv::debug_build_guard::_OutputArray const &,class cv::Size_<int>,double,double,int)" (?resize@cv@@YAXAEBV_InputArray@debug_build_guard@1@AEBV_OutputArray@31@V?$Size_@H@1@NNH@Z) referenced in function "void __cdecl writeToVideo(void)" (?writeToVideo@@YAXXZ)
+C:\Users\98397\OneDrive\Course\COMP0016 System Eng\Dance-Health-Phase-1\Kinect\SkeletalTracking\x64\Debug\SkeletalTracking.exe : fatal error LNK1120: 1 unresolved externals
