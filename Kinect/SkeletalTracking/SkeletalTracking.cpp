@@ -15,7 +15,11 @@ SkeletalBasics::SkeletalBasics() :
 	m_fSessionJointsMaxheight(),
 	m_nSpecialPostureStartTime(0),
 	m_fSpecialPostureDuration(5),
-	m_session_id("")
+	m_session_id(""),
+	m_sessionID(""),
+	m_show_gui_start(true),
+	m_show_session_start(false),
+	m_endSessionButton(false)
 {
 	for (int i = 0; i < JointType_Count; i++)
 	{
@@ -90,14 +94,14 @@ void SkeletalBasics::Update()
 	{
 		return;
 	}
-
+	/*
 	if (m_session_id == "") {
 		cout << "Please input a session ID. It should match the one entered in the Apple Watch, \nand differ from all session IDs used within the same day." << endl;
 		cout << "It can contain any characters, but it should not be blank (in which case you wil be re-prompted)." << endl;
 		cout << "Example: \"Name 1\"." << endl;
 		cin >> m_session_id;
 	}
-
+	*/
 	IBodyFrame* pBodyFrame = NULL;
 
 	HRESULT hr = m_pBodyFrameReader->AcquireLatestFrame(&pBodyFrame);
@@ -113,8 +117,9 @@ void SkeletalBasics::Update()
 		if (SUCCEEDED(hr))
 		{
 			//ends after user left screen for 7 seconds or more
-			if ((time(0) - m_fLatestBodyDetectedTime < 7) || (m_nSessionStartTime == 0))
+			if (((time(0) - m_fLatestBodyDetectedTime < 7) || (m_nSessionStartTime == 0) || m_show_gui_start || m_show_session_start) && !m_endSessionButton) //the session can't end if the start button hasn't been pressed
 			{
+				cout << m_show_gui_start << endl;
 				// The main function to process body data e.g. joints
 				ProcessBody(BODY_COUNT, ppBodies);
 
@@ -358,14 +363,14 @@ void SkeletalBasics::Summary()
 {
 	// Build the summary data in JSON
 	string json;
-	json += "{\"id\" : \"" + m_session_id + "\",";
-	json += "\"watchDuration\" : \"0\",";
-	json += "\"minHeartRate\" : \"0\",";
-	json += "\"maxHeartRate\" : \"0\",";
-	json += "\"averageHeartRate\" : \"0\",";
-	json += "\"caloriesBurned\" : \"0\",";
-	json += "\"distanceTravelled\" : \"0\",";
-	json += "\"twists\" : \"0\", ";
+	json += "{\"id\" : \"" + m_sessionID + "\",";
+	json += "\"watchDuration\" : \"-1\",";
+	json += "\"minHeartRate\" : \"-1\",";
+	json += "\"maxHeartRate\" : \"-1\",";
+	json += "\"averageHeartRate\" : \"-1\",";
+	json += "\"caloriesBurned\" : \"-1\",";
+	json += "\"distanceTravelled\" : \"-1\",";
+	json += "\"twists\" : \"-1\", ";
 	json += "\"timeStamp\" : \"" + m_SessionDate + "\",";
 	json += "\"kinectDurationInSec\" : \"" + to_string(m_fSessionDuration) + "\",";
 	json += "\"avgJointDistanceMoved\" : \"" + to_string(m_fSessionAvgJointDisplacement) + "\",";
@@ -373,7 +378,7 @@ void SkeletalBasics::Summary()
 	json += "\"maxRightHandHeight\" : \"" + to_string(Calibrate(m_fSessionJointsMaxheight[23])) + "\",";
 	json += "\"maxLeftKneeHeight\" : \"" + to_string(Calibrate(m_fSessionJointsMaxheight[13])) + "\",";
 	json += "\"maxRightKneeHeight\" : \"" + to_string(Calibrate(m_fSessionJointsMaxheight[17])) + "\",";
-	json += "\"linkToVideo\" : \"0\"}";
+	json += "\"linkToVideo\" : \"-1\"}";
 
 	// Initialise the curl handle to send the summary json to server
 	CURL* curl = curl_easy_init();
@@ -399,9 +404,9 @@ void SkeletalBasics::Summary()
 
 	// Each summary file will be named with the SessionDate and saved as a json file
 	ofstream summaryFile;
-	String filename = "SessionSummary" + m_SessionDate + ".json";//clinical resource json in fhir?
+	//String filename = "SessionSummary" + m_SessionDate + ".json";//clinical resource json in fhir?
 
-	summaryFile.open(filename);
+	summaryFile.open("kinect.json");
 	summaryFile << json;
 	summaryFile.close();
 }
