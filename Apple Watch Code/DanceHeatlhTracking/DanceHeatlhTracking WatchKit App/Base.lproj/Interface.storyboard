@@ -6,10 +6,10 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="15501"/>
     </dependencies>
     <scenes>
-        <!--Interface Controller-->
+        <!--StartWorkout-->
         <scene sceneID="AoU-rq-VJl">
             <objects>
-                <controller id="8hb-ZL-GMe">
+                <controller id="8hb-ZL-GMe" userLabel="StartWorkout" customClass="StartWorkout" customModule="DanceHeatlhTracking_WatchKit_Extension">
                     <items>
                         <group width="1" alignment="left" id="cTx-hD-twl">
                             <items>
@@ -22,33 +22,31 @@
                             <items>
                                 <textField width="1" alignment="left" text="Enter ID" id="ahi-fw-xXz">
                                     <connections>
-                                        <action selector="startDancingButtonClick" destination="AgC-eL-Hgc" id="Yq0-Nl-AR9"/>
+                                        <action selector="idTextFieldAction:" destination="8hb-ZL-GMe" id="0Co-dH-WbH"/>
                                     </connections>
                                 </textField>
                             </items>
                         </group>
-                        <button width="1" height="61" alignment="left" title="Start Dancing" id="KFF-9v-guW">
+                        <button width="1" height="80" alignment="left" title="Next" id="KFF-9v-guW">
                             <connections>
-                                <segue destination="AgC-eL-Hgc" kind="modal" id="cC3-sv-EjC"/>
+                                <action selector="nextButtonAction" destination="8hb-ZL-GMe" id="Bho-pb-ww4"/>
+                                <segue destination="AgC-eL-Hgc" kind="modal" identifier="transition" id="o1p-QC-RDi"/>
                             </connections>
                         </button>
                     </items>
+                    <connections>
+                        <outlet property="idTextField" destination="ahi-fw-xXz" id="i09-h3-VMY"/>
+                        <outlet property="nextButton" destination="KFF-9v-guW" id="Bre-8m-OHv"/>
+                    </connections>
                 </controller>
             </objects>
             <point key="canvasLocation" x="-310" y="17"/>
         </scene>
-        <!--Interface Controller-->
+        <!--Dance Session-->
         <scene sceneID="aou-V4-d1y">
             <objects>
-                <controller id="AgC-eL-Hgc" customClass="InterfaceController" customModule="DanceHeatlhTracking_WatchKit_App" customModuleProvider="target">
+                <controller id="AgC-eL-Hgc" customClass="DanceSession" customModule="DanceHeatlhTracking_WatchKit_Extension">
                     <items>
-                        <group width="1" alignment="left" id="2gj-vH-uxO">
-                            <items>
-                                <label alignment="center" verticalAlignment="center" text="Dance for Health" textAlignment="center" id="40z-6h-a01">
-                                    <fontDescription key="font" style="UICTFontTextStyleHeadline"/>
-                                </label>
-                            </items>
-                        </group>
                         <label alignment="left" text="Heart rate: " id="Lgp-Oc-k7B"/>
                         <label alignment="left" text="Calories: " id="nmP-nd-tG4"/>
                         <label alignment="left" text="Distance: " id="24n-I6-guW"/>
@@ -66,23 +64,23 @@
                             <items>
                                 <button width="1" alignment="left" title="Start Dancing" id="zle-77-e63">
                                     <connections>
-                                        <action selector="startDancingButtonClick" destination="AgC-eL-Hgc" id="eYd-S0-vRl"/>
+                                        <action selector="startDancingButtonClick" destination="AgC-eL-Hgc" id="5yY-Ew-vqD"/>
                                     </connections>
                                 </button>
                             </items>
                         </group>
                     </items>
                     <connections>
-                        <outlet property="caloriesLabel" destination="nmP-nd-tG4" id="Nbd-UA-yLl"/>
-                        <outlet property="distanceLabel" destination="24n-I6-guW" id="cyg-vi-C5a"/>
-                        <outlet property="heartRateLabel" destination="Lgp-Oc-k7B" id="RLj-NV-dDD"/>
-                        <outlet property="spinsLabel" destination="xZO-fn-zcM" id="IMa-PK-1QY"/>
-                        <outlet property="startDancingButton" destination="zle-77-e63" id="bpe-al-sRh"/>
-                        <outlet property="timer" destination="wu3-gE-MFL" id="Zfk-by-12K"/>
+                        <outlet property="caloriesLabel" destination="nmP-nd-tG4" id="Bg2-cI-qN3"/>
+                        <outlet property="distanceLabel" destination="24n-I6-guW" id="uJc-cE-jFV"/>
+                        <outlet property="heartRateLabel" destination="Lgp-Oc-k7B" id="QXO-Mm-fvy"/>
+                        <outlet property="spinsLabel" destination="xZO-fn-zcM" id="EIy-AU-g75"/>
+                        <outlet property="startDancingButton" destination="zle-77-e63" id="zkC-yc-zHW"/>
+                        <outlet property="timer" destination="wu3-gE-MFL" id="BdA-wH-Ur0"/>
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="34" y="31"/>
+            <point key="canvasLocation" x="31" y="15"/>
         </scene>
     </scenes>
 </document>

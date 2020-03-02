@@ -5,6 +5,8 @@
 //  Created by Honza on 06/01/2020.
 //  Copyright © 2020 Team32. All rights reserved.
 //
+//  Adapted from SpeedySloth example from Apple
+
 
 import WatchKit
 import Foundation
@@ -12,19 +14,22 @@ import CoreMotion
 import HealthKit
 import CoreML
 
-class InterfaceController: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorkoutBuilderDelegate {
+class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorkoutBuilderDelegate {
     
 // MARK: - Declaration of variables + actions
     //Need to replace '!' with '?' and handle errors!
     //Maybe move code to seperate classes?
+
     @IBOutlet weak var timer: WKInterfaceTimer!
+
     @IBOutlet weak var heartRateLabel: WKInterfaceLabel!
     @IBOutlet weak var caloriesLabel: WKInterfaceLabel!
-    
-    @IBOutlet weak var idTextField: WKInterfaceTextField!
     @IBOutlet weak var distanceLabel: WKInterfaceLabel!
     @IBOutlet weak var spinsLabel: WKInterfaceLabel!
     @IBOutlet weak var startDancingButton: WKInterfaceButton!
+    
+
+    var id = ""
     
     let healthStore = HKHealthStore()
     let motion = CMMotionManager()
@@ -57,10 +62,12 @@ class InterfaceController: WKInterfaceController, HKWorkoutSessionDelegate, HKLi
     // MARK: - Default Interface Setup
     override func awake(withContext context: Any?) {
         super.awake(withContext: context)
+        id = context as! String
         // Configure interface objects here.
         authenticator()
         setUpEnv()
     }
+    
     
     override func willActivate() {
         // This method is called when watch view controller is about to be visible to user
@@ -277,31 +284,13 @@ class InterfaceController: WKInterfaceController, HKWorkoutSessionDelegate, HKLi
     func workoutSession(_ workoutSession: HKWorkoutSession, didFailWithError error: Error) {
         // No error handling in this sample project.
     }
-    
-    // MARK: - JSON Object
-    func createJSON(){
-        let jsonObject: [String: Any] = [
-            "session_id": 0,
-            "minHeartRate": minHeartRate,
-            "maxHeartRate": maxHeartRate,
-            "averageHeartRate": avgHeartRate,
-            "caloriesBurned": caloriesBurned,
-            "distanceTravelled": distanceTravelled
-        ]
-
-        if(JSONSerialization.isValidJSONObject(jsonObject)){
-        }
-        else{
-            //Error Handling
-        }
-    }
 
 // MARK: - Creating URL Requests
     //Mongo DB Docs
     //https://docs.mongodb.com/stitch/services/http-actions/http.post/
     func postData(){
         let jsonDanceObject: [String: Any] = [
-            "id": -1,
+            "id": id,
             "duration": -1,
             "minHeartRate": minHeartRate,
             "maxHeartRate": maxHeartRate,
