@@ -159,7 +159,7 @@ void getKinectData(GLubyte* dest) {
 
 void gui_start()
 {
-	if (show_gui_start) {
+	if (application.m_show_gui_start) {
 		ImGui::SetNextWindowSize(ImVec2(800, 150));
 		ImGui::Begin("Input Session ID", NULL);//setting p_open to NULL removes the close button
 		if (badUser) {
@@ -175,19 +175,20 @@ void gui_start()
 				badUser = true;
 			}
 			else {//saves the sessionID, closes ID input window, opens start menu
-				ImGui::SetNextWindowSize(ImVec2(700, 120));
+				ImGui::SetNextWindowSize(ImVec2(700, 150));
 				application.m_sessionID = application.m_session_id;
-				show_session_start = true;
-				show_gui_start = false;
+				application.m_show_session_start = true;
+				application.m_show_gui_start = false;
 			}
 		}
 		ImGui::End();
 	}
-	if (show_session_start) {
+	if (application.m_show_session_start) {
 		ImGui::Begin("Start Window", NULL);
-		ImGui::Text("Welcome to Dance Health!\nPlease try to stay within the camera frame.\nThe session will automatically end when you exit the frame for over 5 seconds.\n Press start to begin recording.");
+		ImGui::Text("Welcome to Dance Health!\nPlease try to stay within the camera frame.\nThe session will automatically end when you exit the frame for over 5 seconds.");
+		ImGui::Text("You can also end the session by pressing the \"End Session\" Button, \nbut if you don't want it to show up in the final video, you can close that pop-up. \nPress start to begin recording.");
 		if (ImGui::Button("Start")) {
-			show_session_start = false;
+			application.m_show_session_start = false;
 			ImGui::SetNextWindowSize(ImVec2(100, 80));
 			show_session_end = true;
 			setupVideo();
@@ -196,7 +197,7 @@ void gui_start()
 	}
 	if (show_session_end) {
 		ImGui::Begin("", &show_session_end);
-		endSessionButton = ImGui::Button("End Session");
+		application.m_endSessionButton = ImGui::Button("End Session");
 		ImGui::End();
 	}
 }
@@ -238,7 +239,7 @@ void drawKinectData() {
 void draw() {
 	drawKinectData();
 	application.Update();
-	if (!show_gui_start && !show_session_start){ writeToVideo(); }
+	if (!application.m_show_gui_start && !application.m_show_session_start){ writeToVideo(); }
 	glutSwapBuffers();
 	glutPostRedisplay();
 }

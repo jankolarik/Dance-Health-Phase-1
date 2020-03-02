@@ -31,14 +31,16 @@ public:
 
 	//video and file saving
 	string				 m_SessionDate;
-
 	long				 m_videoTimer;
-
 	int					 m_frameCounter;
 
-	char				 m_session_id[10];
 
+	// Dear ImGUI Variables
+	char				 m_session_id[10];
 	string				 m_sessionID;
+	bool				m_show_gui_start;
+	bool				m_show_session_start;
+	bool				m_endSessionButton;
 
 private:
 
