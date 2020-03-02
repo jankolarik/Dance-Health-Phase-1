@@ -26,6 +26,11 @@
 // Curl header Files
 #include <curl.h>
 
+//GUI Header Files
+#include "imgui.h"
+#include"imgui_impl_glut.h"
+#include <imgui_impl_opengl2.h>
+
 // Other libraries
 #include <iostream>
 #include <cmath>
@@ -44,6 +49,14 @@ using namespace cv;
 
 static cv::VideoWriter outputVideo;
 extern cv::VideoWriter outputVideo;
+
+// Dear ImGUI Variables
+static bool show_gui_start = true;
+static bool badUser = false;
+static bool show_session_start = false;
+static bool show_session_end = false;
+static bool endSessionButton = false;
+static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 // Safe release for interfaces
 template<class Interface>

@@ -15,7 +15,8 @@ SkeletalBasics::SkeletalBasics() :
 	m_fSessionJointsMaxheight(),
 	m_nSpecialPostureStartTime(0),
 	m_fSpecialPostureDuration(5),
-	m_session_id("")
+	m_session_id(""),
+	m_sessionID("")
 {
 	for (int i = 0; i < JointType_Count; i++)
 	{
@@ -90,14 +91,14 @@ void SkeletalBasics::Update()
 	{
 		return;
 	}
-
+	/*
 	if (m_session_id == "") {
 		cout << "Please input a session ID. It should match the one entered in the Apple Watch, \nand differ from all session IDs used within the same day." << endl;
 		cout << "It can contain any characters, but it should not be blank (in which case you wil be re-prompted)." << endl;
 		cout << "Example: \"Name 1\"." << endl;
 		cin >> m_session_id;
 	}
-
+	*/
 	IBodyFrame* pBodyFrame = NULL;
 
 	HRESULT hr = m_pBodyFrameReader->AcquireLatestFrame(&pBodyFrame);
@@ -113,7 +114,7 @@ void SkeletalBasics::Update()
 		if (SUCCEEDED(hr))
 		{
 			//ends after user left screen for 7 seconds or more
-			if ((time(0) - m_fLatestBodyDetectedTime < 7) || (m_nSessionStartTime == 0))
+			if ((time(0) - m_fLatestBodyDetectedTime < 7) || (m_nSessionStartTime == 0) || show_gui_start || show_session_start || !endSessionButton) //the session can't end if the start button hasn't been pressed
 			{
 				// The main function to process body data e.g. joints
 				ProcessBody(BODY_COUNT, ppBodies);
@@ -358,7 +359,7 @@ void SkeletalBasics::Summary()
 {
 	// Build the summary data in JSON
 	string json;
-	json += "{\"id\" : \"" + m_session_id + "\",";
+	json += "{\"id\" : \"" + m_sessionID + "\",";
 	json += "\"watchDuration\" : \"0\",";
 	json += "\"minHeartRate\" : \"0\",";
 	json += "\"maxHeartRate\" : \"0\",";

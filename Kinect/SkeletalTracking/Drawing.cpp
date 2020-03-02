@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "SkeletalTracking.h"
 
+
 // OpenGL Variables
 GLuint textureId;              // ID of the texture to contain Kinect RGB Data
 GLubyte dataGlu[width * height * 4];  // BGRA array containing the texture data
@@ -28,6 +29,38 @@ bool initKinect() {
 	else {
 		return false;
 	}
+}
+
+void setupVideo() {
+	outputVideo.open("vide0.avi", CV_FOURCC('M', 'J', 'P', 'G'), 5, cv::Size(width, height), true);
+	//start timer for first frame here, end it before the exit: this will adjust the playback speed to fit "real life"
+	application.m_videoTimer = time(0);
+	//initialise frame counter here: we'll increment it each time we write to the video
+	application.m_frameCounter = 0;
+	if (!outputVideo.isOpened()) {
+		cout << "video writer failed to open" << endl;
+	}
+}
+
+void writeToVideo() {
+	//this gets the x and y window coordinates of the viewport, followed by its width and height
+	double ViewPortParams[4];
+	glGetDoublev(GL_VIEWPORT, ViewPortParams);
+	cv::Mat gl_pixels(ViewPortParams[3], ViewPortParams[2], CV_8UC3);
+	glReadPixels(0, 0, ViewPortParams[2], ViewPortParams[3], GL_RGB, GL_UNSIGNED_BYTE, gl_pixels.data);
+	cv::Mat pixels(height, width, CV_8UC3);
+	resize(gl_pixels, pixels, cv::Size(width, height));
+	cv::Mat cv_pixels(height, width, CV_8UC3);
+	for (int y = 0; y < height; y++) for (int x = 0; x < width; x++)
+	{
+		cv_pixels.at<cv::Vec3b>(y, x)[2] = pixels.at<cv::Vec3b>(height - y - 1, x)[0];
+		cv_pixels.at<cv::Vec3b>(y, x)[1] = pixels.at<cv::Vec3b>(height - y - 1, x)[1];
+		cv_pixels.at<cv::Vec3b>(y, x)[0] = pixels.at<cv::Vec3b>(height - y - 1, x)[2];
+	}
+	//writes to the video
+	outputVideo << cv_pixels;
+	//increments the video counter
+	application.m_frameCounter++;
 }
 
 void drawSkeletals() {
@@ -124,7 +157,63 @@ void getKinectData(GLubyte* dest) {
 	if (frame) frame->Release();
 }
 
+void gui_start()
+{
+	if (show_gui_start) {
+		ImGui::SetNextWindowSize(ImVec2(800, 150));
+		ImGui::Begin("Input Session ID", NULL);//setting p_open to NULL removes the close button
+		if (badUser) {
+			ImGui::Text("You mustn't input a blank session ID.");
+		}
+		else {
+			ImGui::Text("Please input a session ID.");
+		}
+		ImGui::Text("It should match the one entered in the Apple Watch, \nand differ from all session IDs used within the same day. It must be under 10 characters.\nIt can contain any characters, but it should not be blank (in which case you wil be re-prompted).");
+		ImGui::InputText("", application.m_session_id, 10);
+		if (ImGui::Button("Submit")) {
+			if (strlen(application.m_session_id) == 0) {
+				badUser = true;
+			}
+			else {//saves the sessionID, closes ID input window, opens start menu
+				ImGui::SetNextWindowSize(ImVec2(700, 120));
+				application.m_sessionID = application.m_session_id;
+				show_session_start = true;
+				show_gui_start = false;
+			}
+		}
+		ImGui::End();
+	}
+	if (show_session_start) {
+		ImGui::Begin("Start Window", NULL);
+		ImGui::Text("Welcome to Dance Health!\nPlease try to stay within the camera frame.\nThe session will automatically end when you exit the frame for over 5 seconds.\n Press start to begin recording.");
+		if (ImGui::Button("Start")) {
+			show_session_start = false;
+			ImGui::SetNextWindowSize(ImVec2(100, 80));
+			show_session_end = true;
+			setupVideo();
+		}
+		ImGui::End();
+	}
+	if (show_session_end) {
+		ImGui::Begin("", &show_session_end);
+		endSessionButton = ImGui::Button("End Session");
+		ImGui::End();
+	}
+}
+
+
 void drawKinectData() {
+	// Start the Dear ImGui frame
+	ImGui_ImplOpenGL2_NewFrame();
+	ImGui_ImplGLUT_NewFrame();
+
+	gui_start();
+
+	// Rendering
+	ImGui::Render();
+	ImGuiIO& io = ImGui::GetIO();
+	glViewport(0, 0, (GLsizei)io.DisplaySize.x, (GLsizei)io.DisplaySize.y);
+	glClear(GL_COLOR_BUFFER_BIT);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, textureId);
 	getKinectData(dataGlu);
@@ -141,45 +230,17 @@ void drawKinectData() {
 	glVertex3f(0, height, 0.0f);
 	glEnd();
 	drawSkeletals();
-}
-
-void setupVideo() {
-	outputVideo.open("vide0.avi", CV_FOURCC('M', 'J', 'P', 'G'), 5, cv::Size(width, height), true);
-	//start timer for first frame here, end it before the exit: this will adjust the playback speed to fit "real life"
-	application.m_videoTimer = time(0);
-	//initialise frame counter here: we'll increment it each time we write to the video
-	application.m_frameCounter = 0;
-	if (!outputVideo.isOpened()) {
-		cout << "video writer failed to open" << endl;
-	}
-}
-
-void writeToVideo() {
-	//this gets the x and y window coordinates of the viewport, followed by its width and height
-	double ViewPortParams[4];
-	glGetDoublev(GL_VIEWPORT, ViewPortParams);
-	cv::Mat gl_pixels(ViewPortParams[3], ViewPortParams[2], CV_8UC3);
-	glReadPixels(0, 0, ViewPortParams[2], ViewPortParams[3], GL_RGB, GL_UNSIGNED_BYTE, gl_pixels.data);
-	cv::Mat pixels(height, width, CV_8UC3);
-	resize(gl_pixels, pixels, cv::Size(width, height));
-	cv::Mat cv_pixels(height, width, CV_8UC3);
-	for (int y = 0; y < height; y++) for (int x = 0; x < width; x++)
-	{
-		cv_pixels.at<cv::Vec3b>(y, x)[2] = pixels.at<cv::Vec3b>(height - y - 1, x)[0];
-		cv_pixels.at<cv::Vec3b>(y, x)[1] = pixels.at<cv::Vec3b>(height - y - 1, x)[1];
-		cv_pixels.at<cv::Vec3b>(y, x)[0] = pixels.at<cv::Vec3b>(height - y - 1, x)[2];
-	}
-	//writes to the video
-	outputVideo << cv_pixels;
-	//increments the video counter
-	application.m_frameCounter++;
+	ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+	//glutSwapBuffers();
+	//glutPostRedisplay();
 }
 
 void draw() {
 	drawKinectData();
 	application.Update();
-	writeToVideo();
+	if (!show_gui_start && !show_session_start){ writeToVideo(); }
 	glutSwapBuffers();
+	glutPostRedisplay();
 }
 
 
@@ -212,6 +273,36 @@ int main(int argc, char* argv[]) {
 	glClearDepth(1.0f);
 	glEnable(GL_TEXTURE_2D);
 
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+
+	// Setup Dear ImGui style
+	ImGui::StyleColorsDark();
+	//ImGui::StyleColorsClassic();
+
+	// Setup Platform/Renderer bindings
+	ImGui_ImplGLUT_Init();
+	ImGui_ImplGLUT_InstallFuncs();
+	ImGui_ImplOpenGL2_Init();
+
+	// Load Fonts
+	// - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
+	// - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
+	// - If the file cannot be loaded, the function will return NULL. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
+	// - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
+	// - Read 'docs/FONTS.txt' for more instructions and details.
+	// - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
+	//io.Fonts->AddFontDefault();
+	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
+	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
+	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
+	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);
+	//ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
+	//IM_ASSERT(font != NULL);
+
 	// Camera setup
 	glViewport(0, 0, width, height);
 	glMatrixMode(GL_PROJECTION);
@@ -220,7 +311,11 @@ int main(int argc, char* argv[]) {
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	setupVideo();
 	glutMainLoop();
+
+	ImGui_ImplOpenGL2_Shutdown();
+	ImGui_ImplGLUT_Shutdown();
+	ImGui::DestroyContext();
+
 	return 0;
 }

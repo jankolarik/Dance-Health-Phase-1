@@ -36,6 +36,10 @@ public:
 
 	int					 m_frameCounter;
 
+	char				 m_session_id[10];
+
+	string				 m_sessionID;
+
 private:
 
 	// Body from previous frame
@@ -51,7 +55,7 @@ private:
 	float				 m_fSessionAvgJointDisplacement;
 	float				 m_fSessionJointsMaxheight[JointType_Count];
 	long				 m_fLatestBodyDetectedTime;
-	string				 m_session_id;
+	
 
 	// Start & Stop posture
 	clock_t              m_nSpecialPostureStartTime;
