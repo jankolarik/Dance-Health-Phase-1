@@ -14,5 +14,10 @@ Kinect/SkeletalTracking/Session*
 Kinect/SkeletalTracking/.json
 Kinect/SkeletalTracking/BadBackup.cpp
 Kinect/SkeletalTracking/packages/FFmpeg.Nightly.20200115.0.0
+Kinect/SkeletalTracking/packages/imgui-master/imgui_impl_glfw.h
+Kinect/SkeletalTracking/packages/imgui-master/imgui_impl_glfw.cpp
+Kinect/SkeletalTracking/packages/imgui-master/imgui_impl_opengl3.h
+Kinect/SkeletalTracking/packages/imgui-master/imgui_impl_opengl3.cpp
+Kinect/SkeletalTracking/packages/imgui-master/misc/freetype
 server.js
 GUITest

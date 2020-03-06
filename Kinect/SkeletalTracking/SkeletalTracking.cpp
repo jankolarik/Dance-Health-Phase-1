@@ -15,6 +15,7 @@ SkeletalBasics::SkeletalBasics() :
 	m_fSessionJointsMaxheight(),
 	m_nSpecialPostureStartTime(0),
 	m_fSpecialPostureDuration(5),
+	m_SessionDate(""),
 	m_session_id(""),
 	m_sessionID(""),
 	m_show_gui_start(true),
@@ -421,9 +422,17 @@ ColorSpacePoint SkeletalBasics::CameraToColor(const CameraSpacePoint& bodyPoint)
 void SkeletalBasics::CloseClean() {
 	//this gets date and time (at the end of the session) for the naming of the video file and summary
 	const time_t now = time(0);
-	m_SessionDate = ctime(&now);
-	m_SessionDate.erase(remove_if(m_SessionDate.begin(), m_SessionDate.end(), isspace), m_SessionDate.end());
-	m_SessionDate.erase(remove(m_SessionDate.begin(), m_SessionDate.end(), ':'), m_SessionDate.end());
+	tm *ltm = localtime(&now);
+	if (ltm->tm_mday < 10) {
+		m_SessionDate += "0";
+	}
+	m_SessionDate += to_string(ltm->tm_mday) + "-";
+	if (ltm->tm_mon + 1 < 10) {
+		m_SessionDate += "0";
+	}
+	m_SessionDate += to_string(ltm->tm_mon + 1) + "-";
+	m_SessionDate += to_string(ltm->tm_year + 1900);
+
 	string vidName = "vid" + m_SessionDate + ".avi";
 	// After the session finished, run summary
 	Summary();
