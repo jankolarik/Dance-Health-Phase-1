@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7E1D01E423F095C20056E3C3 /* WorkoutSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E1D01E323F095C20056E3C3 /* WorkoutSession.swift */; };
-		7E1D01E623F095E90056E3C3 /* RouteHTTPController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E1D01E523F095E90056E3C3 /* RouteHTTPController.swift */; };
 		7E32060924052AA900C3DBCD /* StartWorkout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E32060824052AA900C3DBCD /* StartWorkout.swift */; };
 		7E61B65C23C3825200AD77D0 /* DanceHeatlhTracking WatchKit App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 7E61B65B23C3825200AD77D0 /* DanceHeatlhTracking WatchKit App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7E61B66223C3825200AD77D0 /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E61B66023C3825200AD77D0 /* Interface.storyboard */; };
@@ -63,8 +61,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		7E1D01E323F095C20056E3C3 /* WorkoutSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSession.swift; sourceTree = "<group>"; };
-		7E1D01E523F095E90056E3C3 /* RouteHTTPController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteHTTPController.swift; sourceTree = "<group>"; };
 		7E32060824052AA900C3DBCD /* StartWorkout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartWorkout.swift; sourceTree = "<group>"; };
 		7E61B65723C3825200AD77D0 /* DanceHeatlhTracking.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DanceHeatlhTracking.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E61B65B23C3825200AD77D0 /* DanceHeatlhTracking WatchKit App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DanceHeatlhTracking WatchKit App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -130,8 +126,6 @@
 				7E61B67123C3825400AD77D0 /* ExtensionDelegate.swift */,
 				7E61B67323C3825400AD77D0 /* Assets.xcassets */,
 				7E61B67523C3825400AD77D0 /* Info.plist */,
-				7E1D01E323F095C20056E3C3 /* WorkoutSession.swift */,
-				7E1D01E523F095E90056E3C3 /* RouteHTTPController.swift */,
 				7E32060824052AA900C3DBCD /* StartWorkout.swift */,
 			);
 			path = "DanceHeatlhTracking WatchKit Extension";
@@ -272,9 +266,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7E1D01E623F095E90056E3C3 /* RouteHTTPController.swift in Sources */,
 				7E61B67223C3825400AD77D0 /* ExtensionDelegate.swift in Sources */,
-				7E1D01E423F095C20056E3C3 /* WorkoutSession.swift in Sources */,
 				7E32060924052AA900C3DBCD /* StartWorkout.swift in Sources */,
 				7E61B67023C3825400AD77D0 /* DanceSession.swift in Sources */,
 			);

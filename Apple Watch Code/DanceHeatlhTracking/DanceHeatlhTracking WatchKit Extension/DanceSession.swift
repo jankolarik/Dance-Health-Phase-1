@@ -1,5 +1,5 @@
 //
-//  InterfaceController.swift
+//  DanceSession.swift
 //  DanceHeatlhTracking WatchKit Extension
 //
 //  Created by Honza on 06/01/2020.
@@ -31,14 +31,11 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
 
     var id = ""
     
-    let healthStore = HKHealthStore()
-    let motion = CMMotionManager()
+    var healthStore = HKHealthStore()
+    var motion = CMMotionManager()
     var session: HKWorkoutSession!
     var builder: HKLiveWorkoutBuilder!
     var configuration: HKWorkoutConfiguration!
-    //enum HKWorkoutSessionState : Int
-    //https://developer.apple.com/documentation/healthkit/hkworkoutsessionstate
-    
     
     var currentState : Int = 0
     var noOfSpinsCompleted : Int = 0
@@ -53,9 +50,13 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
     @IBAction func startDancingButtonClick() {
         if(currentState == 0){
             startSession()
+            currentState = 1
+            startDancingButton.setTitle("Stop Measuring")
         }
         else{
             endSession()
+            currentState = 0
+            startDancingButton.setTitle("Start Measuring")
         }
     }
     
@@ -63,6 +64,7 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
     override func awake(withContext context: Any?) {
         super.awake(withContext: context)
         id = context as! String
+        
         // Configure interface objects here.
         authenticator()
         setUpEnv()
@@ -85,41 +87,28 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
         currentState = 1
         startDancingButton.setTitle("Stop Dancing")
         motionData()
-        session.startActivity(with: Date())
-        builder.beginCollection(withStart: Date()) { (success, error) in
-            self.setDurationTimerDate(.running)
-        }
-        
-        
-        // Setup session and builder.
-        session.delegate = self
-        builder.delegate = self
     }
         
     func endSession(){
-        //if(self.idTextField){
-        //    idTextField.setText("You must enter an ID")
-        //}
-        //else{
-            session.end()
-            self.setDurationTimerDate(.ended)
-            endCollectionOfWorkout()
-            currentState = 0
-            motionData()
-            startDancingButton.setTitle("Start Dancing")
-            postData()
-        //}
+        session.end()
+        self.setDurationTimerDate(.ended)
+        endCollectionOfWorkout()
+        currentState = 0
+        motionData()
+        startDancingButton.setTitle("Start Dancing")
+        postData()
+        self.noOfSpinsCompleted = 0
     }
     
     //Used from SpeedySloth example code
      func setDurationTimerDate(_ sessionState: HKWorkoutSessionState) {
          /// Obtain the elapsed time from the workout builder.
          /// - Tag: ObtainElapsedTime
-         let timerDate = Date(timeInterval: -self.builder.elapsedTime, since: Date())
+        let timerDate = Date(timeInterval: -self.builder.elapsedTime, since: Date())
          
          // Dispatch to main, because we are updating the interface.
          DispatchQueue.main.async {
-             self.timer.setDate(timerDate)
+            self.timer.setDate(timerDate)
          }
          
          // Dispatch to main, because we are updating the interface.
@@ -141,7 +130,11 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
 
         // The quantity types to read from the health store.
         let typesToRead: Set = [
-            HKQuantityType.workoutType()
+            //HKQuantityType.workoutType()
+            HKQuantityType.quantityType(forIdentifier: .heartRate)!,
+            HKQuantityType.quantityType(forIdentifier: .distanceWalkingRunning)!,
+            HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!,
+            HKQuantityType.quantityType(forIdentifier: .stepCount)!
         ]
 
         // Request authorization for those quantity types.
@@ -161,12 +154,22 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
             session = try HKWorkoutSession(healthStore: healthStore, configuration: configuration)
             builder = session.associatedWorkoutBuilder()
         } catch {
-            dismiss()
+            // Handle failure here.
             return
         }
         
+        // Setup session and builder.
+        session?.delegate = self
+        builder?.delegate = self
+        
         builder.dataSource = HKLiveWorkoutDataSource(healthStore: healthStore,
         workoutConfiguration: configuration)
+        
+        
+        session.startActivity(with: Date())
+        builder.beginCollection(withStart: Date()) { (success, error) in
+            self.setDurationTimerDate(.running)
+        }
     }
     
     func endCollectionOfWorkout(){
@@ -202,7 +205,6 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
         }
         else{
             self.spinsLabel.setText("Spins: \(self.noOfSpinsCompleted)")
-            self.noOfSpinsCompleted = 0
             motion.stopDeviceMotionUpdates()
             return
         }
@@ -213,39 +215,39 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
     
     func workoutBuilder(_ workoutBuilder: HKLiveWorkoutBuilder, didCollectDataOf collectedTypes: Set<HKSampleType>) {
             
-        
-        if let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate), let statistics = workoutBuilder.statistics(for: heartRateType){
-            let heartRateUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
-            let value = statistics.mostRecentQuantity()?.doubleValue(for: heartRateUnit)
-            let roundedValue = Double( round( 1 * value! ) / 1 )
-            heartRateLabel.setText("\(roundedValue) BPM")
-            avgHeartRate = roundedValue
+        //Because we are updating to the interface
+        DispatchQueue.main.async {
+            if let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate), let statistics = workoutBuilder.statistics(for: heartRateType){
+                let heartRateUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
+                let value = statistics.mostRecentQuantity()?.doubleValue(for: heartRateUnit)
+                let roundedValue = Double( round( 1 * value! ) / 1 )
+                self.heartRateLabel.setText("\(roundedValue) BPM")
+                self.avgHeartRate = roundedValue
+                
+                let minValue = statistics.minimumQuantity()?.doubleValue(for: heartRateUnit)
+                let minRoundedValue = Double( round( 1 * minValue! ) / 1 )
+                self.minHeartRate = minRoundedValue
+                
+                let maxValue = statistics.maximumQuantity()?.doubleValue(for: heartRateUnit)
+                let maxRoundedValue = Double( round( 1 * maxValue! ) / 1 )
+                self.maxHeartRate = maxRoundedValue
+            }
+             
+            if let distanceType = HKQuantityType.quantityType(forIdentifier: .distanceWalkingRunning), let statistics = workoutBuilder.statistics(for: distanceType){
+                let meterUnit = HKUnit.meter()
+                let value = statistics.sumQuantity()?.doubleValue(for: meterUnit)
+                let roundedValue = Double( round( 1 * value! ) / 1 )
+                self.distanceLabel.setText("\(roundedValue) m")
+                self.distanceTravelled = roundedValue
+            }
             
-            let minValue = statistics.minimumQuantity()?.doubleValue(for: heartRateUnit)
-            let minRoundedValue = Double( round( 1 * minValue! ) / 1 )
-            minHeartRate = minRoundedValue
-            
-            let maxValue = statistics.maximumQuantity()?.doubleValue(for: heartRateUnit)
-            let maxRoundedValue = Double( round( 1 * maxValue! ) / 1 )
-            maxHeartRate = maxRoundedValue
-        }
-        
-        
-        if let distanceType = HKQuantityType.quantityType(forIdentifier: .distanceWalkingRunning), let statistics = workoutBuilder.statistics(for: distanceType){
-            let meterUnit = HKUnit.meter()
-            let value = statistics.sumQuantity()?.doubleValue(for: meterUnit)
-            let roundedValue = Double( round( 1 * value! ) / 1 )
-            distanceLabel.setText("\(roundedValue) m")
-            distanceTravelled = roundedValue
-        }
-        
-        
-        if let calorieType = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned), let statistics = workoutBuilder.statistics(for: calorieType){
-            let energyUnit = HKUnit.kilocalorie()
-            let value = statistics.sumQuantity()?.doubleValue(for: energyUnit)
-            let roundedValue = Double( round( 1 * value! ) / 1 )
-            caloriesLabel.setText("\(roundedValue) cal")
-            caloriesBurned = roundedValue
+            if let calorieType = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned), let statistics = workoutBuilder.statistics(for: calorieType){
+                let energyUnit = HKUnit.kilocalorie()
+                let value = statistics.sumQuantity()?.doubleValue(for: energyUnit)
+                let roundedValue = Double( round( 1 * value! ) / 1 )
+                self.caloriesLabel.setText("\(roundedValue) cal")
+                self.caloriesBurned = roundedValue
+            }
         }
     }
     
@@ -253,6 +255,7 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
     
     // Track elapsed time.
     func workoutBuilderDidCollectEvent(_ workoutBuilder: HKLiveWorkoutBuilder) {
+
         // Retreive the workout event.
         guard let workoutEventType = workoutBuilder.workoutEvents.last?.type else { return }
         
@@ -264,7 +267,6 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
             setDurationTimerDate(.running)
         default:
             return
-            
         }
     }
     
@@ -276,9 +278,7 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
         date: Date
     ) {
         // Dispatch to main, because we are updating the interface.
-        DispatchQueue.main.async {
-            //self.setupMenuItemsForWorkoutSessionState(toState)
-        }
+        DispatchQueue.main.async {}
     }
     
     func workoutSession(_ workoutSession: HKWorkoutSession, didFailWithError error: Error) {
@@ -289,16 +289,21 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
     //Mongo DB Docs
     //https://docs.mongodb.com/stitch/services/http-actions/http.post/
     func postData(){
+        let today = Date()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd-MM-yyyy"
+
+        
         let jsonDanceObject: [String: Any] = [
             "id": id,
-            "duration": -1,
+            "duration": String(format: "%.01f", self.builder.elapsedTime),
             "minHeartRate": minHeartRate,
             "maxHeartRate": maxHeartRate,
             "averageHeartRate": avgHeartRate,
             "caloriesBurned": caloriesBurned,
             "distanceTravelled": distanceTravelled,
             "twists" : noOfSpinsCompleted,
-            "timeStamp" : -1,
+            "timeStamp" : formatter.string(from: today),
             "durationInSec" : -1,
             "avgJointDistanceMoved" : -1,
             "maxLeftHandHeight" : -1,

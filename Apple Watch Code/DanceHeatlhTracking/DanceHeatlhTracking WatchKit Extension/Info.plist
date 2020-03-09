@@ -36,6 +36,12 @@
 	<string>DanceHealthTracking wants to use your health data for better dance tracking</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>DanceHealthTracking wants to use your health data for better dance tracking</string>
+	<key>UIBackgroundModes</key>
+	<array/>
+	<key>WKBackgroundModes</key>
+	<array>
+		<string>workout-processing</string>
+	</array>
 	<key>WKExtensionDelegateClassName</key>
 	<string>$(PRODUCT_MODULE_NAME).ExtensionDelegate</string>
 	<key>WKWatchOnly</key>

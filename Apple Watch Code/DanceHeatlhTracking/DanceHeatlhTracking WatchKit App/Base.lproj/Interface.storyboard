@@ -73,7 +73,7 @@
                     <connections>
                         <outlet property="caloriesLabel" destination="nmP-nd-tG4" id="Bg2-cI-qN3"/>
                         <outlet property="distanceLabel" destination="24n-I6-guW" id="uJc-cE-jFV"/>
-                        <outlet property="heartRateLabel" destination="Lgp-Oc-k7B" id="QXO-Mm-fvy"/>
+                        <outlet property="heartRateLabel" destination="Lgp-Oc-k7B" id="Htl-Qq-JPc"/>
                         <outlet property="spinsLabel" destination="xZO-fn-zcM" id="EIy-AU-g75"/>
                         <outlet property="startDancingButton" destination="zle-77-e63" id="zkC-yc-zHW"/>
                         <outlet property="timer" destination="wu3-gE-MFL" id="BdA-wH-Ur0"/>
