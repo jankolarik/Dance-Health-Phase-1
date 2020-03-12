@@ -12,3 +12,6 @@ https://tommy.chheng.com/post/123568080616/encode-opengl-to-video-with-opencv
 
 OpenGL to OpenCV video saving tutorial by YZhong52, Jeff Molofee, and Frederic Echols:
 https://github.com/yzhong52/OpenGLFramebufferAsVideo
+
+Dear Imgui OpenCV2 example:
+https://github.com/ocornut/imgui/tree/master/examples/example_glut_opengl2
