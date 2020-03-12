@@ -1,14 +1,13 @@
-﻿  SkeletalTracking.cpp
-C:\Users\98397\OneDrive\Course\COMP0016 System Eng\Dance-Health-Phase-1\Kinect\SkeletalTracking\SkeletalTracking.cpp(215,38): warning C4244: '=': conversion from 'time_t' to 'long', possible loss of data
-C:\Users\98397\OneDrive\Course\COMP0016 System Eng\Dance-Health-Phase-1\Kinect\SkeletalTracking\SkeletalTracking.cpp(316,20): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\98397\OneDrive\Course\COMP0016 System Eng\Dance-Health-Phase-1\Kinect\SkeletalTracking\SkeletalTracking.cpp(332,20): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\98397\OneDrive\Course\COMP0016 System Eng\Dance-Health-Phase-1\Kinect\SkeletalTracking\SkeletalTracking.cpp(409,25): warning C4244: '=': conversion from 'time_t' to 'long', possible loss of data
-C:\Users\98397\OneDrive\Course\COMP0016 System Eng\Dance-Health-Phase-1\Kinect\SkeletalTracking\SkeletalTracking.cpp(402,1): warning C4996: 'ctime': This function or variable may be unsafe. Consider using ctime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\ucrt\time.h(476): message : see declaration of 'ctime'
+﻿  Drawing.cpp
+C:\Users\Alex\source\repos\GitMess\Dance-Health-Phase-1\Kinect\SkeletalTracking\Drawing.cpp(37,33): warning C4244: '=': conversion from 'time_t' to 'long', possible loss of data
+C:\Users\Alex\source\repos\GitMess\Dance-Health-Phase-1\Kinect\SkeletalTracking\Drawing.cpp(49,55): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Alex\source\repos\GitMess\Dance-Health-Phase-1\Kinect\SkeletalTracking\Drawing.cpp(49,36): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Alex\source\repos\GitMess\Dance-Health-Phase-1\Kinect\SkeletalTracking\Drawing.cpp(50,56): warning C4244: 'argument': conversion from 'double' to 'GLsizei', possible loss of data
+C:\Users\Alex\source\repos\GitMess\Dance-Health-Phase-1\Kinect\SkeletalTracking\Drawing.cpp(50,37): warning C4244: 'argument': conversion from 'double' to 'GLsizei', possible loss of data
 LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
   Generating code
-  2 of 466 functions ( 0.4%) were compiled, the rest were copied from previous compilation.
+  1 of 1451 functions (<0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    2 functions had inline decision re-evaluated but remain unchanged
+    13 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
-  SkeletalTracking.vcxproj -> C:\Users\98397\OneDrive\Course\COMP0016 System Eng\Dance-Health-Phase-1\Kinect\SkeletalTracking\x64\Release\SkeletalTracking.exe
+  SkeletalTracking.vcxproj -> C:\Users\Alex\source\repos\GitMess\Dance-Health-Phase-1\Kinect\SkeletalTracking\x64\Release\SkeletalTracking.exe
