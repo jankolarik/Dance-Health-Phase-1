@@ -160,6 +160,7 @@ void getKinectData(GLubyte* dest) {
 void gui_start()
 {
 	if (application.m_show_gui_start) {
+		application.m_show_session_start = false;
 		ImGui::SetNextWindowSize(ImVec2(800, 150));
 		ImGui::Begin("Input Session ID", NULL);//setting p_open to NULL removes the close button
 		if (badUser) {
@@ -175,7 +176,7 @@ void gui_start()
 				badUser = true;
 			}
 			else {//saves the sessionID, closes ID input window, opens start menu
-				ImGui::SetNextWindowSize(ImVec2(700, 150));
+				ImGui::SetNextWindowSize(ImVec2(800, 250));
 				application.m_sessionID = application.m_session_id;
 				application.m_show_session_start = true;
 				application.m_show_gui_start = false;
@@ -187,6 +188,7 @@ void gui_start()
 		ImGui::Begin("Start Window", NULL);
 		ImGui::Text("Welcome to Dance Health!\nPlease try to stay within the camera frame.\nThe session will automatically end when you exit the frame for over 5 seconds.");
 		ImGui::Text("You can also end the session by pressing the \"End Session\" Button, \nbut if you don't want it to show up in the final video, you can close that pop-up. \nPress start to begin recording.");
+		ImGui::Text("Note: When using the Dance Health Application Package with a Kinect \nfor Windows v2 sensor, Microsoft will collect telemetry data(e.g., operating system, \nnumber of processors, graphic chipset, memory, device type, locale, time) \nin order to improve Microsoft productsand services.\nThe data will not be used to identify specific individuals.");
 		if (ImGui::Button("Start")) {
 			application.m_show_session_start = false;
 			ImGui::SetNextWindowSize(ImVec2(100, 80));

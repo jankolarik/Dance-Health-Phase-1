@@ -112,6 +112,10 @@ void SkeletalBasics::Update()
 			//ends after user left screen for 7 seconds or more
 			if (((time(0) - m_fLatestBodyDetectedTime < 7) || (m_nSessionStartTime == 0) || m_show_gui_start || m_show_session_start) && !m_endSessionButton) //the session can't end if the start button hasn't been pressed
 			{
+<<<<<<< HEAD
+=======
+				//cout << m_show_session_start << endl;
+>>>>>>> 75fb9ba88c5ab0b174304cce63831581499b9a0d
 				// The main function to process body data e.g. joints
 				ProcessBody(BODY_COUNT, ppBodies);
 
@@ -397,7 +401,7 @@ void SkeletalBasics::Summary()
 	ofstream summaryFile;
 	//String filename = "SessionSummary" + m_SessionDate + ".json";//clinical resource json in fhir?
 
-	summaryFile.open("kinect.json");
+	summaryFile.open("kinect"+ m_SessionDate + m_SessionTime +".json");
 	summaryFile << json;
 	summaryFile.close();
 }
@@ -423,7 +427,10 @@ void SkeletalBasics::CloseClean() {
 	m_SessionDate += to_string(ltm->tm_mon + 1) + "-";
 	m_SessionDate += to_string(ltm->tm_year + 1900);
 
-	string vidName = "vid" + m_SessionDate + ".avi";
+	m_SessionTime += "_" + to_string(ltm->tm_hour) + "-";
+	m_SessionTime += to_string(ltm->tm_min);
+
+	string vidName = "vid" + m_SessionDate + m_SessionTime + ".avi";
 	// After the session finished, run summary
 	Summary();
 	//end timer here and calculate time difference
