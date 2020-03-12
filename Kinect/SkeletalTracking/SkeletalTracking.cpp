@@ -117,8 +117,12 @@ void SkeletalBasics::Update()
 		// If the body data is refreshed successfully
 		if (SUCCEEDED(hr))
 		{
+			//before the session starts
+			if (m_show_gui_start || m_show_session_start) {
+				cout << "Session hasn't started yet" <<endl;
+			}
 			//ends after user left screen for 7 seconds or more
-			if (((time(0) - m_fLatestBodyDetectedTime < 7) || (m_nSessionStartTime == 0) || m_show_gui_start || m_show_session_start) && !m_endSessionButton) //the session can't end if the start button hasn't been pressed
+			else if ((time(0) - m_fLatestBodyDetectedTime < 7) || (m_nSessionStartTime == 0)  && !m_endSessionButton) //the session can't end if the start button hasn't been pressed
 			{
 				//cout << m_show_session_start << endl;
 				// The main function to process body data e.g. joints

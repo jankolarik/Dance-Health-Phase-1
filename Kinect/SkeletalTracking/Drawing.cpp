@@ -169,14 +169,14 @@ void gui_start()
 		else {
 			ImGui::Text("Please input a session ID.");
 		}
-		ImGui::Text("It should match the one entered in the Apple Watch, \nand differ from all session IDs used within the same day. It must be under 10 characters.\nIt can contain any characters, but it should not be blank (in which case you wil be re-prompted).");
+		ImGui::Text("It should match the one entered in the Apple Watch, \nand differ from all session IDs used within the same day. It must be under 10 characters.\nIt can contain any characters, but it should not be blank (in which case you will be re-prompted).");
 		ImGui::InputText("", application.m_session_id, 10);
 		if (ImGui::Button("Submit")) {
 			if (strlen(application.m_session_id) == 0) {
 				badUser = true;
 			}
 			else {//saves the sessionID, closes ID input window, opens start menu
-				ImGui::SetNextWindowSize(ImVec2(800, 250));
+				ImGui::SetNextWindowSize(ImVec2(800, 220));
 				application.m_sessionID = application.m_session_id;
 				application.m_show_session_start = true;
 				application.m_show_gui_start = false;
@@ -188,7 +188,7 @@ void gui_start()
 		ImGui::Begin("Start Window", NULL);
 		ImGui::Text("Welcome to Dance Health!\nPlease try to stay within the camera frame.\nThe session will automatically end when you exit the frame for over 5 seconds.");
 		ImGui::Text("You can also end the session by pressing the \"End Session\" Button, \nbut if you don't want it to show up in the final video, you can close that pop-up. \nPress start to begin recording.");
-		ImGui::Text("Note: When using the Dance Health Application Package with a Kinect \nfor Windows v2 sensor, Microsoft will collect telemetry data(e.g., operating system, \nnumber of processors, graphic chipset, memory, device type, locale, time) \nin order to improve Microsoft productsand services.\nThe data will not be used to identify specific individuals.");
+		ImGui::Text("Note: When using the Dance Health Application Package with a Kinect \nfor Windows v2 sensor, Microsoft will collect telemetry data(e.g., operating system, \nnumber of processors, graphic chipset, memory, device type, locale, time) \nin order to improve Microsoft products and services.\nThe data will not be used to identify specific individuals.");
 		if (ImGui::Button("Start")) {
 			application.m_show_session_start = false;
 			ImGui::SetNextWindowSize(ImVec2(100, 80));
