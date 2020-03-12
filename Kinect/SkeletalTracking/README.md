@@ -15,3 +15,5 @@ https://github.com/yzhong52/OpenGLFramebufferAsVideo
 
 Dear Imgui OpenCV2 example:
 https://github.com/ocornut/imgui/tree/master/examples/example_glut_opengl2
+
+Speedy Sloth example from Apple: https://developer.apple.com/documentation/healthkit/workouts_and_activity_rings/speedysloth_creating_a_workout
