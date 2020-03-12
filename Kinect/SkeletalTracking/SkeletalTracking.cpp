@@ -95,14 +95,6 @@ void SkeletalBasics::Update()
 	{
 		return;
 	}
-	/*
-	if (m_session_id == "") {
-		cout << "Please input a session ID. It should match the one entered in the Apple Watch, \nand differ from all session IDs used within the same day." << endl;
-		cout << "It can contain any characters, but it should not be blank (in which case you wil be re-prompted)." << endl;
-		cout << "Example: \"Name 1\"." << endl;
-		cin >> m_session_id;
-	}
-	*/
 	IBodyFrame* pBodyFrame = NULL;
 
 	HRESULT hr = m_pBodyFrameReader->AcquireLatestFrame(&pBodyFrame);
@@ -120,7 +112,6 @@ void SkeletalBasics::Update()
 			//ends after user left screen for 7 seconds or more
 			if (((time(0) - m_fLatestBodyDetectedTime < 7) || (m_nSessionStartTime == 0) || m_show_gui_start || m_show_session_start) && !m_endSessionButton) //the session can't end if the start button hasn't been pressed
 			{
-				cout << m_show_gui_start << endl;
 				// The main function to process body data e.g. joints
 				ProcessBody(BODY_COUNT, ppBodies);
 
@@ -212,17 +203,17 @@ void SkeletalBasics::ProcessBody(int nBodyCount, IBody** ppBodies)
 					{
 						m_cColorPoints[i][j] = CameraToColor(joints[j].Position);
 					}
-
+					
 					// Update max height of joints
 					MaxJointsData(joints);
 
 					// Joint angle calculation
-					cout << "Angle: " << GetJointAngle(joints, 8) << endl;
+					//cout << "Angle: " << GetJointAngle(joints, 8) << endl;
 
-					// If the data from last frame is loaded, start comparison2
+					// If the data from last frame is loaded, start comparison
 					if (previousBodyLoad)
 					{
-						cout << "Activity Analysis value : " << ActivityAnalysis(pBody, pBodyPrevious) << endl;
+						cout << "Activity Analysis : " << ActivityAnalysis(pBody, pBodyPrevious) << endl;
 					}
 
 					// Update the latest time that a body is detected on the screen
@@ -378,8 +369,7 @@ void SkeletalBasics::Summary()
 	json += "\"maxLeftHandHeight\" : \"" + to_string(Calibrate(m_fSessionJointsMaxheight[7])) + "\",";
 	json += "\"maxRightHandHeight\" : \"" + to_string(Calibrate(m_fSessionJointsMaxheight[23])) + "\",";
 	json += "\"maxLeftKneeHeight\" : \"" + to_string(Calibrate(m_fSessionJointsMaxheight[13])) + "\",";
-	json += "\"maxRightKneeHeight\" : \"" + to_string(Calibrate(m_fSessionJointsMaxheight[17])) + "\",";
-	json += "\"linkToVideo\" : \"-1\"}";
+	json += "\"maxRightKneeHeight\" : \"" + to_string(Calibrate(m_fSessionJointsMaxheight[17])) + "\"}";
 
 	// Initialise the curl handle to send the summary json to server
 	CURL* curl = curl_easy_init();
