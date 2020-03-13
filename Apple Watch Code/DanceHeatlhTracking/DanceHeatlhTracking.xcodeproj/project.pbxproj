@@ -16,6 +16,7 @@
 		7E61B67223C3825400AD77D0 /* ExtensionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E61B67123C3825400AD77D0 /* ExtensionDelegate.swift */; };
 		7E61B67423C3825400AD77D0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E61B67323C3825400AD77D0 /* Assets.xcassets */; };
 		7E61B68623C3831100AD77D0 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E61B68523C3831100AD77D0 /* HealthKit.framework */; };
+		7EEFA70B241BB23E00DB1755 /* License.txt in Resources */ = {isa = PBXBuildFile; fileRef = 7EEFA70A241BB23E00DB1755 /* License.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -74,6 +75,7 @@
 		7E61B67523C3825400AD77D0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7E61B68323C3831100AD77D0 /* DanceHeatlhTracking WatchKit Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "DanceHeatlhTracking WatchKit Extension.entitlements"; sourceTree = "<group>"; };
 		7E61B68523C3831100AD77D0 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS6.1.sdk/System/Library/Frameworks/HealthKit.framework; sourceTree = DEVELOPER_DIR; };
+		7EEFA70A241BB23E00DB1755 /* License.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = License.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,6 +129,7 @@
 				7E61B67323C3825400AD77D0 /* Assets.xcassets */,
 				7E61B67523C3825400AD77D0 /* Info.plist */,
 				7E32060824052AA900C3DBCD /* StartWorkout.swift */,
+				7EEFA70A241BB23E00DB1755 /* License.txt */,
 			);
 			path = "DanceHeatlhTracking WatchKit Extension";
 			sourceTree = "<group>";
@@ -255,6 +258,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7EEFA70B241BB23E00DB1755 /* License.txt in Resources */,
 				7E61B67423C3825400AD77D0 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

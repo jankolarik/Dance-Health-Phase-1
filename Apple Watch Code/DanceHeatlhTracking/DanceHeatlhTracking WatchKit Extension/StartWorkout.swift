@@ -13,6 +13,7 @@ import HealthKit
 
 class StartWorkout: WKInterfaceController {
     
+// MARK: - Global variables & actions
     var enableButton = false
     var id = ""
     
@@ -26,11 +27,14 @@ class StartWorkout: WKInterfaceController {
         }
     }
     
+// MARK: - Interface Setup
+    //Configure interface
     override func didAppear() {
         super.didAppear()
         nextButton.setEnabled(enableButton)
     }
     
+    //Pass the id to the next class on transition
     override func contextForSegue(withIdentifier segueIdentifier: String) -> Any? {
         return id
     }

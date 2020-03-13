@@ -1,12 +1,5 @@
-//
 //  DanceSession.swift
 //  DanceHeatlhTracking WatchKit Extension
-//
-//  Created by Honza on 06/01/2020.
-//  Copyright © 2020 Team32. All rights reserved.
-//
-//  Adapted from SpeedySloth example from Apple
-
 
 import WatchKit
 import Foundation
@@ -16,9 +9,8 @@ import CoreML
 
 class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorkoutBuilderDelegate {
     
-// MARK: - Declaration of variables + actions
+// MARK: - Global variables & actions
     //Need to replace '!' with '?' and handle errors!
-    //Maybe move code to seperate classes?
 
     @IBOutlet weak var timer: WKInterfaceTimer!
 
@@ -60,12 +52,10 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
         }
     }
     
-    // MARK: - Default Interface Setup
+    // MARK: - Interface Setup
     override func awake(withContext context: Any?) {
         super.awake(withContext: context)
         id = context as! String
-        
-        // Configure interface objects here.
         authenticator()
         setUpEnv()
     }
@@ -94,9 +84,9 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
         self.setDurationTimerDate(.ended)
         endCollectionOfWorkout()
         currentState = 0
-        motionData()
         startDancingButton.setTitle("Start Dancing")
         postData()
+        motion.stopDeviceMotionUpdates()
         self.noOfSpinsCompleted = 0
     }
     
@@ -130,7 +120,6 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
 
         // The quantity types to read from the health store.
         let typesToRead: Set = [
-            //HKQuantityType.workoutType()
             HKQuantityType.quantityType(forIdentifier: .heartRate)!,
             HKQuantityType.quantityType(forIdentifier: .distanceWalkingRunning)!,
             HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!,
@@ -139,7 +128,6 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
 
         // Request authorization for those quantity types.
         healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead) { (success, error) in
-            // Handle error. No error handling in this sample project.
         }
     }
     
@@ -149,12 +137,12 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
         configuration.locationType = .indoor
     }
     
+// MARK: - Workout Management
     func createHKWorkoutSession(){
         do {
             session = try HKWorkoutSession(healthStore: healthStore, configuration: configuration)
             builder = session.associatedWorkoutBuilder()
         } catch {
-            // Handle failure here.
             return
         }
         
@@ -186,27 +174,20 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
     
     
     // MARK: - Motion Manager
-
-
     //https://stackoverflow.com/questions/46756274/how-to-work-with-accelerometer-data-from-the-apple-watch
     
+    //Sensors track the number of spins and update the interface
     func motionData(){
-        if(self.currentState == 1){
-            motion.deviceMotionUpdateInterval = 0.3
-
-            motion.startDeviceMotionUpdates(to: OperationQueue.current!) { (data, error) in
-                if let myData = data {
-                    if(abs(myData.rotationRate.x) > 7 && abs(myData.gravity.y) < 0.2){
-                        self.noOfSpinsCompleted += 1
-                    }
+        motion.deviceMotionUpdateInterval = 0.3
+        motion.startDeviceMotionUpdates(to: OperationQueue.current!) { (data, error) in
+            if let myData = data {
+                if(abs(myData.rotationRate.x) > 7 && abs(myData.gravity.y) < 0.2){
+                    self.noOfSpinsCompleted += 1
+                }
+                DispatchQueue.main.async {
                     self.spinsLabel.setText("Spins: \(self.noOfSpinsCompleted)")
                 }
             }
-        }
-        else{
-            self.spinsLabel.setText("Spins: \(self.noOfSpinsCompleted)")
-            motion.stopDeviceMotionUpdates()
-            return
         }
     }
     
@@ -215,7 +196,7 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
     
     func workoutBuilder(_ workoutBuilder: HKLiveWorkoutBuilder, didCollectDataOf collectedTypes: Set<HKSampleType>) {
             
-        //Because we are updating to the interface
+        //We are updating the interface with new data from the sensors
         DispatchQueue.main.async {
             if let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate), let statistics = workoutBuilder.statistics(for: heartRateType){
                 let heartRateUnit = HKUnit.count().unitDivided(by: HKUnit.minute())
@@ -250,9 +231,7 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
             }
         }
     }
-    
-    // MARK: - Update the interface
-    
+        
     // Track elapsed time.
     func workoutBuilderDidCollectEvent(_ workoutBuilder: HKLiveWorkoutBuilder) {
 
@@ -271,21 +250,21 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
     }
     
     // MARK: - HKWorkoutSessionDelegate
+    //Delegate methods
+    
     func workoutSession(
         _ workoutSession: HKWorkoutSession,
         didChangeTo toState: HKWorkoutSessionState,
         from fromState: HKWorkoutSessionState,
         date: Date
     ) {
-        // Dispatch to main, because we are updating the interface.
-        DispatchQueue.main.async {}
+        
     }
     
     func workoutSession(_ workoutSession: HKWorkoutSession, didFailWithError error: Error) {
-        // No error handling in this sample project.
     }
 
-// MARK: - Creating URL Requests
+// MARK: - URL Request
     //Mongo DB Docs
     //https://docs.mongodb.com/stitch/services/http-actions/http.post/
     func postData(){
@@ -309,16 +288,13 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
             "maxLeftHandHeight" : -1,
             "maxRightHandHeight" : -1,
             "maxLeftKneeHeight" : -1,
-            "maxRightKneeHeight": -1,
-            "linkToVideo": -1
+            "maxRightKneeHeight": -1
         ]
         
         
         let jsonDanceObjectSerialized = try? JSONSerialization.data(withJSONObject: jsonDanceObject)
         
         //https://learnappmaking.com/urlsession-swift-networking-how-to/
-        //Create new betton to send data (Provide success/failure of data sent?
-        
         let session = URLSession.shared
         let url = URL(string: "http://51.11.52.98:3300/dance")!
         var request = URLRequest(url: url)
