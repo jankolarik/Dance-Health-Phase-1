@@ -10,7 +10,6 @@ import CoreML
 class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorkoutBuilderDelegate {
     
 // MARK: - Global variables & actions
-    //Need to replace '!' with '?' and handle errors!
 
     @IBOutlet weak var timer: WKInterfaceTimer!
 
@@ -39,15 +38,21 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
     var distanceTravelled : Double = 0
     var caloriesBurned : Double = 0
     
+    final var sessionNotStarted : Int = 0
+    final var sessionStarted : Int = 1
+    final var deviceUpdateIntervalSec  : Double = 0.3
+    final var optimalXRotation : Double = 7.0
+    final var optimalYGravity : Double = 0.2
+    
     @IBAction func startDancingButtonClick() {
-        if(currentState == 0){
+        if(currentState == sessionNotStarted){
             startSession()
-            currentState = 1
+            currentState = sessionStarted
             startDancingButton.setTitle("Stop Measuring")
         }
         else{
             endSession()
-            currentState = 0
+            currentState = sessionNotStarted
             startDancingButton.setTitle("Start Measuring")
         }
     }
@@ -74,7 +79,7 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
 // MARK: - Session Management
     func startSession(){
         createHKWorkoutSession()
-        currentState = 1
+        currentState = sessionStarted
         startDancingButton.setTitle("Stop Dancing")
         motionData()
     }
@@ -83,7 +88,7 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
         session.end()
         self.setDurationTimerDate(.ended)
         endCollectionOfWorkout()
-        currentState = 0
+        currentState = sessionNotStarted
         startDancingButton.setTitle("Start Dancing")
         postData()
         motion.stopDeviceMotionUpdates()
@@ -178,10 +183,10 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
     
     //Sensors track the number of spins and update the interface
     func motionData(){
-        motion.deviceMotionUpdateInterval = 0.3
+        motion.deviceMotionUpdateInterval = deviceUpdateIntervalSec
         motion.startDeviceMotionUpdates(to: OperationQueue.current!) { (data, error) in
             if let myData = data {
-                if(abs(myData.rotationRate.x) > 7 && abs(myData.gravity.y) < 0.2){
+                if(abs(myData.rotationRate.x) > self.optimalXRotation && abs(myData.gravity.y) < self.optimalYGravity){
                     self.noOfSpinsCompleted += 1
                 }
                 DispatchQueue.main.async {
