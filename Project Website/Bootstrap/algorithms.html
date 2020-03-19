@@ -106,7 +106,17 @@
       <img src="./images/algo2.png" style="float: left; position: relative" width="500" height="350">
       <img src="./images/algoSketch2.jpg" style="float: right; position: relative" width="500" height="350"></div><br>
   The main problem with this algorithm is the introduction of the possibility of user error: if the user does not type the session ID properly, it could cause merging issues.</p>
-  </div>
+
+  <h2>Apple Watch: Number of Spins</h2>
+  <img src="./images/CodeSnippetMotionData.png" class="center" width="1080" height="600">
+<p>With the Apple Watch code, one of the key algorithms was implementing a function that would recordthe number of spins the user has made. The function motionData() measures and tracks this. <br>
+This function uses a variable called motion which is of type CMMotionManager. This allows us to recieve four types of motion data including Gyroscope, Accelerometer, Magnetometer and Device-Motion Data. <br>
+We set the device motion update interval, meaning how frequently it should measure values (over what period of time) to a constant that we have dervied works best after extensive testing. <br>
+Next, we start the device motion updates and every time we get an update, we check if the two sensors that we use, are in the range of our pre-define values. If yes, we classify the movement as a spins and increase the spins counter for the number of spins by one.
+</p>
+</div>
+
+
       <!-- /.container -->
 
   <!-- Footer -->

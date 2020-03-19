@@ -186,7 +186,33 @@
         <h3>Apple Watch - No of Spins</h3>
         <p>We have a method using the gyroscope and accelerometer inside the apple watch to identify the number of turns the person performed.</p>
         <p><b>Test method</b>: having a person performs turning with different angle and speed and compared result with the amount of turing actually happened.</p>
-        <p><b>Test result</b>: In most condition the turns are recognised properly, however when you are turning too fast, the method result appears to be higher than the actual result.</p>
+        <p><b>Test result</b>: </p>
+        <table style="width:100%" >
+          <colspn>
+          <tr>
+            <th width="20%"></th>
+            <th width="20%">Slow Spins</th>
+            <th width="20%">Normal Spins</th>
+            <th width="20%">Fast Spins</th>
+            <th width="20%">Spins at different angles</th>
+          </tr>
+          <tr>
+            <th>Actual Spins</th>
+            <td>50</td>
+            <td>50</td>
+            <td>50</td>
+            <td>50</td>
+          </tr>
+          <tr>
+            <th>Recorded Spins</th>
+            <td>39</td>
+            <td>54</td>
+            <td>65</td>
+            <td>46</td>
+          </tr>
+          </colspn>
+        </table>
+        <p><b>Comment</b>: In most condition the turns are recognised properly, however when you are turning too fast, the method result appears to be higher than the actual result.</p>
 
         <h3>Kinect - Video Saving and Skeletal Mapping</h3>
         <p>Our system saves a video each time: we checked the video saved (and watched the live feed) to identify and fix bugs. Here's an example:</p>
