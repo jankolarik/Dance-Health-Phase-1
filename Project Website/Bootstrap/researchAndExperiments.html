@@ -197,8 +197,21 @@
         <p>We also compared with Intel Real Sense, and the latest Kinect Azure camera, the optimial solution is the Kinect Azure which is the newest realsed one with brand new SDK come with it and is also capable of synchronise multiple cameras which hugely improve the data accuracy and reduce occlusion problem. However we are not able to get it in UK so we choose to use Kinect 2 camera which is compatible with the Azure camera.</p>
 
         <h3>Alternative Algorithms (merging)</h3>
+        <p>
+            Originally, we had a <a href="algorithms">different algorithm</a> planned and written for the json merging:
+            it was meant to delete the files merged after using them to avoid merging incorrect and already used data.
+            Ultimately, this was too complex to implement, so instead we opted to use the date as well in teh merging algorithm.
+        </p>
 
         <h3>Alternative Libraries (Kinect UI)</h3>
+
+        <p>
+            We considered many library alternatives when creating the Kinect user experience:<br>
+            we chose to use OpenGL instead of the Microsoft D2D library for live feed and skeletal display, because of Microsoft licensing, and how OpenGL works easily with OpenCV.<br>
+            OpenCV and the FFMpeg libraries were both considered for the video saving, but ultimately, a lot of the FFMpeg library functionalities we wanted to use were deprecated,
+            so we opted to use OpenCV as it already played well with our use of OpenGL, and it depended on FFMpeg anyway.<br>
+            Lastly, we chose Dear Imgui over Qt and many other libraries because it was very simple and light, with minimal dependencies, and it fulfilled the job we wanted it to.
+        </p>
 
         <h3>Summary</h3>
 
