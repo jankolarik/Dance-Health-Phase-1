@@ -280,7 +280,7 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
             "distanceTravelled": distanceTravelled,
             "twists" : noOfSpinsCompleted,
             "timeStamp" : getDate(),
-            "durationInSec" : DEFAULT_VALUE,
+            "kinectDurationInSec" : DEFAULT_VALUE,
             "avgJointDistanceMoved" : DEFAULT_VALUE,
             "maxLeftHandHeight" : DEFAULT_VALUE,
             "maxRightHandHeight" : DEFAULT_VALUE,
