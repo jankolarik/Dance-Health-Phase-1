@@ -126,12 +126,35 @@ Implementation of Key functionalities:
       <img src="./images/Kinect-Angle2.png" class="center" width="1080" height="300">
       <p>Then we have a joint angle calculator function which using vector math to determine the actual distance between these joints provided by their co-ordinate.</p>
       <!-- /.container -->
+
+      <h3>Implementation</h3>
+    <p><b>The Apple Watch code works in the following way.</b><br/>
+      <br/>
+      Initially all the variables are initialised and the application checks whether the user has granted it access to use the sensors and their medical data. If not, the application will prompt the user if they will allow this.<br/>
+      There is a global state variable, which tells functions whether the user is dancing or not. If currentState = 1, the session is active and if currentState = 0, the session is inactive. Whenever the session is active, a lot of background calculations are being run.<br/>
+      The Apple Watch will constantly record the user heart rate with the heart rate sensor along with getting accelerometer and gyroscope data. With this data it calculates the number of calories burned and distance travelled (which is implemented by Apple and an API is called for this) along with tracking the number of spins, which is implemented by us. It does this by using data from two of the sensors which is updates every 0.3seconds. This feature is implemented in the motionData() function.<br/>
+      After the user presses stop, the currentState will change and this button click will initiate the process for ending a workout. It will call on Apple's HealthKit API, to log the workout results into the Activity Application in a FHIR standard. The button will reset to display „Start Dancing“ again.<br/>
+      <br/>
+      <br/>
+      <b>Kinect Implementation</b><br/>
+      <br/>
+      We have a class called SkeletalTracking which include all of our Kinect code. In the main function, we first initialise the glut and OpenCV setting which are responsible for our video display and skeletal drawing. Then we call a series of OpenGL functions to initialise the textures of our display screen, then to setup the screen and camera. Then, we call the glut main loop: this calls all the functions we want to loop, as we call them inside the draw() function (which is defined as the default function that runs if the program is idle).<br/>
+      This video should then theoretically be saved in a .avi file at the end of the session.<br/>
+      The Kinect library provides us with an object called IBodyFrame which allow us to obtain the bodies inside the camera view, those bodies are stored in object called IBody which are returned as a list contain up to 6 IBody which is the maximum number of people Kinect can track at the same time. These IBody
+      can provides us the tracing state of this body and also joints data, includes joints X,Y,Z coordinates and their tracking state.<br/>
+      In the update function, we first call functions to acquire the latest frame and body data. If that process succeed, we enter a series of if conditions blocks, we currently have 3 blocks which represent the different part of the dance process, start from calibration session, then body process session, and the last one which is the summary session. After each session is finished, we set the condition of current block to false so that it fall into the next session.<br/>
+      In these functions, we are defining a position to let people move to next session without the need to touch any devices, the current position require you to raise both of your hands above the head for 3-5 seconds, this can be changed to any other position if needed.<br/>
+      Inside the calibration function, we are calculating the height of floor from the height of feet joint by letting user stand still for a few seconds, the purpose is to calculate joints data relative to the floor height as Kinect has its coordinate system relative to the camera instead of floor.<br/>
+      Then inside process body function, we now have activity level and max height functions. The activity level calculate the distance moved of each joint per frame by storing the previous frame data and compare it to the current frame. The max height function detect max height of joints (currently both hands and knees) by replacing any height that is higher than the current maximum.<br/>
+      Then in the summary session, we write those data obtained by the process body session and also local time data into a txt file.
+    </p>
+    
   </div>
 
   <!-- Footer -->
   <footer class="py-5 bg-dark">
     <div class="container">
-      <p class="m-0 text-center text-white">Copyright &copy; Team 32, 2020</p>
+      <p class="m-0 text-center text-white">Team 32, 2020</p>
     </div>
     <!-- /.container -->
   </footer>
