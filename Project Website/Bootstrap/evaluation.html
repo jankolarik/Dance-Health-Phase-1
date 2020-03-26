@@ -94,7 +94,7 @@
     <li>Managed to get gyroscope, accelerometer and orientation data</li>
     <li>Track the number of spins the user has made</li>
     <li>Record and save the activity to the Apple Health Kit (Duration, distance travelled, average heartbeat and calories burned)</li>
-    <li>Store and send this data to a server in a standardized (FHIR) JSON format.</li>
+    <li>Store and send this data to a server in a standardized JSON format.</li>
   </ul>
   <h4>Kinect</h4>
   <ul>
@@ -103,7 +103,7 @@
     <li>Tracks and stores the activity level of users as well as limb positionment metrics</li>
     <li>Can display skeletals ovelaid over live video feed</li>
     <li>Stores video file of session with skeletals and video feed</li>
-    <li>Sends data to server in standardized (FHIR) JSON format</li>
+    <li>Sends data to server in standardized JSON format</li>
   </ul>
   <h4>Server</h4>
   <ul>
@@ -452,25 +452,28 @@
   components are not linked or synchronised was a bit counter-intitive to some people, and overall they would have appreciated some colour being added. For the Kinect UI, they mostly would have liked more
     feedback on what is happening (i.e. a message when the user is out of frame or their feet/floor aren't detected), and for us to have split the plaintext into more digestible portions.
     Lastly, for the server interface, by and large the consensus was to lock the headings to a place where no matter how many entries were in the database, they were always easily visible to the user
-  (so they didn't need to scroll up to identify their data), units could have been added, manual entry allowed for erroneous data to be entered, and they'd like the page to refresh automatically if an entry is deleted or added.
+  (so they didn't need to scroll up to identify their data), units could have been added, and they'd like the page to refresh automatically if an entry is deleted or added.
   Their feedback was polled in a Google form, the results of which can be viewed on the <a href="testing.html">Testing</a> page.
-  Overall, their feeling was extremely positive, but the constructive criticism was also greatly appreciated.</p>
+  Overall, their feeling was extremely positive, as they enjoyed our simple user interfaces, but the constructive criticism was also greatly appreciated. If we had more time, we woudl definitely implement their suggestions.</p>
 
   <h3>Functionality</h3>
-  <p></p>
+  <p>The Apple Watch functionality included showcasing what some of the health statistics that the sensors could provide. Overall is satisfied all of the requirements however, more health statistics could be derived from the data in the future.</p>
+  <p>In terms of evaluating the Kinect functionality, we conducted a lot of testing through out the development process, were we and our test-users evaluated the Kinect and it's tracking, displaying, saving, and analysis of people dancing, and found its abilities to be sufficient in facilitating and fulfilling the requirements set to and by us</p>
 
   <h3>Stability</h3>
-  <p>Kinect: Due to the way we implement the code, the data upload and the video saving function are called in the end of the session, so if the program is crashed in the middle of the session, no data will be stored and sent to the server.    </p>
-  <p>Server: The session id may cause problem if the naming convention was not followed or miss spelling occurred, these may cause situation where some data never merged.    </p>
+  <p>Apple Watch: The Apple Watch app can occasionally crash if the user has not allowed it the specific permissions. This could definitely be improved. Other than that, it is very stable.</p>
+  <p>Kinect: Due to the way we implemented the code, the data uploading and the video saving functions are called at the end of the session, so if the program crashed in the middle of the session, no data will be stored and sent to the server. The Kinect code rarely crashes.</p>
+  <p>Server: The session id may cause problem if the naming convention was not followed or there is a spelling. This may cause situation where some data never merged. Furthermore, the server may throw an error with erroneous user input. Next time, we should check the user input first, before allowing it over a more complex and complete specification.  </p>
   <p>If internet problem occuered on on of the devices, this will cause the data got lost and the result won't be send successfully to the server.    </p>
 
   <h3>Efficiency</h3>
-  <p>Video saving: the video will only be recorded after the user start session so that the video is in minimum length, and the video will be stored locally instead of sending it to the server as saving a lot of video in the server is costing a lot of money.    </p>
-  <p>Data extracting: for most of the data we get, they are all done between frames and data other than the result are erasered after each frame to save memories. All joint data are calibrated in the end of the session instead of each time we obtain it so there are less amount of calculation needed.</p>
-  <p>Server: the data base is made to be simple and easy so that it can be run with lower price server and the cheapest server from the azure is enough for this project which will save unnecessary on the server hosting.    </p>
+  <p>Video saving: the video will only be recorded after the user starts the session so that the video has the minimum size, and the video will be stored locally instead of sending it to the server as saving a lot of video files on the server can cost a lot of money and may not be financially viable.    </p>
+  <p>Data extracting: for most of the raw data we get, they are all collected between frames and only the data that is used for further computations is saved to the memory. All joint data are calibrated at the end of the session instead of each time we obtain it, so there are less amount of calculation needed which makes data extracting relatively efficient.</p>
+  <p>Server: the database is made to be simple and easy so that it can be run with a lower price server on the cheapest virtual machine from Microsoft Axure, which is enough for this project. However, the implementation of the merge function, i.e. searching through all of the records is not that efficient and can be improved. One idea would be to use the fact that the user data is sorted according to time it was recorded (and thus sorted by time stamp). This means that the merge function could be implemented not to have to search below a specified time stamp than is on the incoming data, increasing its efficiency.    </p>
+  
   <h3>Compatibility</h3>
   <p>Since in our project requirements, we had to use very specific devices, we will discuss the compatiibility of our software to similar devices or older versions of them.</p>
-  <p>The Apple Watch software is compatible with all of the currently available Apple Watches, assuming that they have the latest operating system.     </p>
+  <p>The Apple Watch software is compatible with all of the currently available Apple Watches, assuming that they have the latest operating system. Due to the new API and HealthKit updates from Apple, we can not run the software on older WatchOS version. There isn't anything we could do about this.  </p>
   <p>The Kinect software had to be specified for the Kinect 2, but it should be partially compatible with the new Kinect Azure with some slight modifications that might be needed. Unfortunately, we could not get access to the latest Kinect since it is only available in the US to test the compatibility.    </p>
   <p>With the server, it was tested on multiple browsers and functioned normally on every one.    </p>
   <h3>Maintainability</h3>

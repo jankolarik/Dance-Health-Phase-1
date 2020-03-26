@@ -94,26 +94,27 @@
       <p>In the next couple of sections, we will explain the types of tests that we have conducted. Chosen supporting data on these tests can then be found at <a href="#testing">Test Cases & Feedback from testers and project partners</a>.</p>
         
         <h3>Unit and integration testing</h3>
-        <p>To a certain extent, we have also done unit and integration testing. This is because we have testing the individual components, such as the Apple Watch, the Kinect and the server individually.
-            After thoroughly testing these components, we have tested these systems integrated such as when we send data from the Kinect and Apple Watch to the server.</p>
+        <p>To a certain extent, we have also completed integration testing of our components. This is because we have tested the individual components, such as the Apple Watch, the Kinect and the server individually and after thoroughly testing these components, we have tested these systems together, integrated. For example, the merging functionw as tested when we send data from the Kinect and Apple Watch to the server.</p>
         
         <h3>Compatibility Testing</h3>
-        <p>We have tested the Apple Watch code on all of the Apple Watch Series in the XCode Simulator, since we did not have them on hand physically.</p>
+        <p>We have tested the Apple Watch code on all of the Apple Watch Series in the XCode Simulator, since we did not have them on hand physically. The Kinect had to be designed for the Kinect 2 specifically, so compatibility testing did not apply.</p>
 
         <h3>Responsive Design testing</h3>
         <p>Responsiveness design testing was only useful for the Apple Watch code by using the Apple Watch simulator which the users tested on.
             They tried to use different version/options of the UI and provided spoken feedback for each. This type of testing led to the final design of the Apple Watch UI.
-            For example, the users wanted to see live data on the display as well as being to view the data after.
+            For example, the users wanted to see live data on the display as well as being to view the data after their session.
             Therefore, the UI was modified to be able to display live user health statistics throughout the session.</p>
         
         <h3>Performance/Stress testing</h3>
         <p>We were unable to perform effective stress testing due to hardware limitations as we only disposed with one Apple Watch and two Kinects.</p>
         <p>Nonetheless we have tried to type in session data manually as well as send it through the devices at the same time,
-            along with creating many sessions in a very short period. Even though this was not idea, it is the best we could do in this situation.</p>
+            along with creating many sessions in a very short period. Even though this was not ideal, it was the best we could do in this situation.</p>
         
         <h2>User Acceptance Testing</h2>
       <div id="testing">
         <h3>Test Cases & Feedback from testers and project partners</h3>
+        <p>Our project partners provided us with contant feedback on our bi-weekly calls. Here are a couple examples: They have often directed us on the right track when we thought of features that were outside the scope of the project such as determining the type of dance by analyzing the music. Furthermore, we had the Kinect stop the dance session after the hands of a user were raised for 5 seconds. The clients thought that this could lead to ending the session accidently as some dance moves require the users hands to be raised. They therefore suggested that we could end the dance session when the user steps out of the frame for a certain time period which is how the final implementation works. They also gave us ideas about more health metrics that we could record such as maximum limb height.</p>
+        <p>Overall, the project partners were very satisfied with what we managed to implement.</p>
       <p>We user-tested our whole system on 5 users, fitting the Jakob Nielsen <a href="appendices.html">[1]</a> suggestion that 3 to 5 evaluators is optimal.
           Despite them being our friends, we told them ot be as harsh as they wanted and not to hold back. Here's what they had to say:</p>
       <table style="width:100%">

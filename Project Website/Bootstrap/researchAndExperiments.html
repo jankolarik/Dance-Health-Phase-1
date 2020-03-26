@@ -206,8 +206,9 @@
             <div class="col">
                 <iframe src="https://drive.google.com/file/d/1JwX1dwRbUFr5elfGEACitAY1P1Yy3EXF/preview"  width="500" height="250" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
         </div>
+        <br>
         
-        <p><b>Conclusion</b></p>
+        <h3>Conclusion</h3>
         <p>We also compared the Intel Real Sense and the latest Azure Kinect cameras.
             The optimial solution appeared to be the Azure Kinect which will be the released in the UK soon and comes with a brand new SDK. It is also capable of synchronising multiple Kinect cameras,
             which would hugely improve the data accuracy and reduce our occlusion problem.
@@ -220,19 +221,19 @@
         </p>
         <p>
         In terms of smart shoes, we talked with our client and agreed that even it were a
-        good idea to use such shoes, dancer may have specific shoes for their dances, so wasn't particularly applicable to our project.
+        good idea to use such shoes, dancers may have specific shoes for their dances, so wasn't particularly applicable to our project.
       </p>
 
-      <h3>Language Choices</h3>
+      <h3>Programming Language Choices</h3>
       <h4>Kinect</h4>
-      We chose to use C++ over C# because we were already familiar with the language, the capabilities of both languages in Kinect development were the same, and the documentation level was the same.
+      <p>We chose to use C++ over C# because we were already familiar with the language, the capabilities of both languages in Kinect development were the same, and the documentation level was the same.</p>
       <h4>Apple Watch</h4>
-      We chose to use Swift over C# because it is vastly better documented.
+      <p>We chose to use Swift over C# because it is vastly better documented. All the example of using libraries and APIs from Apple were documented in Swift.</p>
       <h4>Server</h4>
-      We chose to use NodeJS and MongoDB because it is easy to use and setup a simple database, which is what we needed.
+      <p>We chose to use NodeJS and MongoDB because it is easy to use and setup a simple database, which is what we needed.</p>
       <br><br>
 
-      <h3>Alternative Libraries (Apple Watch)</h3>
+      <h3>Alternative Libraries</h3>
         <p>No alternative libraries are considered for Apple Watch as the native library and the Apple Health Kit were used to give access to the sensors and health data.
             <br><br>
             We considered many library alternatives when creating the Kinect user experience:<br><br>
@@ -242,11 +243,11 @@
             Lastly, we chose Dear Imgui over Qt and many other libraries because it was very simple and light, with minimal dependencies, and it fulfilled the job we wanted it to.
         </p>
 
-        <h3>Alternative Algorithms (merging)</h3>
+        <h3>Alternative Algorithms/Functions (merging)</h3>
         <p>
-            Originally, we had a <a href="design.html">different algorithm</a> planned and written for the json merging:
-            it was meant to delete the files merged after using them to avoid merging incorrect and already used data.
-            Ultimately, this was too complex to implement, so instead we opted to use the date as well in teh merging algorithm.
+            Originally, we had a <a href="design.html">different function</a> planned and written for the json merging:
+            it was meant to delete the merged files after using them to avoid merging incorrect and already merrged data.
+            Ultimately, this was too complex to implement, so instead we opted to use the ID and time-stamp in our merging function.
         </p>
 
       </div>

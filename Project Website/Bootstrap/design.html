@@ -75,36 +75,25 @@
           </li>
           <li class="breadcrumb-item active">Design</li>
         </ol>
-    <!--System architecture diagram and a brief description of each component (this should follow design patterns, show core components, packages, and identify innovation in using existing tools/APIs):
 
-Site Map (if applicable):
-
-Sequence Diagram (if applicable):
-
-Class Diagram (if applicable):
-
-Data storage (if applicable) - Please use an Entity Relationship Diagram to show the database design if you have a database:
-
-Implementation of Key functionalities:
--->
     <h2>System Architecture</h2>
-    <p>This project uses an Apple Watch and a Kinect 2 to collect information about a dance session. We needed a place to store the collected data:<br> <br>
-      We decided to implement a server running on a virtual machine with Node.js and the express framework along with a MongoDB database.<br> <br>
-      We wanted the devices to automatically send the data to the server at the end of each session, which would then merge and display the information to the user.<br> <br>
-      Here is a detailed system architecture diagram of our system:</p>
+      <p>Here is a detailed system architecture diagram of our system:</p>
     <div style="display: inline-block">
       <img src="./images/Architecture%20sketch.png" style="float: right; position: relative" width="1080" height="820"></div>
     <h3>Kinect 2</h3>
     <p>We built the application for a Windows PC in Visual C++ and the latest Kinect SDK that uses the cameras and sensors in the Kinect 2 for Windows to detect, analyse, and display users' skeletal data.
     This Application communicates a JSON to the server at the end of each session (and stores the video in .avi format).</p>
     <h3>Apple Watch</h3>
-    <p>The Apple Watch app was built in Swift: it measures user health metrics, then sends a JSON to the server at the end of a dance session.</p>
+    <p>The Apple Watch app was built in Swift: it measures user health metrics such as heart rate or number of spins performed using the devices sensors and then then sends a JSON to the server at the end of a dance session.</p>
     <h3>Server and Database</h3>
+    <p>This project uses an Apple Watch and a Kinect 2 to collect information about a dance session. We needed a place to store the collected data:
+      We decided to implement a server running on a virtual machine with Node.js and the express framework along with a MongoDB database.
+      We wanted the devices to automatically send the data to the server at the end of each session, which would then merge and display the information to the user.</p>
     <p>Our server is built using NodeJS and our database uses MongoDB; it receives, merges, displays, and stores the JSONs from the Kinect and Apple Watch. It runs on a Linux Virtual Machine in Microsoft Azure.</p>
     <br>
 
     <h3>Data Storage</h3>
-    <p>Within our database, there are no relations (as it is a simple database) so there is no need for an entity relationship diagram in our case.<br>
+    <p>Within our database, there are no relations (as it is a simple database) and only contains one entity.<br>
       Here is the format of the JSONs stored:<br>
     <table class="table-bordered">
       <tr>
@@ -140,16 +129,15 @@ Implementation of Key functionalities:
     <p>The server receives 2 separate JSON files each session: 1 from the Kinect, and 1 from the Apple Watch.<br>
       We needed to merge the JSON files received by the server before displaying them.<br>
       We wanted to make sure that if any part of the system failed, no past sessions could be overwritten and we could not merge two files from two different sessions.<br>
-      We started by choosing to delete the received JSONs after they'd been merged, but we were worried that if the system crashed before the files got deleted, it wouldn't be enough. <br>
-      To remedy this, we added a user-entered session ID that needs to match in both JSON files in order for the merging process to happen:
+      After carefull considerration, we added a user-entered session ID that needs to match in both JSON files in order for the merging process to happen:
     <div style="display: inline-block">
       <img src="./images/algo2.png" style="float: left; position: relative" width="500" height="350">
       <img src="./images/algoSketch2.jpg" style="float: right; position: relative" width="500" height="350">
     </div><br>
     The main problem with this algorithm is the introduction of the possibility of user error: if the user does not type the session ID properly, it could cause merging issues.
     <br>
-    We ended up changing this algorithm in the final implementation of our server, as it we introduced another factor: it also merged by by the day of the dance session (using the timestamp recorded)
-    This could also introduce bugs, if the user had poorly calibated the date on their devices, or uploaded a session at midnight, but after analysing this risk, we decided it was lesser than the risk of accidentally merging two incorrect files together.</p>
+    We ended up changing this algorithm in the final implementation of our server, as it we introduced another factor: it also merged by by the day of the dance session (using the timestamp recorded).
+    This could also introduce bugs. For example, if the user had poorly calibated the date on their devices, or uploaded a session at midnight. However, after analysing this risk, we calculated that the probability was lower than the user typing an ID that was already used some time ago and the function not checking the time stamp.</p>
 
 
     <h4><b>Apple Watch: Number of Spins</b></h4>
@@ -166,25 +154,25 @@ Implementation of Key functionalities:
         This is achieved in two ways, depending on which joint it is: for elbows and similar joints, the system will only need the co-ordinates of the adjacent joints (the shoulder and the wrist joint),
         but for joints like the shoulders, the angle the system wants is actually the angle between the side of the body and the arm,
         so the system can't just use the adjacent joint to calculate it; this is
-        where the second way of calculating the angle is used.
-        This way uses two joints (upper spine and base spine) to determine the position of the user's body, then calculates the angle between the line created by connecting by two spine
+        were the second way of calculating the angle is used.
+        This way uses two joints (upper spine and base spine) to determine the position of the user's body, then calculates the angle between the line created by connecting two spine
         joints and the arm, for example.
       <img src="./images/Kinect-Angle2.png" class="center" width="1080" height="300">
       <p>Then we have a joint angle calculator function which uses vector math to determine the actual distance between these joints provided by their co-ordinates.</p>
       <!-- /.container -->
 
       <h3>Implementation</h3>
-    <p><b>The Apple Watch code works in the following way.</b><br/>
+    <p><b>The Apple Watch code in implemented in the following way.</b><br/>
       <br/>
       Initially all the variables are initialised and the application checks whether the user has granted it access to use the sensors and their medical data. If not, the application will prompt
       the user to allow this.<br/>
       There is a global state variable, which tells functions whether the user is dancing or not. If currentState = 1, the session is active and if currentState = 0, the session is inactive.
       Whenever the session is active, a lot of background calculations are being run.<br/>
-      The Apple Watch will constantly record the user heart rate with the heart rate sensor along with getting accelerometer and gyroscope data.
+      The Apple Watch will constantly record the heart rate of the user with the heart rate sensor along with getting accelerometer and gyroscope data.
       With this data, it calculates the number of calories burned and distance travelled (which is implemented by Apple; an API is called for this) along with tracking the number of spins,
-      which was implemented by us. It does this by using data from two of the sensors which is updates every 0.3seconds. This feature is implemented in the motionData() function.<br/>
+      which was implemented by us. It does this by using data from two of the sensors which is updates every 0.3 seconds. This feature is implemented in the motionData() function.<br/>
       After the user presses stop, the currentState will change and this button click will initiate the process for ending a workout.
-      It will call on Apple's HealthKit API, to log the workout results into the Activity Application in a standard format. The button will reset to display "Start Dancing“ again.<br/>
+      It will call on Apple's HealthKit API, to log the workout results into the Activity Application in a standard format. It will also send a JSON file with the health data to our server. The button will reset to display "Start Dancing“ again.<br/>
       <br/>
       <br/>
       <b>Kinect Implementation</b><br/>
@@ -199,15 +187,15 @@ Implementation of Key functionalities:
       In the update function, we first call functions to acquire the latest frame and body data.
       If that process succeeds, we enter a series of "if" conditions blocks, we currently have 3 blocks which represent the different part of the dance process, starting
       from a calibration session, then a body process session, and the last one which is the summary session. After each session is finished, we set the condition of current block to false so that
-      it fall into the next session.<br/>
-      Inside the calibration function, we find  height of floor from the height of feet joint using the Kinect library.<br/>
+      it falls into the next session.<br/>
+      Inside the calibration function, we find the height of the floor from the height of the feet joint using the Kinect library.<br/>
       Then, inside the process body function, we now have activity level and max height functions. The activity level calculates the distance moved of each joint
       per frame by storing the previous frame data and compare it to the current frame.
       The max height function detects maximal height of joints (currently both hands and knees) by replacing any height that is higher than the current maximum.<br/>
       Then in the summary session, we write those data obtained by the process body session and also local time data into a .json file, sending the JSON to the server in a post request, and recompiling and saving the video in a .avi format.
     </p>
     <h3>Notes:</h3>
-    We explained the design and makeup of our project in depth in our <a href="https://liveuclac-my.sharepoint.com/personal/zcabkol_ucl_ac_uk/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fzcabkol%5Fucl%5Fac%5Fuk%2FDocuments%2F32%5Ffinishedfeatures%2Emp4&parent=%2Fpersonal%2Fzcabkol%5Fucl%5Fac%5Fuk%2FDocuments&originalPath=aHR0cHM6Ly9saXZldWNsYWMtbXkuc2hhcmVwb2ludC5jb20vOnY6L2cvcGVyc29uYWwvemNhYmtvbF91Y2xfYWNfdWsvRWJPVmRpU28waUJGa2VVRGFQaUswUHdCaWlCclp4cWNQMHZULVZWOEFVWjZiZz9ydGltZT1aOXFhczd6UjEwZw">
+    We explained the design and makeup of our project in depth in our <a href="https://liveuclac-my.sharepoint.com/:v:/g/personal/zcabkol_ucl_ac_uk/EbOVdiSo0iBFkeUDaPiK0PwBiiBrZxqcP0vT-VV8AUZ6bg?e=Ht1YbL">
     Technical Video</a>.
   </a>
     <!-- padding--><br><br><br><br><br>
