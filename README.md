@@ -6,33 +6,56 @@
 
 ## Contents
 
-1 Summary 1
+1 Summary
 
-2 Manual and How-To 
+
+2 Manual and How-To
+
 2.1 Deployment
+
 2.1.1 Apple Watch Application
+
 2.1.2 Kinect 2 Application
+
 2.2 General Use
 
-3 Licensing 3
+
+3 Licensing 
+
 3.1 Apple Watch Examples
+
 3.1.1 Speedy Sloth Example
+
 3.2 Kinect Libraries and Software
+
 3.2.1 Curl
+
 3.2.2 OpenGL
+
 3.2.2.1 NupenGL
+
 3.2.2.2 FreeGlut
+
 3.2.2.3 GLFW
+
 3.2.2.4 GLEW
+
 3.2.2.4.1 GLEW
+
 3.2.2.4.2 MESA
+
 3.2.2.4.3 Khronos
+
 3.2.3 OpenCV
+
 3.2.4 Dear ImGui
+
 3.2.5 Kinect SDK and Library
+
 3.2.6 FFMpeg Software and Library
 
-4 Acknowledgements 8
+
+4 Acknowledgements 
 
 ## 1 Summary
 
