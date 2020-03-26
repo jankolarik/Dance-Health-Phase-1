@@ -89,20 +89,24 @@
         <h2>User Testing and Design</h2>
 
         <h3>Testing Strategy</h3>
-        <p>Our testing strategy has been clear from the beginning; and was outlined by the philosophy of continuous testing. To put it simply, this is a testing strategy of testing early, often and everywhere.</p>
-        <p>In the next couple of sections, we will explain the underlying tests we did and strategies and under the heading "Feedback from testers and project partners", you can view all the data that we have collected from the tests.</p>
+        <p>Our testing strategy has been clear from the beginning; and was outlined by the philosophy of agile development, specifically continuous testing. To put it simply, this is a testing strategy of testing early, often and everywhere.</p>
+        <p>In the next couple of sections, we will explain the types of tests that we have conducted. Chosen supportring data of these test can then be found under the heading "Test Cases & Feedback from testers and project partners", further down the page.</p>
         
         <h3>Unit and integration testing</h3>
         <p>To a certain extent, we have also done unit and integration testing. This is because we have testing the individual components, such as the Apple Watch, the Kinect and the server individually. After thoroughly testing these components, we have tested these systems integrated such as when we send data from the Kinect and Apple Watch to the server.</p>
         
+        <h3>Compatibility Testing</h3>
+        <p>We have tested the Apple Watch code on all of the Apple Watch Series in the XCode Simulator, since we did not have them on hand physically.</p>
+
         <h3>Responsive Design testing</h3>
-        <p>Responsiveness design testing was only useful for the Apple Watch code by using the Apple Watch simulator which the users tested on.</p>
+        <p>Responsiveness design testing was only useful for the Apple Watch code by using the Apple Watch simulator which the users tested on. There tried to use different version/options of the UI and provided spoken feedback for each. This type of testing led to the final design of the Apple Watch UI. For example, the users wanted to see live data on the display as well as being to view the data after. Therefore, the UI was modified to be able to display live user health statistics throughout the session.</p>
         
         <h3>Performance/Stress testing</h3>
-        <p>We were unable to perform stress testing because we only disposed with one Apple Watch and two Kinects.</p>
-        <p>We have tried to type in session data manually as well as send it through the devices at the same time, along with creating many sessions in a very short period. This is the best we could do in this situation.</p>
+        <p>We were unable to perform effective stress testing due to hardware limitations as we only disposed with one Apple Watch and two Kinects.</p>
+        <p>Nonetheless we have tried to type in session data manually as well as send it through the devices at the same time, along with creating many sessions in a very short period. Even though this was not idea, it is the best we could do in this situation.</p>
         
-        <h3>Feedback from testers and project partners</h3>
+        <h2>User Acceptance Testing</h2>
+        <h3>Test Cases & Feedback from testers and project partners</h3>
       <p>We user-tested our whole system on 5 users, fitting the <a href="appendices.html">Jakob Nielsen</a> suggestion that 3 to 5 evaluators is optimal.
           Despite them being our friends, we told them ot be as harsh as they wanted and not to hold back. Here's what they had to say:</p>
       <table style="width:100%">
@@ -139,7 +143,7 @@
               <td>WOW! THATS SO COOL! I hope there's some sort of portal to view the videos but its fine if there isn't,
                   that's crazy cool. The UI was pretty easy to read, simple instructions, good disclaimer from
                   Kinect message for transparency with the user. </td>
-              <td>&#10004</td>
+              <td>&#128295</td>
               <td>The time stamp field still allows for erroneous input, maybe calendar selection if the format is dd-mm-yyyy.
                   The way it stops you from entering letters, it doesnt stop the letter "e". This may have broken the server...</td>
           </tr>
@@ -161,10 +165,10 @@
               <td>Joel Morgan</td>
               <td>&#10004</td>
               <td>N/A</td>
-              <td>&#128295</td>
+              <td>&#10004</td>
               <td>I enjoyed testing this!</td>
               <td>&#10004</td>
-              <td>It would be good if the delete button would refresh the page.</td>
+              <td>It would be good if the delete button would refresh the pagem but it's great otherwise.</td>
           </tr>
           <tr>
               <td>3/19/2020 20:04:32</td>
@@ -180,9 +184,9 @@
               <td>3/19/2020 20:53:24</td>
               <td>Govind Balla</td>
               <td>&#10004</td>
-              <td>Make the metrics screen more colourful, ie diferentiate between calories and bpm etc</td>
+              <td>Make the metrics screen more colourful, ie diferentiate between calories and bpm etc. Other than that, it is good</td>
               <td>&#10004</td>
-              <td>Plain text is bland, split into a different colourscheme and font.</td>
+              <td>The only thing I would change it to split it into a different colourscheme and font.</td>
               <td>&#10004</td>
               <td>Looked good</td>
           </tr>

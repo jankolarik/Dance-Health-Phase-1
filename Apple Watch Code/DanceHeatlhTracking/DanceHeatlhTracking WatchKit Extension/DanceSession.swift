@@ -36,9 +36,9 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
     
     final var SESSION_NOT_STARTED : Int = 0
     final var SESSION_STARTED : Int = 1
-    final var DEVICE_UPDATE_INTERVAL  : Double = 0.3
-    final var OPT_X_ROTATION : Double = 7.0
-    final var OPT_Y_GRAVITY : Double = 0.2
+    final var DEVICE_UPDATE_INTERVAL  : Double = 0.4
+    final var OPT_X_ROTATION : Double = 6.0
+    final var OPT_Y_GRAVITY : Double = 0.4
     final var DEFAULT_VALUE : Int = -1
     
     @IBAction func startDancingButtonClick() {
