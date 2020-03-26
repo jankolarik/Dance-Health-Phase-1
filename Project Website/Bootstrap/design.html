@@ -87,13 +87,52 @@ Data storage (if applicable) - Please use an Entity Relationship Diagram to show
 
 Implementation of Key functionalities:
 -->
-    <h2>System Architecture Diagram</h2>
+    <h2>System Architecture</h2>
     <p>This project uses an Apple Watch and a Kinect 2 to collect information about a dance session. We needed a place to store the collected data:<br> <br>
       We decided to implement a server running on a virtual machine with Node.js and the express framework along with a MongoDB database.<br> <br>
       We wanted the devices to automatically send the data to the server at the end of each session, which would then merge and display the information to the user.<br> <br>
       Here is a detailed system architecture diagram of our system:</p>
     <div style="display: inline-block">
       <img src="./images/Architecture%20sketch.png" style="float: right; position: relative" width="1080" height="820"></div>
+    <h3>Kinect 2</h3>
+    <p>We built the application for a Windows PC in Visual C++ and the latest Kinect SDK that uses the cameras and sensors in the Kinect 2 for Windows to detect, analyse, and display users' skeletal data.
+    This Application communicates a JSON to the server at the end of each session (and stores the video in .avi format).</p>
+    <h3>Apple Watch</h3>
+    <p>The Apple Watch app was built in Swift: it measures user health metrics, then sends a JSON to the server at the end of a dance session.</p>
+    <h3>Server and Database</h3>
+    <p>Our server is built using NodeJS and our database uses MongoDB; it receives, merges, displays, and stores the JSONs from the Kinect and Apple Watch. It runs on a Linux Virtual Machine in Microsoft Azure.</p>
+    <br>
+
+    <h3>Data Storage</h3>
+    <p>Whithin our database, there are no relations (as it is a simple database) so there is no need for an entity relationship diagram in our case.<br>
+      Here is the format of the JSONs stored:<br>
+    <table class="table-bordered">
+      <tr>
+        <th>
+          Session
+        </th>
+      </tr>
+      <tr>
+        <td>
+          id: String<br>
+          watchDuration: Float<br>
+          minHeartRate: Float<br>
+          maxHeartRate: Float<br>
+          averageHeartRate: Float<br>
+          caloriesBurned: Float<br>
+          distanceTravelled: Float<br>
+          twists: int<br>
+          timeStamp: String<br>
+          kinectDurationInSec: Float<br>
+          avgJointDistanceMoved: Float<br>
+          maxLeftHandHeight: Float<br>
+          maxRightHandHeight: Float<br>
+          maxLeftKneeHeight: Float<br>
+          maxRightKneeHeight: Float
+        </td>
+      </tr>
+    </table>
+    </p>
 
     <h2>Implementation of Key functionalities</h2>
 
@@ -108,6 +147,7 @@ Implementation of Key functionalities:
       <img src="./images/algoSketch2.jpg" style="float: right; position: relative" width="500" height="350">
     </div><br>
     The main problem with this algorithm is the introduction of the possibility of user error: if the user does not type the session ID properly, it could cause merging issues.</p>
+
 
     <h4><b>Apple Watch: Number of Spins</b></h4>
       <img src="./images/CodeSnippetMotionData.png" class="center" width="1080" height="600">
@@ -148,7 +188,7 @@ Implementation of Key functionalities:
       Then inside process body function, we now have activity level and max height functions. The activity level calculate the distance moved of each joint per frame by storing the previous frame data and compare it to the current frame. The max height function detect max height of joints (currently both hands and knees) by replacing any height that is higher than the current maximum.<br/>
       Then in the summary session, we write those data obtained by the process body session and also local time data into a txt file.
     </p>
-    
+    <!-- padding--><br><br><br><br><br>
   </div>
 
   <!-- Footer -->

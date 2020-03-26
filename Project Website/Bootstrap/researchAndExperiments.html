@@ -90,7 +90,7 @@
         <p>After reasearching similar projects online we have found several articles which have similar goals with us. Thus we picked up two articels we think is most appropiate to compare with and comes up with following reviews.</p>
 
         <h5><b>Dance Analysis using Multiple Kinect Sensors</b></h5>
-        <h6>by A. Kitsikidis et. al.</h6>
+        <h6>by A. Kitsikidis et. al. <a href="appendices.html">[1]</a></h6>
         <p>After viewing the whole paper we found there were quite a lot of useful information in it. It was extremely applicable to us, as the researchers used the same cameras as us, to the same or similar ends.</p>
         <p>The first part of the article is about calibration and fusion of using multiple kinect devices at the same time, due to the fact that the latest Kinect Azure synchronise sensors stream from multiple Kinect devices easily, so we decided not to go too deep with this part.</p>
         <p>Then the next part is about motion analysis, their way of dividing whole body parts into five sub parts and analysing them separately to obtain a result posture is a clever way to do it and we think this is a possible approach to take in our project as well. Even though we are not so familiar with machine learning, but we will make some notes about their method and potentially use it in the later part of the project.</p>
@@ -99,7 +99,7 @@
         <p>In conclusion, the paper was a helpful insight in skeletal tracking specifically for dance with Kinect cameras, tailoring said tracking to a specific dance style, and dealing with object or human occlusions while tracking a dancer, and it will be considered in the development of our project.</p>
 
         <h5><b>Development of an automated exercise detection and evaluation system using the kinect depth camera</b></h5>
-        <h6>master thesis, twente university, Frodo Muijzer</h6>
+        <h6>master thesis, twente university, Frodo Muijzer <a href="appendices.html">[2]</a></h6>
         <p>This article is describing the way to use Microsoft Kinect camera for automated rehabilitation exercise evaluation. The evaluation process is using the parameter that have been explicitly defined by a new parameterization method based on Labanotation. Due to the huge amount of information this article includes, only a few sections of this article is gonna be used.</p>
         <p>The first part is introducing the basic concepts about Kinect sensor, it go through the way Kinect recognise joints data from camera and also accuracy problem that occur at the same time. It contains some ideas that we are agreed with after our own testing, like the difficulty of recognising some specific body movements due to joints occlusion.</p>
         <p>Then the next part is about choosing the suitable exercise for evaluation, even though these information are not related to our project goals, but their evaluation result show us the potential challenge we might face in our projects. Some rehabilitation movements are very simple to perform for human being, but it’s hard for Kinect to capture and also difficult to parameterize.</p>
@@ -190,8 +190,8 @@
     <p>We tested the Kinect and iPhone cameras side by side in videos to share the full experience with our partners at Arthur Murray Dance Centers.</p>
     <div class="col-lg-6">
       <iframe width="700" height="450" src="https://www.youtube.com/embed/7ev9H3-h-ls" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        <iframe src="https://drive.google.com/file/d/1JwX1dwRbUFr5elfGEACitAY1P1Yy3EXF/preview" width="700" height="480" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-  </div>
+        <iframe src="https://drive.google.com/file/d/1JwX1dwRbUFr5elfGEACitAY1P1Yy3EXF/preview"  width="700" height="480" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
         
         <p><b>Conclusion</b></p>
         <p>We also compared with Intel Real Sense, and the latest Kinect Azure camera, the optimial solution is the Kinect Azure which is the newest realsed one with brand new SDK come with it and is also capable of synchronise multiple Kinect c
@@ -205,6 +205,15 @@
         In terms of smart shoes, we discussed with the client and agreed that even it's a 
         good idea to use such shoes but as the dancer may have specific shoes for their dances so it is not that applicable to our project.
       </p>
+
+      <h3>Language Choices</h3>
+      <h4>Kinect</h4>
+      We chose to use C++ over C# because we were already familiar with the language, the capabilities of both languages in Kinect development were the same, and the documentation level was the same.
+      <h4>Apple Watch</h4>
+      We chose to use Swift over C# because it is vastly better documented.
+      <h4>Server</h4>
+      We chose to use NodeJS and MongoDB because it is easy to use and setup a simple database, which is what we needed.
+      <br><br>
 
       <h3>Alternative Libraries (Apple Watch)</h3>
         <p>No alternative libraries are considered for Apple Watch as the native library and the Apple Health Kit were used to give access to the sensors and health data.</p>
@@ -232,6 +241,7 @@
 
       </div>
 </div>
+<!-- padding--><br><br><br><br><br>
 </div>
       <!-- /.container -->
 

@@ -78,11 +78,13 @@
 
         <h3>Deployment Manual</h3>
         <p>General Prerequesites: You will need both the code for the Apple Watch, and the .exe file (or the Visual Studio solution) for the Kinect.<br/>
-          Email <a href="mailto:Jan.Kolarik.18@ucl.ac.uk">Jan.Kolarik.18@ucl.ac.uk</a> to ask for this. </p>
+          Go to <a href="https://github.com/jankolarik/Dance-Health-Phase-1">our github repository</a> to find these. </p>
         <p><b>Apple Watch App</b></p>
-        <p>Prerequisites: A Mac compuer running MacOS with Xcode installed, an iPhone with an Apple ID Account and an Apple Watch. All devices used must be updated to the latest software.</p>
+        <p>Prerequisites: A Mac computer running MacOS with Xcode installed [an iPhone with an Apple ID Account and an Apple Watch]. All devices used must be updated to the latest software.</p>
         <ol>
             <li>Open the project in Xcode.</li>
+            <li>If you don't have an Apple Watch, you can run it in the simulator (without having to do any of the following signings): just open the project in Xcode, then at the top left corner of Xcode instead of Generic watchOS device, select a specific simulator WatchOS device. Select your device and click the run button on the top left; the code should install in approximately one minute.Dance Health Tracking app will be ready on the Apple Watch simulator.</li>
+            <li>If you do have an Apple Watch:</li>
             <li>On the top left of Xcode, click on the navigator called ‘DanceHealthTracking’ with the blue blueprint icon on its left.</li>
             <li>In the signing & capabilities tab in the top middle part of you screen, click on the ‘automatically manage signing’ and select you ‘Team’ to your Apple ID. In case it is not there automatically, click on ‘add account’ and add your account.</li>
             <li>Connect your iPhone device to your mac via a charging cable and leave the iPhone unlocked. On the iPhone it might ask you if you ‘trust this computer’. Please press yes.</li>
@@ -100,23 +102,41 @@
           <li>Alternatively, open the solution (.sln) file with Visual Studio and run (under Release x64).</li>
           <li>On the pop up window, follow the instruction and enter an appropriate session ID.</li>
           <li>To end the Analysis and Video, stand out of the frame for 7 seconds and the program will stop automatically.</li>
-          <li>The Video recored will be stored locally with </li>
+          <li>The Video recorded will be stored locally with </li>
       </ol>
       <h3>User Manual</h3>
-      <p><b>Session ID</b></p>
-      <p>The session ID is recommended to follow the covention: start with your first name e.g. "mike", followed by the number of the seesion you have done today e.g. if it's this is the second session you have done today, enter "2", so the result session ID should be "mike2".</p>
-      <p>The session ID is used for merging the data sent from Kinect and Apple Watch, so please make sure you enter the same ID on both device for each session.</p>
-      <p>This convention is used to make sure each session ID is unique on that day, you can also define your own convention.</p>
+      <li>Once you've deployed/installed the software, you might want to use it!</li>
+      <li>Start by opening the application on both of your devices.</li>
+      <li>Both will prompt for a session ID</li>
+      <li>The session ID is recommended to follow the convention: start with your first name e.g. "Mike", followed by the number of the seesion you have done today e.g. if it's this is the second session you have done today, enter "2", so the result session ID should be "mike2".</li>
+      <li>The session ID is used for merging the data sent from Kinect and Apple Watch, so please make sure you enter the same ID on both device for each session (this is very important).</li>
+      <li>This convention is used to make sure each session ID is unique on that day, you can also define your own convention.</li>
+      <li>Once you've input the session ID, the Kinect will open a start window with instructions on how to end the session, and a required telemetry and data collection consent message.</li>
+      <li>The Apple Watch will display the metrics that will be measured, and "Start Dancing" button,</li>
+      <li>Start your session by clicking both the "start" button on the Kinect interface, and the "Start Dancing" button on the Apple Watch interface.</li>
+      <li>You can end the session on the Kinect by leaving frame for 7 seconds or more, or pressing the "End Session" button, which you can hide from the resulting video by closing the popup that contains this button.</li>
+      <li>For the Apple Watch, just click "Stop Dancing".</li>
+      <li>You can then view, delete, or manually enter your data on our <a href="http://51.11.52.98:3300/">server, here</a>.</li>
+      <li>The video from the Kinect should also be saved locally on your machine to whichever folder the Kinect application files are placed.</li>
+      <br>
+      Enjoy!<br>
+      You can find more details in our <a href="https://drive.google.com/file/d/1wKp-zA0gE9T41aAQXwVo5VDL7fiZIm87/view?usp=sharing"> Read Me file</a>.
+      <br>
       <h3>Bi-weekly Reports</h3>
       <p><a href="https://docs.google.com/document/d/1gp46-xUcKjCCcTGFFz44zMdHA1_tLF4ROqsFojtJbuI/edit?usp=sharing">Report 1</a></p>
       <p><a href="https://docs.google.com/document/d/1nCjKKQmxsoIdXW3D2obqpBwNutpAgFzgJdJ_fj4SpEY/edit?usp=sharing">Report 2</a></p>
       <p><a href="https://docs.google.com/document/d/12kSvmsoPqA1E7R7Nep9OHlxQEoT3ctpgkIlmIQ0nRIo/edit?usp=sharing">Report 3</a></p>
       <p><a href="https://docs.google.com/document/d/10x7B1CRfoUvPYtc3WqRV_FCY2w77u8Y7vXNq4JuCCNo/edit?usp=sharing">Report 4</a></p>
-      <p><a href="https://docs.google.com/document/d/12IDYeiQ8jAPWJDsP5oqNoGNMVVF8CBxRw4w1EwcopbQ/edit?usp=sharing">Report 5</a></p><br>
+      <p><a href="https://docs.google.com/document/d/12IDYeiQ8jAPWJDsP5oqNoGNMVVF8CBxRw4w1EwcopbQ/edit?usp=sharing">Report 5</a></p>
+      <p><a href="https://docs.google.com/document/d/12fR2AOGx276euSNAOi98YJABl3rId5Gtutu8p1IUTwo/edit?usp=sharing">Report 6</a></p>
+      <p><a href="https://docs.google.com/document/d/1Ps7i-Lf3i-ysjDNcHtLLRp3QGiXWCranwqudsLW2Sl0/edit?usp=sharing">Report 7</a></p>
+      <br>
       <h3>Gannt Chart</h3>
 
       <img src="./images/GanntChart.png" alt="Gannt Chart" width="1080" height="500">
-
+<br><br><br>
+      <h2>References:</h2>
+      <br>
       <h3>Photos</h3>
       <p>
           <b>Home Page:</b><br/>
@@ -144,23 +164,32 @@
       </p>
       <h3>Research Papers, Articles, and Textbooks</h3>
       <h5>Research and Experiments</h5>
-        <p><a href="https://ieeexplore.ieee.org/abstract/document/7295020">Dance Analysis using Multiple Kinect Sensors </a> by A. Kitsikidis et. al.
+        <p>[1] <a href="https://ieeexplore.ieee.org/abstract/document/7295020">Dance Analysis using Multiple Kinect Sensors </a> by A. Kitsikidis et. al.
         <br/>
-        <a href="https://www.semanticscholar.org/paper/Development-of-an-automated-exercise-Detection-and-Muijzer/be040f24f33f12ec51ca8f65b87e84e4c6f4fa92">Development of an automated exercise Detection and Evaluation system using the Kinect depth camera. </a>
+        [2] <a href="https://www.semanticscholar.org/paper/Development-of-an-automated-exercise-Detection-and-Muijzer/be040f24f33f12ec51ca8f65b87e84e4c6f4fa92">Development of an automated exercise Detection and Evaluation system using the Kinect depth camera. </a>
         master thesis, twente university, Frodo Muijzer
         </p>
+      <h5>Requirements</h5>
+      <p>[1] Preece, J. , Sharp, H., & Rogers, Y 2015. Interaction Design: Beyond Human-Computer Interaction. 4th ed. West Sussex: Wiley. Chapter 7.4.2</p>
       <h5>Testing</h5>
-      <p>Nielsen Norman group: <a href="https://www.nngroup.com/articles/why-you-only-need-to-test-with-5-users/?fbclid=IwAR2fWT7pmjmEv-8GxoXD6ciHRZnL">“Why You Only Need to Test with 5 Users”</a> March 18 2000, Jakob Nielsen</p>
+      <p>[1] Nielsen Norman group: <a href="https://www.nngroup.com/articles/why-you-only-need-to-test-with-5-users/?fbclid=IwAR2fWT7pmjmEv-8GxoXD6ciHRZnL">“Why You Only Need to Test with 5 Users”</a> March 18 2000, Jakob Nielsen</p>
         <h5>HCI</h5>
-            Preece, J. , Sharp, H., & Rogers, Y 2015.  <a href="https://www.wiley.com/en-gb/Interaction+Design:+Beyond+Human+Computer+Interaction,+4th+Edition-p-9781119020752">Interaction Design: Beyond Human-Computer Interaction.</a> 4th ed. West Sussex: Wiley.<br/>
-          <a href="https://www.designthinkingbook.com/">“Personas - Design Thinking Book” </a>February 2 2016 MJV Technology and Innovation<br/>
+            [1] Preece, J. , Sharp, H., & Rogers, Y 2015.  <a href="https://www.wiley.com/en-gb/Interaction+Design:+Beyond+Human+Computer+Interaction,+4th+Edition-p-9781119020752">Interaction Design: Beyond Human-Computer Interaction.</a> 4th ed. West Sussex: Wiley.<br/>
+            [2] <a href="https://www.designthinkingbook.com/">“Personas - Design Thinking Book” </a>February 2 2016 MJV Technology and Innovation<br/>
+             <br>
+            <b>Other Sources include:</b>
+            <br>
             Don Norman, <a href="https://mitpress.mit.edu/books/design-everyday-things">The Design of Everyday Things</a> <br/>
             Greenberg et. al. Y 2017, <a href="https://www.sciencedirect.com/book/9780123819598/sketching-user-experiences-the-workbook">Sketching User Experience: The Workbook </a><br/>
             Nielsen Norman group: <a href="https://www.nngroup.com/articles/usability-101-introduction-to-usability/">“Usability 101: Introduction to Usability”</a> January 3 2012, Jakob Nielsen<br/>
             Nielsen Norman group: <a href="https://www.nngroup.com/articles/why-you-only-need-to-test-with-5-users/">“Why You Only Need to Test with 5 Users”</a> March 18 2000, Jakob Nielsen <br/>
             <!--<a href="http://bit.ly/proto32">Test our prototype!</a> Keep in mind that this was an older iteration of our design (within the iterative design cycle)</p>-->
       <br/>
-    
+      <h3>Maintenance</h3>
+      <p>The cost of maintaining this project boils down to 7.26€ per month, to host the Virtual Machine that our server runs on</p>
+      <h3>Notes:</h3>
+      In the current version of this project, we only consider one type of user. This may however change in the future.
+      <!-- padding--><br><br><br><br><br>
       </div>
       <!-- /.container -->
 
