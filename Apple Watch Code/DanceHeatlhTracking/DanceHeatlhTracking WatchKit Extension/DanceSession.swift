@@ -147,7 +147,7 @@ class DanceSession: WKInterfaceController, HKWorkoutSessionDelegate, HKLiveWorko
             return
         }
         
-        // Setup session and builder.
+        // Setup session and builder. - Used from SpeedySloth example code by Apple, modified and with permission
         session?.delegate = self
         builder?.delegate = self
         builder.dataSource = HKLiveWorkoutDataSource(healthStore: healthStore,

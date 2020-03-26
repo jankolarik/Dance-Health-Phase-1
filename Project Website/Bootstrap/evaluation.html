@@ -446,6 +446,15 @@
   </div>
   <br/>
   <h2>Critical evaluation of the project</h2>
+  <h3>Stability</h3>
+  <p>Kinect: Due to the way we implement the code, the data upload and the video saving function are called in the end of the session, so if the program is crashed in the middle of the session, no data will be stored and sent to the server.    </p>
+  <p>Server: The session id may cause problem if the naming convention was not followed or miss spelling occurred, these may cause situation where some data never merged.    </p>
+  <p>If internet problem occuered on on of the devices, this will cause the data got lost and the result won't be send successfully to the server.    </p>
+
+  <h3>Efficiency</h3>
+  <p>Video saving: the video will only be recorded after the user start session so that the video is in minimum length, and the video will be stored locally instead of sending it to the server as saving a lot of video in the server is costing a lot of money.    </p>
+  <p>Data extracting: for most of the data we get, they are all done between frames and data other than the result are erasered after each frame to save memories. All joint data are calibrated in the end of the session instead of each time we obtain it so there are less amount of calculation needed.</p>
+  <p>Server: the data base is made to be simple and easy so that it can be run with lower price server and the cheapest server from the azure is enough for this project which will save unnecessary on the server hosting.    </p>
   <h3>Compatibility</h3>
   <p>Since in our project requirements, we had to use very specific devices, we will discuss the compatiibility of our software to similar devices or older versions of them.</p>
   <p>The Apple Watch software is compatible with all of the currently available Apple Watches, assuming that they have the latest operating system.     </p>
