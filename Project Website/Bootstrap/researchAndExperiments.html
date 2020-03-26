@@ -89,8 +89,8 @@
         <h3>Related Projects</h3>
         <p>After reasearching similar projects online we have found several articles which have similar goals with us. Thus we picked up two articels we think is most appropiate to compare with and comes up with following reviews.</p>
 
-        <h4><b>Dance Analysis using Multiple Kinect Sensors</b></h4>
-        <h5>by A. Kitsikidis et. al.</h5>
+        <h5><b>Dance Analysis using Multiple Kinect Sensors</b></h5>
+        <h6>by A. Kitsikidis et. al.</h6>
         <p>After viewing the whole paper we found there were quite a lot of useful information in it. It was extremely applicable to us, as the researchers used the same cameras as us, to the same or similar ends.</p>
         <p>The first part of the article is about calibration and fusion of using multiple kinect devices at the same time, due to the fact that the latest Kinect Azure synchronise sensors stream from multiple Kinect devices easily, so we decided not to go too deep with this part.</p>
         <p>Then the next part is about motion analysis, their way of dividing whole body parts into five sub parts and analysing them separately to obtain a result posture is a clever way to do it and we think this is a possible approach to take in our project as well. Even though we are not so familiar with machine learning, but we will make some notes about their method and potentially use it in the later part of the project.</p>
@@ -98,8 +98,8 @@
         <p>In terms of their testing result, there are a couple of issues with this. First of all, this was set-up to just target a single dance, whereas our project encapsulates many more dances. Furthermore, the dance that is described in the paper was relatively easy to perform thus might have been the reason why they reached reasonable accuracy. </p>
         <p>In conclusion, the paper was a helpful insight in skeletal tracking specifically for dance with Kinect cameras, tailoring said tracking to a specific dance style, and dealing with object or human occlusions while tracking a dancer, and it will be considered in the development of our project.</p>
 
-        <h4><b>Development of an automated exercise detection and evaluation system using the kinect depth camera</b></h4>
-        <h5>master thesis, twente university, Frodo Muijzer</h5>
+        <h5><b>Development of an automated exercise detection and evaluation system using the kinect depth camera</b></h5>
+        <h6>master thesis, twente university, Frodo Muijzer</h6>
         <p>This article is describing the way to use Microsoft Kinect camera for automated rehabilitation exercise evaluation. The evaluation process is using the parameter that have been explicitly defined by a new parameterization method based on Labanotation. Due to the huge amount of information this article includes, only a few sections of this article is gonna be used.</p>
         <p>The first part is introducing the basic concepts about Kinect sensor, it go through the way Kinect recognise joints data from camera and also accuracy problem that occur at the same time. It contains some ideas that we are agreed with after our own testing, like the difficulty of recognising some specific body movements due to joints occlusion.</p>
         <p>Then the next part is about choosing the suitable exercise for evaluation, even though these information are not related to our project goals, but their evaluation result show us the potential challenge we might face in our projects. Some rehabilitation movements are very simple to perform for human being, but it’s hard for Kinect to capture and also difficult to parameterize.</p>
@@ -108,6 +108,8 @@
         <p>In conclusion, this articles helped us understand more about different possible ways to use data gathered from Kinect Sensor, and also identify some potential challenges we may face in our projects.</p>
       
         <h3>Related Technologies</h3>
+
+        <h5><b>Cameras</b></h5>
         <p>Comparison sheet between Kinect 2, iPhone X and iPhone 11 Pro</p>
         <table style="width:100%">
             <colspn >
@@ -183,15 +185,40 @@
         <p>Microsoft Azure Kinect DK</p>
         <img src="./images/kinect_azure.png" alt="Kinect_Azure" width="1080" height="400">
 <br/>
-      <h3>Experimenting with Cameras</h3>
+<br>
+      <p><b>Experimenting with Cameras</b></p>
     <p>We tested the Kinect and iPhone cameras side by side in videos to share the full experience with our partners at Arthur Murray Dance Centers.</p>
     <div class="col-lg-6">
       <iframe width="700" height="450" src="https://www.youtube.com/embed/7ev9H3-h-ls" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         <iframe src="https://drive.google.com/file/d/1JwX1dwRbUFr5elfGEACitAY1P1Yy3EXF/preview" width="700" height="480" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
   </div>
-        <p></p>
-        <h3>Conclusion</h3>
-        <p>We also compared with Intel Real Sense, and the latest Kinect Azure camera, the optimial solution is the Kinect Azure which is the newest realsed one with brand new SDK come with it and is also capable of synchronise multiple cameras which hugely improve the data accuracy and reduce occlusion problem. However we are not able to get it in UK so we choose to use Kinect 2 camera which is compatible with the Azure camera.</p>
+        
+        <p><b>Conclusion</b></p>
+        <p>We also compared with Intel Real Sense, and the latest Kinect Azure camera, the optimial solution is the Kinect Azure which is the newest realsed one with brand new SDK come with it and is also capable of synchronise multiple Kinect c
+          ameras which hugely improve the data accuracy and reduce occlusion problem. However we are not able to get it in UK during this project so we choose to use Kinect 2 camera which has similar system and is compatible with the Azure camera.</p>
+
+        <h5><b>Other Technologies</b></h5>
+        <p>Apart from cameras, We also researched about other wearable health devices such like smart watches and smart shoes. We all agreed that the smart watch particularly Apple Watch is a good choice, it does not only provide excellent health related 
+        data like heart rate and calories burned, but also has some advanced sensors like gyroscope. These feature can help us obtain different aspects of health matrics. 
+        </p>
+        <p>
+        In terms of smart shoes, we discussed with the client and agreed that even it's a 
+        good idea to use such shoes but as the dancer may have specific shoes for their dances so it is not that applicable to our project.
+      </p>
+
+      <h3>Alternative Libraries (Apple Watch)</h3>
+        <p>No alternative libraries are considered for Apple Watch as the native library and the Apple Health Kit were used to give access to the sensors and health data.</p>
+        
+
+        <h3>Alternative Libraries (Kinect UI)</h3>
+
+        <p>
+            We considered many library alternatives when creating the Kinect user experience:<br><br>
+            We chose to use OpenGL instead of the Microsoft D2D library for live feed and skeletal display, because of Microsoft licensing, and how OpenGL works easily with OpenCV.<br><br>
+            OpenCV and the FFMpeg libraries were both considered for the video saving, but ultimately, a lot of the FFMpeg library functionalities we wanted to use were deprecated,
+            so we opted to use OpenCV as it already played well with our use of OpenGL, and it depended on FFMpeg anyway.<br><br>
+            Lastly, we chose Dear Imgui over Qt and many other libraries because it was very simple and light, with minimal dependencies, and it fulfilled the job we wanted it to.
+        </p>
 
         <h3>Alternative Algorithms (merging)</h3>
         <p>
@@ -200,21 +227,11 @@
             Ultimately, this was too complex to implement, so instead we opted to use the date as well in teh merging algorithm.
         </p>
 
-        <h3>Alternative Libraries (Kinect UI)</h3>
-
-        <p>
-            We considered many library alternatives when creating the Kinect user experience:<br>
-            we chose to use OpenGL instead of the Microsoft D2D library for live feed and skeletal display, because of Microsoft licensing, and how OpenGL works easily with OpenCV.<br>
-            OpenCV and the FFMpeg libraries were both considered for the video saving, but ultimately, a lot of the FFMpeg library functionalities we wanted to use were deprecated,
-            so we opted to use OpenCV as it already played well with our use of OpenGL, and it depended on FFMpeg anyway.<br>
-            Lastly, we chose Dear Imgui over Qt and many other libraries because it was very simple and light, with minimal dependencies, and it fulfilled the job we wanted it to.
-        </p>
-
-        <h3>Summary</h3>
-
+        <h3>Reference</h3>
+        Please see referece here in the <a href="appendices.html">Appendices</a> page
 
       </div>
-</div>>
+</div>
 </div>
       <!-- /.container -->
 
